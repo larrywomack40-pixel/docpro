@@ -421,5 +421,20 @@ function rList(){return'<div class="dh"><div class="dt">PROPERTY LISTING</div><d
 function rGen(){var h='<div class="dh"><div class="dt">'+curDoc.n.toUpperCase()+'</div></div>';
 curDoc.f.forEach(function(k){if(V(k)){var m=gf(k);h+='<p><strong>'+m.label+':</strong> '+V(k)+'</p>'}});return h}
 renderSidebar();renderPreview();
+  // Supabase Integration - Load templates from database
+var SUPA_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+function loadFromSupabase(){
+fetch(SUPA_URL+'/rest/v1/categories?select=*&order=sort_order',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}})
+.then(function(r){return r.json()}).then(function(cats){
+fetch(SUPA_URL+'/rest/v1/document_templates?select=*&order=sort_order',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}})
+.then(function(r){return r.json()}).then(function(docs){
+if(cats.length&&docs.length){
+CATS=cats.map(function(c){return{id:c.id,n:c.name,i:c.icon,docs:docs.filter(function(d){return d.category_id===c.id}).map(function(d){return{id:d.id,n:d.name,i:d.icon,f:d.fields}})}});
+curCat=CATS[0];curDoc=CATS[0].docs[0];fv={};renderSidebar();renderPreview();
+console.log('DocPro: Loaded '+docs.length+' templates from Supabase')}
+}).catch(function(e){console.log('DocPro: Using local data',e)})
+}).catch(function(e){console.log('DocPro: Using local data',e)})}
+loadFromSupabase();
 </script>
 </body></html>
