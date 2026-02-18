@@ -37,36 +37,39 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .sb{width:280px;min-width:280px;background:var(--sb);overflow-y:auto;padding:14px;border-right:1px solid var(--bd)}
 .sb::-webkit-scrollbar{width:5px}.sb::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 .st2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--mt)}
-.cg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px}
-.cc{background:var(--cd);border:2px solid transparent;border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s;font-size:11px;position:relative}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px}
+.cg.collapsed{max-height:148px;overflow:hidden}
+.cc{background:var(--cd);border:2px solid transparent;border-radius:6px;padding:6px 4px;text-align:center;cursor:pointer;transition:all .2s;font-size:10px;position:relative}
 .cc:hover{border-color:var(--ac);transform:translateY(-1px)}
 .cc.on{border-color:var(--ac);background:rgba(16,185,129,.1)}
-.cc .ic{font-size:20px;margin-bottom:2px;display:block}
-.cc .badge{position:absolute;top:4px;right:4px;background:var(--ac);color:var(--bg);font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:18px}
-.ds{padding:6px 10px;background:var(--cd);border:1px solid var(--bd);border-radius:6px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cc .ic{font-size:16px;margin-bottom:1px;display:block}
+.cc .badge{position:absolute;top:2px;right:2px;background:var(--ac);color:var(--bg);font-size:8px;font-weight:700;padding:1px 4px;border-radius:8px;min-width:16px}
+.cat-toggle{width:100%;text-align:center;padding:4px;cursor:pointer;font-size:10px;color:var(--ac);border:1px dashed var(--bd);border-radius:4px;margin-bottom:12px;background:none;transition:all .2s}
+.cat-toggle:hover{background:rgba(16,185,129,.1);border-color:var(--ac)}
+.ds{padding:5px 8px;background:var(--cd);border:1px solid var(--bd);border-radius:6px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .ds input{flex:1;background:none;border:none;color:var(--tx);font-size:12px;outline:none}
 .ds input::placeholder{color:var(--bd)}
-.tf-row{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.tf-row{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap}
 .tf-btn{padding:3px 10px;border-radius:12px;font-size:10px;cursor:pointer;border:1px solid var(--bd);color:var(--mt);transition:all .2s;font-weight:600;background:none}
 .tf-btn:hover{border-color:var(--ac);color:var(--tx)}
 .tf-btn.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
 .tf-btn.pro-f{border-color:var(--pro)}.tf-btn.pro-f.on{background:var(--pro)}
 .tf-btn.biz-f{border-color:var(--biz)}.tf-btn.biz-f.on{background:var(--biz);color:var(--bg)}
-.dl{max-height:250px;overflow-y:auto}
+.dl{max-height:300px;overflow-y:auto}
 .dl::-webkit-scrollbar{width:4px}.dl::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-.di{padding:8px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-size:12px;display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.di{padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-size:12px;display:flex;align-items:center;gap:7px;margin-bottom:2px}
 .di:hover{background:var(--cd)}.di.on{background:var(--ac);color:var(--bg)}
 .di .vb{font-size:9px;padding:1px 5px;border-radius:4px;margin-left:auto;white-space:nowrap;font-weight:600}
-.di .lock{margin-left:auto;font-size:12px;opacity:.6}
-.vp{margin:10px 0;display:flex;gap:4px;flex-wrap:wrap}
-.vp .vt{padding:4px 10px;border-radius:12px;font-size:10px;cursor:pointer;border:1px solid var(--bd);color:var(--mt);transition:all .2s;font-weight:600}
+.di .lock{margin-left:4px;font-size:11px;opacity:.6}
+.vp{margin:8px 0;display:flex;gap:4px;flex-wrap:wrap}
+.vp .vt{padding:3px 8px;border-radius:12px;font-size:10px;cursor:pointer;border:1px solid var(--bd);color:var(--mt);transition:all .2s;font-weight:600}
 .vp .vt:hover{border-color:var(--ac);color:var(--tx)}
 .vp .vt.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
-.fg{margin-bottom:10px}
-.fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:3px}
-.fg input,.fg textarea,.fg select{width:100%;padding:7px 9px;background:var(--cd);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:12px;outline:none;transition:border-color .2s}
+.fg{margin-bottom:8px}
+.fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:2px}
+.fg input,.fg textarea,.fg select{width:100%;padding:6px 8px;background:var(--cd);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:12px;outline:none;transition:border-color .2s}
 .fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--ac)}
-.fg textarea{resize:vertical;min-height:50px}
+.fg textarea{resize:vertical;min-height:40px}
 .mn{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:var(--bg);position:relative}
 .pw{width:100%;max-width:850px;min-height:600px;background:#fff;color:#1e293b;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.3);padding:60px;font-size:14px;line-height:1.6;position:relative}
 .pw.locked::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to bottom,transparent 30%,rgba(255,255,255,.95) 60%,#fff 80%);z-index:10;pointer-events:none}
@@ -154,7 +157,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <div class="sb" id="sidebar"></div>
 <div class="mn"><div class="pw" id="preview"></div><div class="lock-overlay" id="lockOverlay" style="display:none"></div></div>
 </div>
-
 <!-- Pricing Modal -->
 <div class="modal-bg" id="pricingModal">
 <div class="modal" style="max-width:800px">
@@ -175,7 +177,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <div><span class="no">&#10007;</span> Contracts & Agreements</div>
 <div><span class="no">&#10007;</span> Legal Documents</div>
 </div>
-<button class="bt b1" style="width:100%;justify-content:center;margin-top:8px" onclick="setPlan('free')">Current Plan</button>
+<button class="bt b1" id="freeBtn" style="width:100%;justify-content:center;margin-top:8px" onclick="setPlan('free')">Current Plan</button>
 </div>
 <div class="price-card popular" onclick="setPlan('pro')">
 <h3 style="color:var(--pro)">&#128142; Pro</h3>
@@ -191,7 +193,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <div><span class="no">&#10007;</span> NDAs & Legal Docs</div>
 <div><span class="no">&#10007;</span> Power of Attorney</div>
 </div>
-<button class="bt b3" style="width:100%;justify-content:center;margin-top:8px" onclick="setPlan('pro')">Upgrade to Pro</button>
+<button class="bt b3" id="proBtn" style="width:100%;justify-content:center;margin-top:8px" onclick="setPlan('pro')">Upgrade to Pro</button>
 </div>
 <div class="price-card" onclick="setPlan('business')">
 <h3 style="color:var(--biz)">&#127775; Business</h3>
@@ -207,11 +209,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <div><span class="ck">&#10003;</span> Unlimited Everything</div>
 <div><span class="ck">&#10003;</span> Premium Support</div>
 </div>
-<button class="bt b4" style="width:100%;justify-content:center;margin-top:8px" onclick="setPlan('business')">Upgrade to Business</button>
+<button class="bt b4" id="bizBtn" style="width:100%;justify-content:center;margin-top:8px" onclick="setPlan('business')">Upgrade to Business</button>
 </div>
 </div>
 </div></div>
-
 <!-- Logo Modal -->
 <div class="modal-bg" id="logoModal">
 <div class="modal">
@@ -229,7 +230,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <div class="logo-prev" id="logoPreview">Your Logo</div>
 <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="bt b2" onclick="closeModal('logoModal')">Cancel</button><button class="bt b1" onclick="applyLogo()">Apply Logo</button></div>
 </div></div>
-
 <!-- Upload Modal -->
 <div class="modal-bg" id="uploadModal">
 <div class="modal">
@@ -249,7 +249,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <script>
 var SUPA_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
 var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
-
 var CATS=[
 {id:'business',n:'Business',i:'&#127970;',docs:[
 {id:'invoice',n:'Invoice',i:'&#129534;',f:['companyName','companyAddr','phone','email','clientName','clientAddr','clientEmail','invoiceNum','invoiceDate','dueDate','i1d','i1q','i1p','i2d','i2q','i2p','i3d','i3q','i3p','notes','taxRate'],tier:1},
@@ -350,47 +349,55 @@ price:'Listing Price:number',propType:'Property Type',beds:'Bedrooms:number',bat
 sqft:'Sq Ft:number',yrBuilt:'Year Built:number',lotSize:'Lot Size',features:'Features:textarea',
 agentPhone:'Agent Phone',agentEmail:'Agent Email',senderAddr:'Sender Address',empAddr:'Employee Address'
 };
-
 var STYLES=[
 {id:'modern',n:'Modern',color:'#10b981'},{id:'classic',n:'Classic',color:'#1e293b'},
 {id:'minimal',n:'Minimal',color:'#64748b'},{id:'bold',n:'Bold',color:'#10b981'},
 {id:'elegant',n:'Elegant',color:'#7c6228'},{id:'corporate',n:'Corporate',color:'#2563eb'}
 ];
-
 var curCat=CATS[0],curDoc=CATS[0].docs[0],fv={},curStyle='modern',docLogo=null;
-var docSearchTerm='',uploadedContent='',tierFilter='all';
+var docSearchTerm='',uploadedContent='',tierFilter='all',catsExpanded=false;
 var userPlan=localStorage.getItem('docpro_plan')||'free';
-
 // Tier helpers
 function tierName(t){return t===1?'Free':t===2?'Pro':t===3?'Business':'Free'}
 function tierClass(t){return t===1?'tier-free':t===2?'tier-pro':'tier-biz'}
 function canAccess(docTier){
-  if(userPlan==='business')return true;
-  if(userPlan==='pro')return docTier<=2;
-  return docTier<=1;
+if(userPlan==='business')return true;
+if(userPlan==='pro')return docTier<=2;
+return docTier<=1;
 }
-function setPlan(p){userPlan=p;localStorage.setItem('docpro_plan',p);updatePlanBadge();closeModal('pricingModal');renderSidebar();renderPreview()}
+function setPlan(p){userPlan=p;localStorage.setItem('docpro_plan',p);updatePlanBadge();updatePricingBtns();closeModal('pricingModal');renderSidebar();renderPreview()}
 function updatePlanBadge(){
-  var b=document.getElementById('planBadge');
-  if(userPlan==='pro'){b.className='plan-badge plan-pro';b.innerHTML='&#128142; Pro Plan'}
-  else if(userPlan==='business'){b.className='plan-badge plan-biz';b.innerHTML='&#127775; Business Plan'}
-  else{b.className='plan-badge plan-free';b.innerHTML='&#9889; Free Plan'}
+var b=document.getElementById('planBadge');
+if(userPlan==='pro'){b.className='plan-badge plan-pro';b.innerHTML='&#128142; Pro Plan'}
+else if(userPlan==='business'){b.className='plan-badge plan-biz';b.innerHTML='&#127775; Business Plan'}
+else{b.className='plan-badge plan-free';b.innerHTML='&#9889; Free Plan'}
+}
+function updatePricingBtns(){
+var fb=document.getElementById('freeBtn'),pb=document.getElementById('proBtn'),bb=document.getElementById('bizBtn');
+if(fb)fb.textContent=userPlan==='free'?'Current Plan':'Switch to Free';
+if(pb)pb.textContent=userPlan==='pro'?'Current Plan':'Upgrade to Pro';
+if(bb)bb.textContent=userPlan==='business'?'Current Plan':'Upgrade to Business';
 }
 function handlePrint(){
-  if(!curDoc)return;
-  var t=curDoc.tier||1;
-  if(!canAccess(t)){openModal('pricingModal');return}
-  window.print();
+if(!curDoc)return;
+var t=curDoc.tier||1;
+if(!canAccess(t)){openModal('pricingModal');return}
+window.print();
 }
 function gf(k){var s=FM[k]||k.replace(/([A-Z])/g,' $1').replace(/^./,function(x){return x.toUpperCase()});var p=s.split(':');return{label:p[0],type:p[1]||'text'}}
-
+function toggleCats(){catsExpanded=!catsExpanded;renderSidebar()}
 function renderSidebar(){
-var sb=document.getElementById('sidebar'),h='<div class="st2">&#128194; Category</div><div class="cg">';
+var sb=document.getElementById('sidebar'),h='';
+// Categories - collapsible grid
+h+='<div class="st2">&#128194; Category</div>';
+h+='<div class="cg'+(catsExpanded?'':' collapsed')+'" id="catGrid">';
 CATS.forEach(function(c){
-  var cnt=c.docs?c.docs.length:0;
-  h+='<div class="cc'+(c.id===curCat.id?' on':'')+'" onclick="selCat(\''+c.id+'\')"><span class="ic">'+c.i+'</span>'+c.n+(cnt?'<span class="badge">'+cnt+'</span>':'')+'</div>'
+var cnt=c.docs?c.docs.length:0;
+h+='<div class="cc'+(c.id===curCat.id?' on':'')+'" onclick="selCat(\''+c.id+'\')"><span class="ic">'+c.i+'</span>'+c.n+(cnt?'<span class="badge">'+cnt+'</span>':'')+'</div>'
 });
 h+='</div>';
+h+='<button class="cat-toggle" onclick="toggleCats()">'+(catsExpanded?'&#9650; Show Less':'&#9660; Show All '+CATS.length+' Categories')+'</button>';
+// Documents section
 h+='<div class="st2">&#128196; Documents</div>';
 h+='<div class="ds"><span style="color:var(--mt)">&#128269;</span><input type="text" id="docFilter" placeholder="Filter documents..." value="'+(docSearchTerm||'')+'" oninput="filterDocs(this.value)"></div>';
 // Tier filter buttons
@@ -407,20 +414,19 @@ if(tierFilter==='free')docs=docs.filter(function(d){return(d.tier||1)===1});
 else if(tierFilter==='pro')docs=docs.filter(function(d){return(d.tier||1)===2});
 else if(tierFilter==='biz')docs=docs.filter(function(d){return(d.tier||1)===3});
 docs.forEach(function(d){
-  var t=d.tier||1;
-  var locked=!canAccess(t);
-  var tierTag=t===1?'<span class="vb tier-free">Free</span>':t===2?'<span class="vb tier-pro">Pro</span>':'<span class="vb tier-biz">Biz</span>';
-  var vLabel=d.variant_label&&d.variant_label!=='Standard'?' ('+d.variant_label+')':'';
-  h+='<div class="di'+(d.id===curDoc.id?' on':'')+'" onclick="selDoc(\''+d.id+'\')"><span>'+(d.i||'&#128196;')+'</span><span style="flex:1;font-size:12px">'+d.n+'</span>'+tierTag+(locked?'<span class="lock">&#128274;</span>':'')+'</div>';
+var t=d.tier||1;
+var locked=!canAccess(t);
+var tierTag=t===1?'<span class="vb tier-free">Free</span>':t===2?'<span class="vb tier-pro">Pro</span>':'<span class="vb tier-biz">Biz</span>';
+h+='<div class="di'+(d.id===curDoc.id?' on':'')+'" onclick="selDoc(\''+d.id+'\')"><span>'+(d.i||'&#128196;')+'</span><span style="flex:1;font-size:12px">'+d.n+'</span>'+tierTag+(locked?'<span class="lock">&#128274;</span>':'')+'</div>';
 });
 if(!docs.length)h+='<div style="padding:16px;text-align:center;color:var(--mt);font-size:12px">No documents found</div>';
 h+='</div>';
 // Style picker
-h+='<div class="st2" style="margin-top:12px">&#127912; Design Style</div><div class="vp">';
+h+='<div class="st2" style="margin-top:10px">&#127912; Design Style</div><div class="vp">';
 STYLES.forEach(function(s){h+='<span class="vt'+(s.id===curStyle?' on':'')+'" onclick="setStyle(\''+s.id+'\')">'+s.n+'</span>'});
 h+='</div>';
 // Fields
-h+='<div class="st2" style="cursor:pointer;margin-top:10px" onclick="togF()">&#9999; Fields &#9660;</div><div id="fs">';
+h+='<div class="st2" style="cursor:pointer;margin-top:8px" onclick="togF()">&#9999; Fields &#9660;</div><div id="fs">';
 if(curDoc&&curDoc.f){
 curDoc.f.forEach(function(k){var m=gf(k);h+='<div class="fg"><label>'+m.label+'</label>';
 if(m.type==='textarea')h+='<textarea oninput="uf(\''+k+'\',this.value)">'+(fv[k]||'')+'</textarea>';
@@ -430,8 +436,7 @@ h+='</div>'});
 h+='</div>';
 sb.innerHTML=h;
 }
-
-function selCat(id){curCat=CATS.find(function(c){return c.id===id})||CATS[0];curDoc=curCat.docs[0]||{id:'',n:'',i:'',f:[]};fv={};docSearchTerm='';renderSidebar();renderPreview();document.getElementById('sidebar').scrollTop=0}
+function selCat(id){curCat=CATS.find(function(c){return c.id===id})||CATS[0];curDoc=curCat.docs[0]||{id:'',n:'',i:'',f:[],tier:1};fv={};docSearchTerm='';renderSidebar();renderPreview()}
 function selDoc(id){curDoc=curCat.docs.find(function(d){return d.id===id})||curCat.docs[0];fv={};renderSidebar();renderPreview()}
 function uf(k,val){fv[k]=val;renderPreview()}
 function togF(){var s=document.getElementById('fs');if(s)s.style.display=s.style.display==='none'?'block':'none'}
@@ -442,24 +447,21 @@ function setStyle(id){curStyle=id;renderSidebar();renderPreview()}
 function V(k){return fv[k]||''}
 function $(n){return parseFloat(n||0).toFixed(2)}
 function ci(){var items=[];for(var i=1;i<=3;i++){var d=V('i'+i+'d'),q=parseFloat(V('i'+i+'q'))||0,p=parseFloat(V('i'+i+'p'))||0;if(d)items.push({d:d,q:q,p:p,t:q*p})}var st=items.reduce(function(s,x){return s+x.t},0);var tx=st*(parseFloat(V('taxRate'))||0)/100;return{items:items,st:st,tx:tx,tot:st+tx}}
-
 // Global search
 function globalSearchFn(val){
 var sr=document.getElementById('searchResults');
 if(!val||val.length<2){sr.innerHTML='';sr.classList.remove('open');return}
 var results=[];
 CATS.forEach(function(c){c.docs.forEach(function(d){
-  if(d.n.toLowerCase().indexOf(val.toLowerCase())>=0){results.push({cat:c,doc:d})}
+if(d.n.toLowerCase().indexOf(val.toLowerCase())>=0){results.push({cat:c,doc:d})}
 })});
 if(!results.length){sr.innerHTML='<div style="padding:16px;text-align:center;color:var(--mt);font-size:12px">No results for \"'+val+'\"</div>';sr.classList.add('open');return}
 sr.innerHTML=results.slice(0,20).map(function(r){var t=r.doc.tier||1;return'<div class="ri" onclick="jumpToDoc(\''+r.cat.id+'\',\''+r.doc.id+'\')"><span>'+(r.doc.i||'&#128196;')+'</span><span>'+r.doc.n+'</span><span class="rc">'+r.cat.n+'</span><span class="tier-tag '+tierClass(t)+'">'+tierName(t)+'</span></div>'}).join('');
 sr.classList.add('open');
 }
 function jumpToDoc(catId,docId){curCat=CATS.find(function(c){return c.id===catId});curDoc=curCat.docs.find(function(d){return d.id===docId});fv={};docSearchTerm='';document.getElementById('globalSearch').value='';document.getElementById('searchResults').classList.remove('open');renderSidebar();renderPreview()}
-
-function openModal(id){document.getElementById(id).classList.add('open')}
+function openModal(id){document.getElementById(id).classList.add('open');if(id==='pricingModal')updatePricingBtns()}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-
 // Logo functions
 function searchLogos(q){var el=document.getElementById('logoSearchResults');if(!q||q.length<2){el.innerHTML='';return}
 var types=['initials','shapes','bottts','identicon','rings','thumbs'];var html='';
@@ -471,7 +473,6 @@ function selectSearchLogo(el,url){document.querySelectorAll('.lg-item').forEach(
 function selectTextSearchLogo(text,color){docLogo={type:'text',text:text,color:color,font:'Arial Black',bg:'#fff'};updateLogoPreview()}
 function updateLogoPreview(){var prev=document.getElementById('logoPreview');var text=document.getElementById('logoText').value||'Your Logo';var font=document.getElementById('logoFont').value;var color=document.getElementById('logoColor').value;var bg=document.getElementById('logoBg').value;prev.style.fontFamily=font;prev.style.color=color;prev.style.background=bg;prev.textContent=text;docLogo={type:'text',text:text,color:color,font:font,bg:bg}}
 function applyLogo(){closeModal('logoModal');renderPreview()}
-
 // Upload functions
 function handleDrop(e){e.preventDefault();document.getElementById('uploadZone').classList.remove('drag');if(e.dataTransfer.files.length)handleFileUpload(e.dataTransfer.files[0])}
 function handleFileUpload(file){if(!file)return;document.getElementById('uploadPreview').style.display='block';
@@ -490,13 +491,13 @@ el.className='pw theme-'+curStyle;
 var t=curDoc.tier||1;var locked=!canAccess(t);
 if(locked)el.classList.add('locked');
 var has=Object.values(fv).some(function(x){return x&&x.trim&&x.trim()!==''});
-if(!has){el.innerHTML='<div class="pp"><div style="font-size:64px;margin-bottom:16px">'+(curDoc.i||'&#128196;')+'</div><h2>'+(curDoc.n||'Select a document')+'</h2><p style="margin-top:8px">&#8592; Fill in the fields to generate your document</p>'+(locked?'<div style="margin-top:16px"><span class="tier-tag '+tierClass(t)+'" style="font-size:12px;padding:4px 12px">'+tierName(t)+' Plan Required</span></div>':'')+'</div>';ov.style.display='none';return}
+if(!has){el.innerHTML='<div class="pp"><div style="font-size:64px;margin-bottom:16px">'+(curDoc.i||'&#128196;')+'</div><h2>'+(curDoc.n||'Select a document')+'</h2><p style="margin-top:8px">&#8592; Fill in the fields to generate your document</p>'+(locked?'<div style="margin-top:16px"><button class="bt b5" style="margin:0 auto" onclick="openModal(\'pricingModal\')">&#128274; '+tierName(t)+' Plan Required - Upgrade</button></div>':'')+'</div>';ov.style.display='none';return}
 // Show lock overlay for premium docs
 if(locked){
-  var planNeeded=t===2?'Pro':'Business';
-  var planPrice=t===2?'$9.99/mo':'$24.99/mo';
-  ov.innerHTML='<h3>&#128274; '+planNeeded+' Plan Required</h3><p>This document requires a '+planNeeded+' subscription</p><div class="price">'+planPrice+'</div><button class="bt b5" style="width:100%;justify-content:center;font-size:14px;padding:12px" onclick="openModal(\'pricingModal\')">&#128142; Upgrade to '+planNeeded+'</button><p style="margin-top:8px;font-size:11px;color:var(--mt)">Preview shown above &mdash; upgrade to print/download</p>';
-  ov.style.display='block';
+var planNeeded=t===2?'Pro':'Business';
+var planPrice=t===2?'$9.99/mo':'$24.99/mo';
+ov.innerHTML='<h3>&#128274; '+planNeeded+' Plan Required</h3><p>This document requires a '+planNeeded+' subscription</p><div class="price">'+planPrice+'</div><button class="bt b5" style="width:100%;justify-content:center;font-size:14px;padding:12px" onclick="openModal(\'pricingModal\')">&#128142; Upgrade to '+planNeeded+'</button><p style="margin-top:8px;font-size:11px;color:var(--mt)">Preview shown above &mdash; upgrade to print/download</p>';
+ov.style.display='block';
 }else{ov.style.display='none'}
 var h='';switch(curDoc.id){
 case'invoice':h=rInv();break;case'receipt':h=rRec();break;case'proposal':h=rProp();break;case'po':h=rPO();break;
@@ -537,37 +538,35 @@ function rEvic(){return logoHTML()+'<div class="dh"><div class="dt">NOTICE TO VA
 function rMaint(){return logoHTML()+'<div class="dh"><div class="dt">MAINTENANCE REQUEST</div></div><div class="ig"><div class="ib"><h4>Tenant</h4><p><strong>'+V('tenantName')+'</strong><br>Unit '+V('unit')+'<br>'+V('phone')+'</p></div><div class="ib"><h4>Details</h4><p>Date: '+V('date')+'<br>Urgency: <strong>'+V('urgency')+'</strong><br>Category: '+V('category')+'</p></div></div><h3 style="margin:20px 0 8px">Description</h3><div style="white-space:pre-wrap;padding:16px;background:#f8fafc;border-radius:8px">'+V('description')+'</div><div style="margin-top:40px"><div class="sl" style="width:300px">Tenant Signature</div></div>'}
 function rList(){return logoHTML()+'<div class="dh"><div class="dt">PROPERTY LISTING</div><div class="ds2">'+V('propAddr')+'</div></div><div style="text-align:center;font-size:32px;font-weight:700;color:#10b981;margin:16px 0">$'+Number(V('price')||0).toLocaleString()+'</div><div class="ig"><div class="ib"><h4>Type</h4><p>'+V('propType')+'</p></div><div class="ib"><h4>Built</h4><p>'+V('yrBuilt')+'</p></div></div><div class="ig"><div class="ib"><h4>Beds</h4><p>'+V('beds')+'</p></div><div class="ib"><h4>Baths</h4><p>'+V('baths')+'</p></div></div><h3 style="margin:20px 0 8px">Description</h3><p>'+V('description')+'</p>'+(V('features')?'<h3 style="margin:20px 0 8px">Features</h3><p>'+V('features')+'</p>':'')+'<div style="margin-top:24px;padding:16px;background:#f0f9ff;border-radius:8px"><h4>Agent</h4><p><strong>'+V('agentName')+'</strong><br>'+V('agentPhone')+' | '+V('agentEmail')+'</p></div>'}
 function rGen(){var h=logoHTML()+'<div class="dh"><div class="dt">'+(curDoc.n||'Document').toUpperCase()+'</div></div>';if(curDoc.f){curDoc.f.forEach(function(k){if(V(k)){var m=gf(k);h+='<div class="ib" style="margin-bottom:12px"><h4>'+m.label+'</h4><p>'+V(k)+'</p></div>'}})}h+='<div class="sa"><div><div class="sl">Signature</div></div><div><div class="sl">Date</div></div></div>';return h}
-
 // Initialize
 updatePlanBadge();renderSidebar();renderPreview();
-
 // Supabase Integration - Load ALL templates with pagination
 function loadFromSupabase(){
 var headers={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
 fetch(SUPA_URL+'/rest/v1/categories?select=*&order=sort_order',{headers:headers})
 .then(function(r){return r.json()}).then(function(cats){
-  if(!cats.length)return;
-  var allTemplates=[];var pageSize=1000;
-  function fetchPage(offset){
-    return fetch(SUPA_URL+'/rest/v1/document_templates?select=*&order=name&offset='+offset+'&limit='+pageSize,{headers:headers})
-    .then(function(r){return r.json()}).then(function(docs){
-      allTemplates=allTemplates.concat(docs);
-      if(docs.length===pageSize){return fetchPage(offset+pageSize)}
-      return allTemplates;
-    });
-  }
-  fetchPage(0).then(function(docs){
-    if(docs.length){
-      CATS=cats.map(function(c){
-        return{id:c.id,n:c.name,i:c.icon,docs:docs.filter(function(d){return d.category_id===c.id}).map(function(d){
-          return{id:d.id,n:d.name,i:d.icon||'&#128196;',f:d.fields||[],tier:d.tier||1,variant:d.variant,variant_label:d.variant_label,description:d.description}
-        })}
-      });
-      curCat=CATS[0];curDoc=CATS[0].docs[0]||{id:'',n:'',i:'',f:[],tier:1};fv={};
-      renderSidebar();renderPreview();
-      console.log('DocPro: Loaded '+docs.length+' templates from Supabase across '+cats.length+' categories');
-    }
-  }).catch(function(e){console.log('DocPro: Pagination error',e)});
+if(!cats.length)return;
+var allTemplates=[];var pageSize=1000;
+function fetchPage(offset){
+return fetch(SUPA_URL+'/rest/v1/document_templates?select=*&order=name&offset='+offset+'&limit='+pageSize,{headers:headers})
+.then(function(r){return r.json()}).then(function(docs){
+allTemplates=allTemplates.concat(docs);
+if(docs.length===pageSize){return fetchPage(offset+pageSize)}
+return allTemplates;
+});
+}
+fetchPage(0).then(function(docs){
+if(docs.length){
+CATS=cats.map(function(c){
+return{id:c.id,n:c.name,i:c.icon,docs:docs.filter(function(d){return d.category_id===c.id}).map(function(d){
+return{id:d.id,n:d.name,i:d.icon||'&#128196;',f:d.fields||[],tier:d.tier||1,variant:d.variant,variant_label:d.variant_label,description:d.description}
+})}
+});
+curCat=CATS[0];curDoc=CATS[0].docs[0]||{id:'',n:'',i:'',f:[],tier:1};fv={};
+renderSidebar();renderPreview();
+console.log('DocPro: Loaded '+docs.length+' templates from Supabase across '+cats.length+' categories');
+}
+}).catch(function(e){console.log('DocPro: Pagination error',e)});
 }).catch(function(e){console.log('DocPro: Using local data',e)});
 }
 loadFromSupabase();
