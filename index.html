@@ -32,26 +32,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .doc-item:hover{background:#f1f5f9}
 .doc-item.active{background:#eff6ff;color:var(--pri)}
 .doc-item .tier-badge{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600}
-.tier-free{background:#dcfce7;color:#166534}
-.tier-pro{background:#dbeafe;color:#1e40af}
-.tier-business{background:#fef3c7;color:#92400e}
+.tier-free{background:#dcfce7;color:#166534}.tier-pro{background:#dbeafe;color:#1e40af}.tier-business{background:#fef3c7;color:#92400e}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .main-header{padding:10px 20px;background:var(--card);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .main-header h2{font-size:16px}
 .header-actions{display:flex;gap:8px;align-items:center}
 .auth-btn{padding:6px 16px;background:var(--pri);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px}
 .auth-btn:hover{background:var(--pri-d)}
-.user-menu{position:relative}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
+.user-menu{position:relative}.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
 .user-dropdown{position:absolute;top:40px;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:200px;display:none;z-index:100}
 .user-dropdown.open{display:block}
 .user-dropdown a,.user-dropdown button{display:block;width:100%;padding:8px 16px;text-align:left;border:none;background:none;cursor:pointer;font-size:12px;color:var(--text);text-decoration:none}
 .user-dropdown a:hover,.user-dropdown button:hover{background:#f1f5f9}
 .admin-badge{background:#fbbf24;color:#000;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px}
 .plan-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
-.plan-free{background:#dcfce7;color:#166534}
-.plan-pro{background:#dbeafe;color:#1e40af}
-.plan-business{background:#fef3c7;color:#92400e}
+.plan-free{background:#dcfce7;color:#166534}.plan-pro{background:#dbeafe;color:#1e40af}.plan-business{background:#fef3c7;color:#92400e}
 .preview-area{flex:1;overflow-y:auto;padding:20px;background:#f1f5f9}
 .preview-card{max-width:900px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden}
 .form-section{padding:20px;border-bottom:1px solid var(--border)}
@@ -67,19 +62,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .toolbar button:hover{background:#f1f5f9}
 .btn-pri{background:var(--pri)!important;color:#fff!important;border-color:var(--pri)!important}
 .btn-pri:hover{background:var(--pri-d)!important}
-.lock-overlay{position:relative}
-.lock-overlay::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);z-index:10;backdrop-filter:blur(2px)}
+.lock-overlay{position:relative}.lock-overlay::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);z-index:10;backdrop-filter:blur(2px)}
 .lock-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:11;text-align:center;padding:24px;background:var(--card);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
-.lock-msg h3{font-size:16px;margin-bottom:6px}
-.lock-msg p{font-size:12px;color:var(--muted);margin-bottom:12px}
+.lock-msg h3{font-size:16px;margin-bottom:6px}.lock-msg p{font-size:12px;color:var(--muted);margin-bottom:12px}
 .lock-msg button{padding:8px 20px;background:var(--pri);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
-.empty-state h3{font-size:18px;margin-bottom:8px;color:var(--text)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}.empty-state h3{font-size:18px;margin-bottom:8px;color:var(--text)}
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.active{display:flex}
-.modal{background:var(--card);border-radius:12px;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
-.modal-lg{max-width:800px}
-.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.modal-overlay.active{display:flex}.modal{background:var(--card);border-radius:12px;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
+.modal-lg{max-width:800px}.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
 .modal h2{font-size:18px;margin-bottom:16px}
 .auth-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
 .auth-tab{padding:8px 20px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px}
@@ -91,19 +81,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .auth-error{color:var(--danger);font-size:12px;display:none}
 .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .pricing-card{border:2px solid var(--border);border-radius:12px;padding:20px;text-align:center;transition:.2s}
-.pricing-card:hover{border-color:var(--pri)}
-.pricing-card.featured{border-color:var(--pri);background:#eff6ff}
-.pricing-card h3{font-size:16px;margin-bottom:4px}
-.pricing-card .price{font-size:28px;font-weight:800;color:var(--pri);margin:8px 0}
+.pricing-card:hover{border-color:var(--pri)}.pricing-card.featured{border-color:var(--pri);background:#eff6ff}
+.pricing-card h3{font-size:16px;margin-bottom:4px}.pricing-card .price{font-size:28px;font-weight:800;color:var(--pri);margin:8px 0}
 .pricing-card .price span{font-size:13px;font-weight:400;color:var(--muted)}
 .pricing-card ul{list-style:none;text-align:left;margin:12px 0;font-size:12px}
-.pricing-card li{padding:4px 0;padding-left:18px;position:relative}
-.pricing-card li::before{content:'\2713';position:absolute;left:0;color:var(--success)}
+.pricing-card li{padding:4px 0;padding-left:18px;position:relative}.pricing-card li::before{content:'\2713';position:absolute;left:0;color:var(--success)}
 .pricing-card button{width:100%;padding:10px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
 .logo-search-results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;max-height:250px;overflow-y:auto}
 .logo-result{border:2px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
-.logo-result:hover,.logo-result.selected{border-color:var(--pri)}
-.logo-result img{max-width:60px;max-height:40px}
+.logo-result:hover,.logo-result.selected{border-color:var(--pri)}.logo-result img{max-width:60px;max-height:40px}
 .logo-creator{margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px}
 .logo-creator canvas{border:1px solid var(--border);border-radius:4px;display:block;margin:8px auto}
 .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;cursor:pointer;transition:.2s}
@@ -119,115 +105,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </style>
 </head>
 <body>
-<div class="sidebar">
-<div class="sidebar-header">
-<h1>DocPro</h1>
-<p>Professional USA Document Generator</p>
-<input class="search-box" id="globalSearch" type="text" placeholder="Search 10,000+ templates..." oninput="filterDocs(this.value)">
-</div>
-<div class="sidebar-content" id="sidebarContent"></div>
-</div>
-<div class="main">
-<div class="main-header">
-<div>
-<h2 id="docTitle">Select a Document</h2>
-<span id="planBadge" class="plan-badge plan-free">FREE PLAN</span>
-</div>
-<div class="header-actions">
-<button class="toolbar" onclick="openModal('logoModal')" title="Logo Studio">Logo</button>
-<button class="toolbar" onclick="openModal('uploadModal')" title="Upload Document">Upload</button>
-<button class="toolbar btn-pri" onclick="openModal('pricingModal')">Upgrade</button>
-<div id="authArea"><button class="auth-btn" onclick="openModal('authModal')">&#128100; Sign In</button></div>
-</div>
-</div>
-<div class="preview-area" id="previewArea">
-<div class="empty-state"><h3>Welcome to DocPro</h3><p>Select a document from the sidebar or search for templates</p><p style="margin-top:16px"><button class="btn-pri toolbar" onclick="openModal('pricingModal')" style="padding:10px 24px;font-size:14px">View Plans & Pricing</button></p></div>
-</div>
-</div>
-<!-- Auth Modal -->
-<div class="modal-overlay" id="authModal">
-<div class="modal">
-<button class="modal-close" onclick="closeModal('authModal')">&times;</button>
-<h2>Welcome to DocPro</h2>
-<div class="auth-tabs">
-<button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
-<button class="auth-tab" onclick="switchAuthTab('register')">Create Account</button>
-</div>
-<div id="authError" class="auth-error"></div>
-<form class="auth-form" id="authForm" onsubmit="handleAuth(event)">
-<input type="email" id="authEmail" placeholder="Email address" required>
-<input type="password" id="authPass" placeholder="Password" required>
-<div id="registerFields" style="display:none">
-<input type="text" id="authName" placeholder="Full Name" style="margin-top:12px">
-</div>
-<button type="submit" id="authSubmitBtn">Sign In</button>
-</form>
-<p style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">By continuing, you agree to DocPro Terms of Service</p>
-</div>
-</div>
-<!-- Pricing Modal -->
-<div class="modal-overlay" id="pricingModal">
-<div class="modal modal-lg">
-<button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
-<h2 style="text-align:center">Choose Your Plan</h2>
-<p style="text-align:center;color:var(--muted);margin-bottom:20px">Unlock premium templates and features</p>
-<div class="pricing-grid">
-<div class="pricing-card">
-<h3>Free</h3>
-<div class="price">$0<span>/mo</span></div>
-<ul><li>Basic document templates</li><li>Invoices, receipts, letters</li><li>Resumes & cover letters</li><li>Memos & checklists</li><li>Standard themes</li></ul>
-<button onclick="selectPlan('free')" style="background:var(--border);color:var(--text)" id="priceFreeBtn">Current Plan</button>
-</div>
-<div class="pricing-card featured">
-<h3>Pro</h3>
-<div class="price">$9.99<span>/mo</span></div>
-<ul><li>Everything in Free</li><li>Contracts & agreements</li><li>Tax documents & W-2s</li><li>Pay stubs & employment</li><li>All 6 premium themes</li><li>Priority support</li></ul>
-<button class="btn-pri" onclick="selectPlan('pro')" id="priceProBtn">Upgrade to Pro</button>
-</div>
-<div class="pricing-card">
-<h3>Business</h3>
-<div class="price">$24.99<span>/mo</span></div>
-<ul><li>Everything in Pro</li><li>Legal & court documents</li><li>Financial statements</li><li>Insurance & medical</li><li>Government forms</li><li>Custom branding</li><li>Bulk generation</li></ul>
-<button onclick="selectPlan('business')" style="background:#1e293b;color:#fff" id="priceBizBtn">Go Business</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Logo Modal -->
-<div class="modal-overlay" id="logoModal">
-<div class="modal">
-<button class="modal-close" onclick="closeModal('logoModal')">&times;</button>
-<h2>Logo Studio</h2>
-<input type="text" class="search-box" id="logoSearchInput" placeholder="Search company logos..." oninput="searchLogos(this.value)">
-<div class="logo-search-results" id="logoResults"></div>
-<div class="logo-creator">
-<h4 style="font-size:13px;margin-bottom:8px">Create Logo</h4>
-<div class="form-grid">
-<div class="form-group"><label>Company Name</label><input type="text" id="logoText" oninput="drawLogo()"></div>
-<div class="form-group"><label>Color</label><input type="color" id="logoColor" value="#2563eb" oninput="drawLogo()"></div>
-<div class="form-group"><label>Shape</label><select id="logoShape" onchange="drawLogo()"><option>Circle</option><option>Square</option><option>Shield</option><option>Diamond</option></select></div>
-</div>
-<canvas id="logoCanvas" width="200" height="80"></canvas>
-<button class="btn-pri toolbar" onclick="applyLogo()" style="margin-top:8px;width:100%">Apply Logo to Document</button>
-</div>
-</div>
-</div>
-<!-- Upload Modal -->
-<div class="modal-overlay" id="uploadModal">
-<div class="modal">
-<button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
-<h2>Upload Document</h2>
-<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
-<p style="font-size:32px">&#128196;</p>
-<p style="margin-top:8px;font-weight:600">Drop file here or click to browse</p>
-<p style="font-size:11px;color:var(--muted);margin-top:4px">PDF, DOCX, TXT, CSV, JSON supported</p>
-</div>
-<input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt,.csv,.json" onchange="handleUpload(this.files[0])">
-<div id="uploadResult" style="margin-top:12px"></div>
-</div>
-</div>
+<div class="sidebar"><div class="sidebar-header"><h1>DocPro</h1><p>Professional USA Document Generator</p><input class="search-box" id="globalSearch" type="text" placeholder="Search 10,000+ templates..." oninput="filterDocs(this.value)"></div><div class="sidebar-content" id="sidebarContent"></div></div>
+<div class="main"><div class="main-header"><div><h2 id="docTitle">Select a Document</h2><span id="planBadge" class="plan-badge plan-free">FREE PLAN</span></div><div class="header-actions"><button class="toolbar" onclick="openModal('logoModal')">Logo</button><button class="toolbar" onclick="openModal('uploadModal')">Upload</button><button class="toolbar btn-pri" onclick="openModal('pricingModal')">Upgrade</button><div id="authArea"><button class="auth-btn" onclick="openModal('authModal')">&#128100; Sign In</button></div></div></div>
+<div class="preview-area" id="previewArea"><div class="empty-state"><h3>Welcome to DocPro</h3><p>Select a document from the sidebar or search for templates</p><p style="margin-top:16px"><button class="btn-pri toolbar" onclick="openModal('pricingModal')" style="padding:10px 24px;font-size:14px">View Plans & Pricing</button></p></div></div></div>
+<div class="modal-overlay" id="authModal"><div class="modal"><button class="modal-close" onclick="closeModal('authModal')">&times;</button><h2>Welcome to DocPro</h2><div class="auth-tabs"><button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button><button class="auth-tab" onclick="switchAuthTab('register')">Create Account</button></div><div id="authError" class="auth-error"></div><form class="auth-form" id="authForm" onsubmit="handleAuth(event)"><input type="email" id="authEmail" placeholder="Email address" required><input type="password" id="authPass" placeholder="Password" required><div id="registerFields" style="display:none"><input type="text" id="authName" placeholder="Full Name" style="margin-top:12px"></div><button type="submit" id="authSubmitBtn">Sign In</button></form><p style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">By continuing, you agree to DocPro Terms of Service</p></div></div>
+<div class="modal-overlay" id="pricingModal"><div class="modal modal-lg"><button class="modal-close" onclick="closeModal('pricingModal')">&times;</button><h2 style="text-align:center">Choose Your Plan</h2><p style="text-align:center;color:var(--muted);margin-bottom:20px">Unlock premium templates and features</p><div class="pricing-grid"><div class="pricing-card"><h3>Free</h3><div class="price">$0<span>/mo</span></div><ul><li>Basic document templates</li><li>Invoices, receipts, letters</li><li>Resumes & cover letters</li><li>Memos & checklists</li><li>Standard themes</li></ul><button onclick="selectPlan('free')" style="background:var(--border);color:var(--text)" id="priceFreeBtn">Current Plan</button></div><div class="pricing-card featured"><h3>Pro</h3><div class="price">$9.99<span>/mo</span></div><ul><li>Everything in Free</li><li>Contracts & agreements</li><li>Tax documents & W-2s</li><li>Pay stubs & employment</li><li>All 6 premium themes</li><li>Priority support</li></ul><button class="btn-pri" onclick="selectPlan('pro')" id="priceProBtn">Upgrade to Pro</button></div><div class="pricing-card"><h3>Business</h3><div class="price">$24.99<span>/mo</span></div><ul><li>Everything in Pro</li><li>Legal & court documents</li><li>Financial statements</li><li>Insurance & medical</li><li>Government forms</li><li>Custom branding</li><li>Bulk generation</li></ul><button onclick="selectPlan('business')" style="background:#1e293b;color:#fff" id="priceBizBtn">Go Business</button></div></div></div></div>
+<div class="modal-overlay" id="logoModal"><div class="modal"><button class="modal-close" onclick="closeModal('logoModal')">&times;</button><h2>Logo Studio</h2><input type="text" class="search-box" id="logoSearchInput" placeholder="Search company logos..." oninput="searchLogos(this.value)"><div class="logo-search-results" id="logoResults"></div><div class="logo-creator"><h4 style="font-size:13px;margin-bottom:8px">Create Logo</h4><div class="form-grid"><div class="form-group"><label>Company Name</label><input type="text" id="logoText" oninput="drawLogo()"></div><div class="form-group"><label>Color</label><input type="color" id="logoColor" value="#2563eb" oninput="drawLogo()"></div><div class="form-group"><label>Shape</label><select id="logoShape" onchange="drawLogo()"><option>Circle</option><option>Square</option><option>Shield</option><option>Diamond</option></select></div></div><canvas id="logoCanvas" width="200" height="80"></canvas><button class="btn-pri toolbar" onclick="applyLogo()" style="margin-top:8px;width:100%">Apply Logo to Document</button></div></div></div>
+<div class="modal-overlay" id="uploadModal"><div class="modal"><button class="modal-close" onclick="closeModal('uploadModal')">&times;</button><h2>Upload Document</h2><div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)"><p style="font-size:32px">&#128196;</p><p style="margin-top:8px;font-weight:600">Drop file here or click to browse</p><p style="font-size:11px;color:var(--muted);margin-top:4px">PDF, DOCX, TXT, CSV, JSON supported</p></div><input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt,.csv,.json" onchange="handleUpload(this.files[0])"><div id="uploadResult" style="margin-top:12px"></div></div></div>
 <script>
-// Supabase - CORRECT API KEY
 var SUPA_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
 var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
 var sb_client=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -249,8 +134,6 @@ var FM={
 'Legal Services Invoice':['Firm Name','Client Name','Matter #','Invoice #','Date','Attorney','Hours','Rate','Expenses','Subtotal','Tax','Total Due'],
 'Consulting Invoice':['Consultant','Client','Invoice #','Date','Project','Phase','Hours','Rate','Expenses','Subtotal','Tax','Balance Due'],
 'Contractor Invoice':['Contractor Name','Client Name','Invoice #','Date','Project','Materials Cost','Labor Hours','Labor Rate','Subtotal','Tax','Total','Payment Terms'],
-'Hourly Invoice':['Provider','Client','Invoice #','Date','Period Start','Period End','Hours Worked','Hourly Rate','Overtime Hours','OT Rate','Subtotal','Total'],
-'Recurring Invoice':['Company','Client','Invoice #','Date','Billing Period','Service','Monthly Rate','Qty','Subtotal','Tax','Total','Next Due Date'],
 'Sales Receipt':['Store Name','Date','Receipt #','Item 1','Price 1','Item 2','Price 2','Subtotal','Tax','Total','Payment Method','Cashier'],
 'Donation Receipt':['Organization','Donor Name','Date','Donation Amount','Purpose','Tax ID','Receipt #','Acknowledgment'],
 'Rent Receipt':['Landlord','Tenant','Property Address','Month','Date','Amount','Payment Method','Receipt #'],
@@ -265,7 +148,6 @@ var FM={
 'Lease Agreement':['Lessor','Lessee','Property','Term Start','Term End','Monthly Payment','Deposit','Maintenance','Insurance Req','Governing Law'],
 'NDA':['Disclosing Party','Receiving Party','Date','Purpose','Duration','Exclusions','Governing Law','Jurisdiction','Return of Materials','Remedies'],
 'W-2 Form':['Employer Name','Employer EIN','Employee Name','Employee SSN','Wages','Federal Tax Withheld','SS Wages','SS Tax','Medicare Wages','Medicare Tax','State','State Tax'],
-'1099-MISC':['Payer Name','Payer TIN','Recipient Name','Recipient TIN','Rents','Royalties','Other Income','Fishing Boat','Medical Payments','NonEmployee Comp','State Tax','State'],
 'Pay Stub':['Company Name','Employee Name','Employee ID','Pay Period','Pay Date','Hours Worked','Hourly Rate','Gross Pay','Federal Tax','State Tax','SS Tax','Medicare','Net Pay'],
 'Power of Attorney':['Principal Name','Agent Name','Date','Powers Granted','Limitations','Duration','State','Witnesses','Notary'],
 'Last Will Testament':['Testator Name','Date','Executor','Beneficiary 1','Bequest 1','Beneficiary 2','Bequest 2','Guardian','Witness 1','Witness 2','State'],
@@ -273,482 +155,96 @@ var FM={
 };
 var STYLES=[{n:'Modern',c:'theme-modern'},{n:'Classic',c:'theme-classic'},{n:'Elegant',c:'theme-elegant'},{n:'Corporate',c:'theme-corporate'},{n:'Minimal',c:'theme-minimal'},{n:'Bold',c:'theme-bold'}];
 var allDocs=[],selCatIdx=null,selDocIdx=null,curFields={},userPlan=localStorage.getItem('docpro_plan')||'free',curStyle=0,showAllCats=false,tierFilterVal='all',customLogo=null,authMode='login';
-// Auth functions
-function switchAuthTab(mode){
-authMode=mode;
-document.querySelectorAll('.auth-tab').forEach(function(t,i){t.classList.toggle('active',i===(mode==='login'?0:1))});
-document.getElementById('registerFields').style.display=mode==='register'?'block':'none';
-document.getElementById('authSubmitBtn').textContent=mode==='login'?'Sign In':'Create Account';
-document.getElementById('authError').style.display='none';
-}
-async function handleAuth(e){
-e.preventDefault();
-var email=document.getElementById('authEmail').value;
-var pass=document.getElementById('authPass').value;
-var errEl=document.getElementById('authError');
-errEl.style.display='none';
-try{
-if(authMode==='register'){
-var name=document.getElementById('authName').value||'';
-var{data,error}=await sb_client.auth.signUp({email:email,password:pass,options:{data:{display_name:name}}});
-if(error)throw error;
-closeModal('authModal');
-}else{
-var{data,error}=await sb_client.auth.signInWithPassword({email:email,password:pass});
-if(error)throw error;
-closeModal('authModal');
-}
-}catch(err){errEl.textContent=err.message;errEl.style.display='block'}
-}
-async function signOut(){
-await sb_client.auth.signOut();
-currentUser=null;userProfile=null;
-userPlan='free';localStorage.setItem('docpro_plan','free');
-updateAuthUI();updatePlanBadge();renderSidebar();renderPreview();
-}
-async function loadProfile(user){
-if(!user)return null;
-var{data}=await sb_client.from('profiles').select('*').eq('id',user.id).single();
-return data;
-}
+function switchAuthTab(mode){authMode=mode;document.querySelectorAll('.auth-tab').forEach(function(t,i){t.classList.toggle('active',i===(mode==='login'?0:1))});document.getElementById('registerFields').style.display=mode==='register'?'block':'none';document.getElementById('authSubmitBtn').textContent=mode==='login'?'Sign In':'Create Account';document.getElementById('authError').style.display='none'}
+async function handleAuth(e){e.preventDefault();var email=document.getElementById('authEmail').value,pass=document.getElementById('authPass').value,errEl=document.getElementById('authError');errEl.style.display='none';try{if(authMode==='register'){var name=document.getElementById('authName').value||'';var{data,error}=await sb_client.auth.signUp({email:email,password:pass,options:{data:{display_name:name}}});if(error)throw error;closeModal('authModal')}else{var{data,error}=await sb_client.auth.signInWithPassword({email:email,password:pass});if(error)throw error;closeModal('authModal')}}catch(err){errEl.textContent=err.message;errEl.style.display='block'}}
+async function signOut(){await sb_client.auth.signOut();currentUser=null;userProfile=null;userPlan='free';localStorage.setItem('docpro_plan','free');updateAuthUI();updatePlanBadge();renderSidebar();renderPreview()}
+async function loadProfile(user){if(!user)return null;var{data}=await sb_client.from('profiles').select('*').eq('id',user.id).single();return data}
 function isAdmin(){return userProfile&&userProfile.role==='admin'}
-function updateAuthUI(){
-var area=document.getElementById('authArea');
-if(currentUser&&userProfile){
-var initials=(userProfile.display_name||currentUser.email||'U').substring(0,2).toUpperCase();
-var adminTag=isAdmin()?'<span class="admin-badge">ADMIN</span>':'';
-var adminItem=isAdmin()?'<a style="color:#f59e0b;font-weight:600">\u2B50 Admin - All Tiers Unlocked</a>':'';
-area.innerHTML='<div class="user-menu" onclick="toggleUserMenu()"><div class="user-avatar">'+initials+'</div><div class="user-dropdown" id="userDropdown">'+adminItem+'<a onclick="openModal(\'pricingModal\')">Manage Plan</a><button onclick="signOut()">Sign Out</button></div></div>'+adminTag;
-}else{
-area.innerHTML='<button class="auth-btn" onclick="openModal(\'authModal\')">&#128100; Sign In</button>';
-}
-}
+function updateAuthUI(){var area=document.getElementById('authArea');if(currentUser&&userProfile){var initials=(userProfile.display_name||currentUser.email||'U').substring(0,2).toUpperCase();var adminTag=isAdmin()?'<span class="admin-badge">ADMIN</span>':'';var adminItem=isAdmin()?'<a style="color:#f59e0b;font-weight:600">\u2B50 Admin - All Tiers Unlocked</a>':'';area.innerHTML='<div class="user-menu" onclick="toggleUserMenu()"><div class="user-avatar">'+initials+'</div><div class="user-dropdown" id="userDropdown">'+adminItem+'<a onclick="openModal(\'pricingModal\')">Manage Plan</a><button onclick="signOut()">Sign Out</button></div></div>'+adminTag}else{area.innerHTML='<button class="auth-btn" onclick="openModal(\'authModal\')">&#128100; Sign In</button>'}}
 function toggleUserMenu(){var dd=document.getElementById('userDropdown');if(dd)dd.classList.toggle('open')}
 document.addEventListener('click',function(e){var dd=document.getElementById('userDropdown');if(dd&&!e.target.closest('.user-menu'))dd.classList.remove('open')});
-sb_client.auth.onAuthStateChange(async function(event,session){
-if(session&&session.user){
-currentUser=session.user;
-userProfile=await loadProfile(session.user);
-if(userProfile){
-if(isAdmin()){userPlan='business';localStorage.setItem('docpro_plan','business')}
-else{userPlan=userProfile.plan||'free';localStorage.setItem('docpro_plan',userProfile.plan||'free')}
-}
-}else{currentUser=null;userProfile=null}
-updateAuthUI();updatePlanBadge();renderSidebar();renderPreview();
-});
-// Tier helpers
+sb_client.auth.onAuthStateChange(async function(event,session){if(session&&session.user){currentUser=session.user;userProfile=await loadProfile(session.user);if(userProfile){if(isAdmin()){userPlan='business';localStorage.setItem('docpro_plan','business')}else{userPlan=userProfile.plan||'free';localStorage.setItem('docpro_plan',userProfile.plan||'free')}}}else{currentUser=null;userProfile=null}updateAuthUI();updatePlanBadge();renderSidebar();renderPreview()});
 function tierName(t){return t==='business'?'Business':t==='pro'?'Pro':'Free'}
 function tierClass(t){return 'tier-'+t}
-function canAccess(docTier){
-if(isAdmin())return true;
-if(docTier==='free')return true;
-if(docTier==='pro')return userPlan==='pro'||userPlan==='business';
-if(docTier==='business')return userPlan==='business';
-return false;
-}
-function selectPlan(plan){
-if(plan==='free'){
-userPlan='free';localStorage.setItem('docpro_plan','free');
-if(userProfile){sb_client.from('profiles').update({plan:'free'}).eq('id',currentUser.id).then(function(){userProfile.plan='free'})}
-closeModal('pricingModal');updatePlanBadge();updatePricingBtns();renderSidebar();renderPreview();
-return;
-}
-if(!currentUser){closeModal('pricingModal');openModal('authModal');return}
-alert('Stripe Checkout will be configured. Plan: '+plan+'\nRedirecting to payment...');
-userPlan=plan;localStorage.setItem('docpro_plan',plan);
-if(userProfile){sb_client.from('profiles').update({plan:plan}).eq('id',currentUser.id).then(function(){userProfile.plan=plan})}
-closeModal('pricingModal');updatePlanBadge();updatePricingBtns();renderSidebar();renderPreview();
-}
-// UI Helpers
-function updatePlanBadge(){
-var b=document.getElementById('planBadge');if(!b)return;
-if(isAdmin()){b.textContent='ADMIN ACCESS';b.className='plan-badge plan-business';return}
-b.textContent=tierName(userPlan).toUpperCase()+' PLAN';b.className='plan-badge plan-'+userPlan;
-}
-function updatePricingBtns(){
-var fb=document.getElementById('priceFreeBtn'),pb=document.getElementById('priceProBtn'),bb=document.getElementById('priceBizBtn');
-if(fb)fb.textContent=userPlan==='free'?'Current Plan':'Downgrade';
-if(pb){pb.textContent=userPlan==='pro'?'Current Plan':'Upgrade to Pro';pb.className=userPlan==='pro'?'':'btn-pri'}
-if(bb)bb.textContent=userPlan==='business'?'Current Plan':'Go Business';
-}
+function canAccess(docTier){if(isAdmin())return true;if(docTier==='free')return true;if(docTier==='pro')return userPlan==='pro'||userPlan==='business';if(docTier==='business')return userPlan==='business';return false}
+function selectPlan(plan){if(plan==='free'){userPlan='free';localStorage.setItem('docpro_plan','free');if(userProfile){sb_client.from('profiles').update({plan:'free'}).eq('id',currentUser.id).then(function(){userProfile.plan='free'})}closeModal('pricingModal');updatePlanBadge();updatePricingBtns();renderSidebar();renderPreview();return}if(!currentUser){closeModal('pricingModal');openModal('authModal');return}alert('Stripe Checkout coming soon. Plan: '+plan);userPlan=plan;localStorage.setItem('docpro_plan',plan);if(userProfile){sb_client.from('profiles').update({plan:plan}).eq('id',currentUser.id).then(function(){userProfile.plan=plan})}closeModal('pricingModal');updatePlanBadge();updatePricingBtns();renderSidebar();renderPreview()}
+function updatePlanBadge(){var b=document.getElementById('planBadge');if(!b)return;if(isAdmin()){b.textContent='ADMIN ACCESS';b.className='plan-badge plan-business';return}b.textContent=tierName(userPlan).toUpperCase()+' PLAN';b.className='plan-badge plan-'+userPlan}
+function updatePricingBtns(){var fb=document.getElementById('priceFreeBtn'),pb=document.getElementById('priceProBtn'),bb=document.getElementById('priceBizBtn');if(fb)fb.textContent=userPlan==='free'?'Current Plan':'Downgrade';if(pb){pb.textContent=userPlan==='pro'?'Current Plan':'Upgrade to Pro';pb.className=userPlan==='pro'?'':'btn-pri'}if(bb)bb.textContent=userPlan==='business'?'Current Plan':'Go Business'}
 function openModal(id){document.getElementById(id).classList.add('active')}
 function closeModal(id){document.getElementById(id).classList.remove('active')}
 function V(id){return document.getElementById(id)}
-// Sidebar
-function renderSidebar(){
-var container=V('sidebarContent');if(!container)return;
-var h='<div class="cat-grid">';
-var visibleCats=showAllCats?CATS:CATS.slice(0,6);
-visibleCats.forEach(function(c,i){
-h+='<div class="cat-btn'+(selCatIdx===i?' active':'')+'" onclick="selCat('+i+')" title="'+c.n+'">'+c.n.split(' ')[0]+'</div>';
-});
-h+='</div>';
-if(CATS.length>6)h+='<button class="cat-toggle" onclick="toggleCats()">'+(showAllCats?'Show Less':'Show All '+CATS.length+' Categories')+'</button>';
-h+='<div class="tier-filter">';
-['all','free','pro','business'].forEach(function(t){
-h+='<div class="tier-btn'+(tierFilterVal===t?' active':'')+'" onclick="setTierFilter(\''+t+'\')">'+( t==='all'?'All':tierName(t))+'</div>';
-});
-h+='</div><div class="doc-list">';
-var docs=getFilteredDocs();
-docs.forEach(function(d){
-h+='<div class="doc-item'+(selDocIdx===d.globalIdx?' active':'')+'" onclick="selDoc('+d.globalIdx+')"><span>'+d.name+'</span><span class="tier-badge '+tierClass(d.tier)+'">'+tierName(d.tier)+'</span></div>';
-});
-if(docs.length===0)h+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">No documents found</div>';
-h+='</div>';
-container.innerHTML=h;
-}
-function getFilteredDocs(){
-var docs=[],searchVal=V('globalSearch')?V('globalSearch').value.toLowerCase():'';
-CATS.forEach(function(cat,ci){
-if(selCatIdx!==null&&selCatIdx!==ci)return;
-cat.docs.forEach(function(docName,di){
-var gIdx=0;for(var x=0;x<ci;x++)gIdx+=CATS[x].docs.length;gIdx+=di;
-if(tierFilterVal!=='all'&&cat.tier!==tierFilterVal)return;
-if(searchVal&&docName.toLowerCase().indexOf(searchVal)===-1)return;
-docs.push({name:docName,tier:cat.tier,catIdx:ci,docIdx:di,globalIdx:gIdx});
-});
-});
-return docs;
-}
+function renderSidebar(){var container=V('sidebarContent');if(!container)return;var h='<div class="cat-grid">';var visibleCats=showAllCats?CATS:CATS.slice(0,6);visibleCats.forEach(function(c,i){h+='<div class="cat-btn'+(selCatIdx===i?' active':'')+'" onclick="selCat('+i+')" title="'+c.n+'">'+c.n.split(' ')[0]+'</div>'});h+='</div>';if(CATS.length>6)h+='<button class="cat-toggle" onclick="toggleCats()">'+(showAllCats?'Show Less':'Show All '+CATS.length+' Categories')+'</button>';h+='<div class="tier-filter">';['all','free','pro','business'].forEach(function(t){h+='<div class="tier-btn'+(tierFilterVal===t?' active':'')+'" onclick="setTierFilter(\''+t+'\')">'+( t==='all'?'All':tierName(t))+'</div>'});h+='</div><div class="doc-list">';var docs=getFilteredDocs();docs.forEach(function(d){h+='<div class="doc-item'+(selDocIdx===d.globalIdx?' active':'')+'" onclick="selDoc('+d.globalIdx+')"><span>'+d.name+'</span><span class="tier-badge '+tierClass(d.tier)+'">'+tierName(d.tier)+'</span></div>'});if(docs.length===0)h+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">No documents found</div>';h+='</div>';container.innerHTML=h}
+function getFilteredDocs(){var docs=[],searchVal=V('globalSearch')?V('globalSearch').value.toLowerCase():'';CATS.forEach(function(cat,ci){if(selCatIdx!==null&&selCatIdx!==ci)return;cat.docs.forEach(function(docName,di){var gIdx=0;for(var x=0;x<ci;x++)gIdx+=CATS[x].docs.length;gIdx+=di;if(tierFilterVal!=='all'&&cat.tier!==tierFilterVal)return;if(searchVal&&docName.toLowerCase().indexOf(searchVal)===-1)return;docs.push({name:docName,tier:cat.tier,catIdx:ci,docIdx:di,globalIdx:gIdx})})});return docs}
 function selCat(idx){selCatIdx=selCatIdx===idx?null:idx;selDocIdx=null;renderSidebar()}
-function selDoc(gIdx){
-var info=globalIdxToInfo(gIdx);if(!info)return;
-if(!canAccess(info.tier)){openModal('pricingModal');return}
-selDocIdx=gIdx;V('docTitle').textContent=info.name;curFields={};renderSidebar();renderPreview();
-}
-function globalIdxToInfo(gIdx){
-var idx=0;
-for(var ci=0;ci<CATS.length;ci++){for(var di=0;di<CATS[ci].docs.length;di++){if(idx===gIdx)return{name:CATS[ci].docs[di],tier:CATS[ci].tier,catIdx:ci,docIdx:di};idx++}}
-return null;
-}
+function selDoc(gIdx){var info=globalIdxToInfo(gIdx);if(!info)return;if(!canAccess(info.tier)){openModal('pricingModal');return}selDocIdx=gIdx;V('docTitle').textContent=info.name;curFields={};renderSidebar();renderPreview()}
+function globalIdxToInfo(gIdx){var idx=0;for(var ci=0;ci<CATS.length;ci++){for(var di=0;di<CATS[ci].docs.length;di++){if(idx===gIdx)return{name:CATS[ci].docs[di],tier:CATS[ci].tier,catIdx:ci,docIdx:di,catName:CATS[ci].n};idx++}}return null}
 function filterDocs(){renderSidebar()}
 function setTierFilter(t){tierFilterVal=t;renderSidebar()}
 function toggleCats(){showAllCats=!showAllCats;renderSidebar()}
 function setStyle(i){curStyle=i;renderPreview()}
 function uf(field,val){curFields[field]=val;renderPreview()}
-// Logo functions
-function searchLogos(query){
-var container=V('logoResults');
-if(!query||query.length<2){container.innerHTML='<p style="text-align:center;color:var(--muted);font-size:11px;grid-column:1/-1">Type to search logos...</p>';return}
-container.innerHTML='<div class="logo-result" onclick="pickLogo(\'https://logo.clearbit.com/'+query.toLowerCase().replace(/\s+/g,'')+'.com\')"><img src="https://logo.clearbit.com/'+query.toLowerCase().replace(/\s+/g,'')+'.com" onerror="this.parentElement.style.display=\'none\'"><p style="font-size:9px;margin-top:4px">'+query+'</p></div>'
-+'<div class="logo-result" onclick="pickLogo(\'https://img.logo.dev/'+query.toLowerCase().replace(/\s+/g,'')+'.com?token=pk_anonymous\')"><img src="https://img.logo.dev/'+query.toLowerCase().replace(/\s+/g,'')+'.com?token=pk_anonymous" onerror="this.parentElement.style.display=\'none\'"><p style="font-size:9px;margin-top:4px">'+query+' (alt)</p></div>'
-+'<div class="logo-result" onclick="drawLogo()"><p style="font-size:24px">\u270F\uFE0F</p><p style="font-size:9px;margin-top:4px">Create Custom</p></div>';
-}
+function searchLogos(query){var container=V('logoResults');if(!query||query.length<2){container.innerHTML='<p style="text-align:center;color:var(--muted);font-size:11px;grid-column:1/-1">Type to search...</p>';return}container.innerHTML='<div class="logo-result" onclick="pickLogo(\'https://logo.clearbit.com/'+query.toLowerCase().replace(/\s+/g,'')+'.com\')"><img src="https://logo.clearbit.com/'+query.toLowerCase().replace(/\s+/g,'')+'.com" onerror="this.parentElement.style.display=\'none\'"><p style="font-size:9px;margin-top:4px">'+query+'</p></div><div class="logo-result" onclick="drawLogo()"><p style="font-size:24px">\u270F\uFE0F</p><p style="font-size:9px">Create Custom</p></div>'}
 function pickLogo(url){customLogo=url;closeModal('logoModal');renderPreview()}
-function drawLogo(){
-var canvas=V('logoCanvas');if(!canvas)return;
-var ctx=canvas.getContext('2d');
-var text=V('logoText')?V('logoText').value:'Company';
-var color=V('logoColor')?V('logoColor').value:'#2563eb';
-var shape=V('logoShape')?V('logoShape').value:'Circle';
-ctx.clearRect(0,0,200,80);ctx.fillStyle=color;
-if(shape==='Circle'){ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill()}
-else if(shape==='Square'){ctx.fillRect(10,10,60,60)}
-else if(shape==='Shield'){ctx.beginPath();ctx.moveTo(40,5);ctx.lineTo(70,20);ctx.lineTo(70,50);ctx.lineTo(40,75);ctx.lineTo(10,50);ctx.lineTo(10,20);ctx.closePath();ctx.fill()}
-else{ctx.beginPath();ctx.moveTo(40,5);ctx.lineTo(70,40);ctx.lineTo(40,75);ctx.lineTo(10,40);ctx.closePath();ctx.fill()}
-ctx.fillStyle='#fff';ctx.font='bold 14px Arial';ctx.textAlign='center';ctx.fillText(text.substring(0,3).toUpperCase(),40,45);
-ctx.fillStyle='#333';ctx.font='bold 16px Arial';ctx.textAlign='left';ctx.fillText(text,85,45);
-}
+function drawLogo(){var canvas=V('logoCanvas');if(!canvas)return;var ctx=canvas.getContext('2d');var text=V('logoText')?V('logoText').value:'Company';var color=V('logoColor')?V('logoColor').value:'#2563eb';var shape=V('logoShape')?V('logoShape').value:'Circle';ctx.clearRect(0,0,200,80);ctx.fillStyle=color;if(shape==='Circle'){ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill()}else if(shape==='Square'){ctx.fillRect(10,10,60,60)}else if(shape==='Shield'){ctx.beginPath();ctx.moveTo(40,5);ctx.lineTo(70,20);ctx.lineTo(70,50);ctx.lineTo(40,75);ctx.lineTo(10,50);ctx.lineTo(10,20);ctx.closePath();ctx.fill()}else{ctx.beginPath();ctx.moveTo(40,5);ctx.lineTo(70,40);ctx.lineTo(40,75);ctx.lineTo(10,40);ctx.closePath();ctx.fill()}ctx.fillStyle='#fff';ctx.font='bold 14px Arial';ctx.textAlign='center';ctx.fillText(text.substring(0,3).toUpperCase(),40,45);ctx.fillStyle='#333';ctx.font='bold 16px Arial';ctx.textAlign='left';ctx.fillText(text,85,45)}
 function applyLogo(){var canvas=V('logoCanvas');if(canvas){customLogo=canvas.toDataURL();closeModal('logoModal');renderPreview()}}
-// Upload
 function handleDrop(e){e.preventDefault();e.currentTarget.classList.remove('dragover');if(e.dataTransfer.files.length>0)handleUpload(e.dataTransfer.files[0])}
-function handleUpload(file){
-if(!file)return;var result=V('uploadResult');
-result.innerHTML='<p>Processing: <strong>'+file.name+'</strong> ('+Math.round(file.size/1024)+'KB)</p>';
-var reader=new FileReader();
-reader.onload=function(e){
-var content=e.target.result;
-if(file.name.endsWith('.json')){try{var data=JSON.parse(content);result.innerHTML='<p style="color:var(--success)">\u2713 JSON loaded</p>';curFields=data;renderPreview()}catch(err){result.innerHTML='<p style="color:var(--danger)">Invalid JSON</p>'}}
-else if(file.name.endsWith('.csv')){var lines=content.split('\n');result.innerHTML='<p style="color:var(--success)">\u2713 CSV: '+lines[0].split(',').length+' cols, '+(lines.length-1)+' rows</p>'}
-else{result.innerHTML='<p style="color:var(--success)">\u2713 '+file.name+'</p><pre style="max-height:150px;overflow:auto;font-size:10px;background:#f1f5f9;padding:8px;border-radius:4px;margin-top:8px">'+content.substring(0,2000)+'</pre>'}
-};
-if(file.name.endsWith('.pdf'))result.innerHTML='<p style="color:var(--warn)">PDF preview requires server processing.</p>';
-else reader.readAsText(file);
-}
-// PDF Download - downloads ONLY the document preview, not the full page
-function generatePDF(){
-var docEl=document.getElementById('docPreview');
-if(!docEl){alert('No document to download');return}
-var btn=event.target;btn.textContent='Generating...';btn.disabled=true;
-html2canvas(docEl,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false}).then(function(canvas){
-var imgData=canvas.toDataURL('image/png');
-var pdf=new jspdf.jsPDF({orientation:canvas.width>canvas.height?'l':'p',unit:'px',format:[canvas.width,canvas.height]});
-pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);
-var info=globalIdxToInfo(selDocIdx);
-var fileName=(info?info.name.replace(/\s+/g,'_'):'document')+'_DocPro.pdf';
-pdf.save(fileName);
-btn.textContent='\u{1F4C4} Download PDF';btn.disabled=false;
-}).catch(function(err){
-console.log('PDF error:',err);
-btn.textContent='\u{1F4C4} Download PDF';btn.disabled=false;
-alert('PDF generation failed. Try Print instead.');
-});
-}
-function printDoc(){
-var docEl=document.getElementById('docPreview');
-if(!docEl)return;
-var win=window.open('','_blank');
-win.document.write('<html><head><title>DocPro Document</title><style>body{font-family:Arial,sans-serif;padding:30px;margin:0}table{border-collapse:collapse;width:100%}td,th{padding:8px}@media print{body{padding:20px}}</style></head><body>'+docEl.innerHTML+'</body></html>');
-win.document.close();
-win.focus();
-setTimeout(function(){win.print();win.close()},500);
-  }
-// Preview
+function handleUpload(file){if(!file)return;var result=V('uploadResult');result.innerHTML='<p>Processing: <strong>'+file.name+'</strong></p>';var reader=new FileReader();reader.onload=function(e){var content=e.target.result;if(file.name.endsWith('.json')){try{curFields=JSON.parse(content);result.innerHTML='<p style="color:var(--success)">\u2713 JSON loaded</p>';renderPreview()}catch(err){result.innerHTML='<p style="color:var(--danger)">Invalid JSON</p>'}}else{result.innerHTML='<p style="color:var(--success)">\u2713 '+file.name+' loaded</p>'}};if(file.name.endsWith('.pdf'))result.innerHTML='<p style="color:var(--warn)">PDF requires server processing</p>';else reader.readAsText(file)}
+function generatePDF(){var docEl=document.getElementById('docPreview');if(!docEl){alert('No document to download');return}var btn=event.target;btn.textContent='Generating...';btn.disabled=true;html2canvas(docEl,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false}).then(function(canvas){var imgData=canvas.toDataURL('image/png');var pdf=new jspdf.jsPDF({orientation:canvas.width>canvas.height?'l':'p',unit:'px',format:[canvas.width,canvas.height]});pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);var info=globalIdxToInfo(selDocIdx);pdf.save((info?info.name.replace(/\s+/g,'_'):'document')+'_DocPro.pdf');btn.textContent='\u{1F4C4} Download PDF';btn.disabled=false}).catch(function(){btn.textContent='\u{1F4C4} Download PDF';btn.disabled=false;alert('PDF failed. Try Print.')})}
+function printDoc(){var docEl=document.getElementById('docPreview');if(!docEl)return;var win=window.open('','_blank');win.document.write('<html><head><title>DocPro</title><style>body{font-family:Arial,sans-serif;padding:30px}table{border-collapse:collapse;width:100%}td,th{padding:8px}</style></head><body>'+docEl.innerHTML+'</body></html>');win.document.close();win.focus();setTimeout(function(){win.print();win.close()},500)}
 function gf(field){return curFields[field]||''}
 function renderPreview(){
 var area=V('previewArea');
-if(selDocIdx===null){area.innerHTML='<div class="empty-state"><h3>Welcome to DocPro</h3><p>Select a document from the sidebar or search for templates</p><p style="margin-top:16px"><button class="btn-pri toolbar" onclick="openModal(\'pricingModal\')" style="padding:10px 24px;font-size:14px">View Plans & Pricing</button></p></div>';return}
+if(selDocIdx===null){area.innerHTML='<div class="empty-state"><h3>Welcome to DocPro</h3><p>Select a document from the sidebar</p><p style="margin-top:16px"><button class="btn-pri toolbar" onclick="openModal(\'pricingModal\')" style="padding:10px 24px;font-size:14px">View Plans & Pricing</button></p></div>';return}
 var info=globalIdxToInfo(selDocIdx);if(!info)return;
-if(!canAccess(info.tier)){area.innerHTML='<div class="preview-card"><div class="lock-overlay" style="min-height:500px"><div class="lock-msg"><h3>&#128274; '+tierName(info.tier)+' Plan Required</h3><p>This template requires a '+tierName(info.tier)+' subscription</p><button onclick="openModal(\'pricingModal\')">View Plans</button>'+(currentUser?'':'<p style="margin-top:8px;font-size:11px"><a href="#" onclick="openModal(\'authModal\');return false" style="color:var(--pri)">Sign in for access</a></p>')+'</div></div></div>';return}
+if(!canAccess(info.tier)){area.innerHTML='<div class="preview-card"><div class="lock-overlay" style="min-height:500px"><div class="lock-msg"><h3>&#128274; '+tierName(info.tier)+' Plan Required</h3><p>Upgrade to access this template</p><button onclick="openModal(\'pricingModal\')">View Plans</button></div></div></div>';return}
 var fields=FM[info.name]||['Field 1','Field 2','Field 3','Field 4','Field 5','Field 6'];
-var h='<div class="preview-card '+STYLES[curStyle].c+'">';
-h+='<div class="form-section"><div class="toolbar">';
-h+='<select onchange="setStyle(this.selectedIndex)">';
+var h='<div class="preview-card '+STYLES[curStyle].c+'"><div class="form-section"><div class="toolbar"><select onchange="setStyle(this.selectedIndex)">';
 STYLES.forEach(function(s,i){h+='<option'+(i===curStyle?' selected':'')+'>'+s.n+'</option>'});
-h+='</select>';
-h+='<button onclick="printDoc()">&#128424; Print</button>';
-h+='<button onclick="resetDoc()">&#128260; Reset</button>';
-h+='<button class="btn-pri" onclick="generatePDF()">&#128196; Download PDF</button>';
-h+='</div>';
+h+='</select><button onclick="printDoc()">&#128424; Print</button><button onclick="resetDoc()">&#128260; Reset</button><button class="btn-pri" onclick="generatePDF()">&#128196; Download PDF</button></div>';
 h+='<h3>'+info.name+'</h3><div class="form-grid">';
 fields.forEach(function(f){
-if(f.indexOf('Body')>-1||f.indexOf('Duties')>-1||f.indexOf('Summary')>-1||f.indexOf('Qualities')>-1||f.indexOf('Notes')>-1||f.indexOf('Paragraph')>-1)
+if(f.indexOf('Body')>-1||f.indexOf('Duties')>-1||f.indexOf('Summary')>-1||f.indexOf('Notes')>-1||f.indexOf('Paragraph')>-1)
 h+='<div class="form-group" style="grid-column:1/-1"><label>'+f+'</label><textarea oninput="uf(\''+f+'\',this.value)">'+gf(f)+'</textarea></div>';
 else h+='<div class="form-group"><label>'+f+'</label><input value="'+gf(f)+'" oninput="uf(\''+f+'\',this.value)"></div>';
 });
-h+='</div></div>';
-h+='<div class="preview-section"><div class="doc-preview" id="docPreview">';
-h+=renderDoc(info.name,info.catIdx);
-h+='</div></div></div>';
-area.innerHTML=h;
-}
+h+='</div></div><div class="preview-section"><div class="doc-preview" id="docPreview">';
+h+=renderDoc(info.name,info.catName||'');
+h+='</div></div></div>';area.innerHTML=h}
 function resetDoc(){curFields={};renderPreview()}
-function renderDoc(name,catIdx){
-var logoH='';
-if(customLogo)logoH='<img src="'+customLogo+'" style="max-height:50px;max-width:150px;margin-bottom:10px" onerror="this.style.display=\'none\'">';
+// FIXED: Route by category NAME instead of index - works with any Supabase category order
+function renderDoc(name,catName){
+var logoH='';if(customLogo)logoH='<img src="'+customLogo+'" style="max-height:50px;max-width:150px;margin-bottom:10px" onerror="this.style.display=\'none\'">';
 var co=gf('Company Name')||gf('Company')||gf('Seller')||gf('Provider')||gf('Firm Name')||gf('Exporter')||gf('Consultant')||gf('Contractor Name')||gf('Freelancer Name')||gf('Organization')||gf('Landlord')||gf('Store Name')||'Company Name';
-if(catIdx===0)return renderInvoiceReceipt(name,logoH,co);
-if(catIdx===1)return renderLetterMemo(name,logoH,co);
-if(catIdx===2)return renderResume(name,logoH,co);
-if(catIdx===3)return renderContract(name,logoH,co);
-if(catIdx===4)return renderTaxFinancial(name,logoH,co);
-if(catIdx===5)return renderLegalGov(name,logoH,co);
+var cn=catName.toLowerCase();
+if(cn.indexOf('invoice')>-1||cn.indexOf('receipt')>-1)return renderInvoiceReceipt(name,logoH,co);
+if(cn.indexOf('letter')>-1||cn.indexOf('memo')>-1)return renderLetterMemo(name,logoH,co);
+if(cn.indexOf('resume')>-1||cn.indexOf('employ')>-1)return renderResume(name,logoH,co);
+if(cn.indexOf('contract')>-1||cn.indexOf('agreement')>-1)return renderContract(name,logoH,co);
+if(cn.indexOf('tax')>-1||cn.indexOf('financial')>-1||cn.indexOf('pay')>-1)return renderTaxFinancial(name,logoH,co);
+if(cn.indexOf('legal')>-1||cn.indexOf('gov')>-1)return renderLegalGov(name,logoH,co);
+if(cn.indexOf('insurance')>-1||cn.indexOf('health')>-1||cn.indexOf('medical')>-1)return renderLegalGov(name,logoH,co);
+if(cn.indexOf('real estate')>-1||cn.indexOf('property')>-1)return renderContract(name,logoH,co);
+if(cn.indexOf('business')>-1||cn.indexOf('operation')>-1)return renderGeneric(name,logoH,co);
+if(cn.indexOf('education')>-1||cn.indexOf('academic')>-1)return renderGeneric(name,logoH,co);
+// Fallback: try to detect from doc name
+var dn=name.toLowerCase();
+if(dn.indexOf('invoice')>-1||dn.indexOf('receipt')>-1)return renderInvoiceReceipt(name,logoH,co);
+if(dn.indexOf('letter')>-1||dn.indexOf('memo')>-1)return renderLetterMemo(name,logoH,co);
+if(dn.indexOf('resume')>-1||dn.indexOf('cv')>-1)return renderResume(name,logoH,co);
+if(dn.indexOf('agreement')>-1||dn.indexOf('contract')>-1||dn.indexOf('lease')>-1||dn.indexOf('nda')>-1)return renderContract(name,logoH,co);
+if(dn.indexOf('w-2')>-1||dn.indexOf('1099')>-1||dn.indexOf('pay stub')>-1||dn.indexOf('tax')>-1)return renderTaxFinancial(name,logoH,co);
+if(dn.indexOf('will')>-1||dn.indexOf('attorney')>-1||dn.indexOf('affidavit')>-1||dn.indexOf('deed')>-1)return renderLegalGov(name,logoH,co);
 return renderGeneric(name,logoH,co);
   }
-function renderInvoiceReceipt(name,logoH,co){
-var h='<div style="padding:20px">';h+=logoH;
-if(name.indexOf('Receipt')>-1){
-h+='<div style="text-align:center;border-bottom:2px dashed #ccc;padding-bottom:15px;margin-bottom:15px">';
-h+='<h2 style="font-size:20px">'+co+'</h2><p style="font-size:11px;color:#666">'+name.toUpperCase()+'</p>';
-h+='<p style="font-size:11px">Date: '+(gf('Date')||'__/__/____')+' | Receipt #: '+(gf('Receipt #')||'______')+'</p></div>';
-if(name==='Sales Receipt'){
-h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';
-h+='<tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(gf('Item 1')||'Item 1')+'</td><td style="text-align:right;padding:6px">$'+(gf('Price 1')||'0.00')+'</td></tr>';
-h+='<tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(gf('Item 2')||'Item 2')+'</td><td style="text-align:right;padding:6px">$'+(gf('Price 2')||'0.00')+'</td></tr>';
-h+='<tr style="border-top:2px solid #333"><td style="padding:6px;font-weight:bold">Subtotal</td><td style="text-align:right">$'+(gf('Subtotal')||'0.00')+'</td></tr>';
-h+='<tr><td style="padding:6px">Tax</td><td style="text-align:right">$'+(gf('Tax')||'0.00')+'</td></tr>';
-h+='<tr style="border-top:2px solid #333;font-weight:bold;font-size:14px"><td style="padding:8px">TOTAL</td><td style="text-align:right;padding:8px">$'+(gf('Total')||'0.00')+'</td></tr></table>';
-h+='<p style="text-align:center;margin-top:15px;font-size:11px;color:#666">Payment: '+(gf('Payment Method')||'____')+' | Cashier: '+(gf('Cashier')||'____')+'</p>';
-}else{
-h+='<table style="width:100%;font-size:12px"><tr><td><strong>From:</strong> '+co+'</td></tr>';
-h+='<tr><td><strong>To:</strong> '+(gf('Payer')||gf('Donor Name')||gf('Tenant')||'________')+'</td></tr>';
-h+='<tr><td><strong>Amount:</strong> $'+(gf('Amount')||gf('Donation Amount')||'0.00')+'</td></tr>';
-h+='<tr><td><strong>Method:</strong> '+(gf('Payment Method')||'________')+'</td></tr></table>';
-}
-h+='<p style="text-align:center;margin-top:20px;font-size:10px;color:#999;border-top:2px dashed #ccc;padding-top:10px">Thank you!</p>';
-}else{
-h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:20px">';
-h+='<div><h1 style="font-size:24px;color:#2563eb">INVOICE</h1><p style="font-size:11px;color:#666">'+name+'</p></div>';
-h+='<div style="text-align:right"><h2 style="font-size:16px">'+co+'</h2><p style="font-size:11px;color:#666">Invoice #: '+(gf('Invoice #')||gf('PI Number')||'______')+'</p><p style="font-size:11px;color:#666">Date: '+(gf('Date')||'__/__/____')+'</p></div></div>';
-h+='<div style="display:flex;justify-content:space-between;margin-bottom:20px"><div><p style="font-size:10px;color:#999;text-transform:uppercase">Bill To</p><p style="font-weight:600">'+(gf('Client Name')||gf('Client')||gf('Buyer')||gf('Importer')||gf('Patient Name')||'________')+'</p></div>';
-h+='<div style="text-align:right"><p style="font-size:10px;color:#999;text-transform:uppercase">Due Date</p><p style="font-weight:600">'+(gf('Due Date')||gf('Validity')||'________')+'</p></div></div>';
-h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px">';
-h+='<tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">Description</th><th style="padding:8px;text-align:center">Qty</th><th style="padding:8px;text-align:right">Rate</th><th style="padding:8px;text-align:right">Amount</th></tr>';
-var item1=gf('Item 1')||gf('Item Description')||gf('Project')||gf('Service')||'Service';
-var qty1=gf('Qty 1')||gf('Qty')||gf('Quantity')||gf('Hours')||'1';
-var rate1=gf('Rate 1')||gf('Rate')||gf('Unit Price')||gf('Charge')||gf('Hourly Rate')||'0.00';
-var amt1=(parseFloat(qty1)||0)*(parseFloat(rate1)||0);
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">'+item1+'</td><td style="padding:8px;text-align:center">'+qty1+'</td><td style="padding:8px;text-align:right">$'+rate1+'</td><td style="padding:8px;text-align:right">$'+amt1.toFixed(2)+'</td></tr>';
-if(gf('Item 2')){var qty2=gf('Qty 2')||'1',rate2=gf('Rate 2')||'0.00',amt2=(parseFloat(qty2)||0)*(parseFloat(rate2)||0);
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">'+gf('Item 2')+'</td><td style="padding:8px;text-align:center">'+qty2+'</td><td style="padding:8px;text-align:right">$'+rate2+'</td><td style="padding:8px;text-align:right">$'+amt2.toFixed(2)+'</td></tr>';amt1+=amt2}
-var tax=gf('Tax %')||gf('Tax')||'0';var taxAmt=amt1*(parseFloat(tax)/100);
-h+='<tr><td colspan="3" style="padding:8px;text-align:right">Subtotal:</td><td style="padding:8px;text-align:right">$'+amt1.toFixed(2)+'</td></tr>';
-h+='<tr><td colspan="3" style="padding:8px;text-align:right">Tax ('+tax+'%):</td><td style="padding:8px;text-align:right">$'+taxAmt.toFixed(2)+'</td></tr>';
-h+='<tr style="font-weight:bold;font-size:14px;background:#f1f5f9"><td colspan="3" style="padding:10px;text-align:right">Total Due:</td><td style="padding:10px;text-align:right;color:#2563eb">$'+(amt1+taxAmt).toFixed(2)+'</td></tr></table>';
-if(gf('Notes'))h+='<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:11px"><strong>Notes:</strong> '+gf('Notes')+'</div>';
-h+='<p style="text-align:center;margin-top:20px;font-size:10px;color:#999">Thank you for your business!</p>';
-}
-h+='</div>';return h;
-}
-function renderLetterMemo(name,logoH,co){
-var h='<div style="padding:30px">';h+=logoH;
-if(name.indexOf('Memo')>-1){
-h+='<div style="border-bottom:3px solid #1e293b;padding-bottom:10px;margin-bottom:20px"><h2 style="font-size:18px;color:#1e293b">MEMORANDUM</h2><p style="font-size:10px;color:#666">'+name+'</p></div>';
-h+='<table style="font-size:12px;margin-bottom:20px;width:100%">';
-h+='<tr><td style="padding:4px 8px;font-weight:bold;width:60px">TO:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Recipient Name')||'________')+'</td></tr>';
-h+='<tr><td style="padding:4px 8px;font-weight:bold">FROM:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Sender Name')||co)+'</td></tr>';
-h+='<tr><td style="padding:4px 8px;font-weight:bold">DATE:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Date')||'__/__/____')+'</td></tr>';
-h+='<tr><td style="padding:4px 8px;font-weight:bold">RE:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Subject')||'________')+'</td></tr></table>';
-h+='<div style="font-size:13px;line-height:1.7">'+(gf('Body')||'Memo content goes here...')+'</div>';
-}else{
-h+='<div style="margin-bottom:30px"><p style="font-size:12px">'+(gf('Sender Name')||gf('Your Name')||gf('Writer Name')||'________')+'</p>';
-h+='<p style="font-size:12px;color:#666">'+(gf('Sender Address')||gf('Address')||'')+'</p>';
-h+='<p style="font-size:12px;color:#666;margin-top:10px">'+(gf('Date')||'__/__/____')+'</p></div>';
-h+='<div style="margin-bottom:20px"><p style="font-size:12px">'+(gf('Recipient Name')||gf('Hiring Manager')||gf('Manager Name')||'________')+'</p>';
-h+='<p style="font-size:12px;color:#666">'+(gf('Recipient Address')||gf('Company')||'')+'</p></div>';
-if(gf('Subject'))h+='<p style="font-size:12px;margin-bottom:15px"><strong>Re: '+gf('Subject')+'</strong></p>';
-if(gf('Position'))h+='<p style="font-size:12px;margin-bottom:15px"><strong>Re: Application for '+gf('Position')+'</strong></p>';
-h+='<p style="font-size:13px;margin-bottom:10px">Dear '+(gf('Recipient Name')||gf('Hiring Manager')||'Sir/Madam')+',</p>';
-h+='<div style="font-size:13px;line-height:1.8"><p style="margin-bottom:10px">'+(gf('Body')||gf('Body Paragraph 1')||gf('Qualities')||'Letter content goes here...')+'</p>';
-if(gf('Body Paragraph 2'))h+='<p style="margin-bottom:10px">'+gf('Body Paragraph 2')+'</p>';
-if(gf('Gratitude Note'))h+='<p style="margin-bottom:10px">'+gf('Gratitude Note')+'</p>';
-h+='</div><p style="font-size:13px;margin-top:20px">'+(gf('Closing')||'Sincerely')+',</p>';
-h+='<p style="font-size:13px;margin-top:30px;font-style:italic">'+(gf('Sender Name')||gf('Your Name')||gf('Writer Name')||'________')+'</p>';
-}
-h+='</div>';return h;
-}
-function renderResume(name,logoH,co){
-var h='<div style="padding:30px">';
-var fn=gf('Full Name')||gf('Your Name')||gf('Employee Name')||'Your Name';
-if(name.indexOf('Resume')>-1||name.indexOf('CV')>-1){
-h+='<div style="text-align:center;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:20px">';
-h+='<h1 style="font-size:24px;letter-spacing:2px">'+fn.toUpperCase()+'</h1>';
-h+='<p style="font-size:12px;color:#666;margin-top:4px">';
-if(gf('Email'))h+=gf('Email')+' | ';if(gf('Phone'))h+=gf('Phone')+' | ';if(gf('LinkedIn'))h+=gf('LinkedIn');
-h+='</p></div>';
-if(gf('Summary'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Professional Summary</h3><p style="font-size:12px;line-height:1.6">'+gf('Summary')+'</p></div>';
-h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Experience</h3>';
-if(gf('Company 1')){h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><strong style="font-size:12px">'+gf('Title 1')+'</strong><span style="font-size:11px;color:#666">'+gf('Dates 1')+'</span></div><p style="font-size:12px;color:#666">'+gf('Company 1')+'</p>';if(gf('Duties 1'))h+='<p style="font-size:11px;margin-top:4px">'+gf('Duties 1')+'</p>';h+='</div>'}
-if(gf('Company 2'))h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><strong style="font-size:12px">'+gf('Title 2')+'</strong><span style="font-size:11px;color:#666">'+gf('Dates 2')+'</span></div><p style="font-size:12px;color:#666">'+gf('Company 2')+'</p></div>';
-h+='</div>';
-if(gf('Education'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Education</h3><p style="font-size:12px">'+gf('Education')+'</p></div>';
-if(gf('Skills'))h+='<div><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Skills</h3><p style="font-size:12px">'+gf('Skills')+'</p></div>';
-}else{
-h+='<div style="border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:20px"><h2 style="font-size:18px">'+name+'</h2><p style="font-size:11px;color:#666">'+co+'</p></div>';
-h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';
-var fields=FM[name]||[];fields.forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});
-h+='</table>';
-}
-h+='</div>';return h;
-  }
-function renderContract(name,logoH,co){
-var h='<div style="padding:30px">';h+=logoH;
-h+='<div style="text-align:center;border-bottom:2px solid #1e293b;padding-bottom:15px;margin-bottom:25px"><h1 style="font-size:22px;letter-spacing:1px">'+name.toUpperCase()+'</h1><p style="font-size:11px;color:#666;margin-top:4px">Effective Date: '+(gf('Effective Date')||gf('Date')||'__/__/____')+'</p></div>';
-h+='<div style="display:flex;justify-content:space-between;margin-bottom:25px;padding:15px;background:#f8fafc;border-radius:8px">';
-h+='<div><p style="font-size:10px;color:#999;text-transform:uppercase">Party A</p><p style="font-weight:bold;font-size:13px">'+(gf('Provider')||gf('Landlord')||gf('Lessor')||gf('Disclosing Party')||co)+'</p></div>';
-h+='<div style="text-align:right"><p style="font-size:10px;color:#999;text-transform:uppercase">Party B</p><p style="font-weight:bold;font-size:13px">'+(gf('Client')||gf('Tenant')||gf('Lessee')||gf('Receiving Party')||'________')+'</p></div></div>';
-var secs=['Services','Compensation','Payment Terms','Duration','Termination Notice','Property','Monthly Rent','Security Deposit','Monthly Payment','Purpose','Exclusions','Governing Law','Jurisdiction'],sn=1;
-secs.forEach(function(s){if(gf(s)){h+='<div style="margin-bottom:15px"><h3 style="font-size:13px;color:#1e293b">Section '+sn+': '+s+'</h3><p style="font-size:12px;line-height:1.6;margin-top:4px">'+gf(s)+'</p></div>';sn++}});
-if(sn===1)h+='<div style="margin-bottom:15px"><h3 style="font-size:13px">Section 1: Terms</h3><p style="font-size:12px;color:#666;line-height:1.6">Fill in the form fields above to populate this document.</p></div>';
-h+='<div style="margin-top:40px;display:flex;justify-content:space-between">';
-h+='<div style="text-align:center"><div style="border-top:1px solid #333;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">'+(gf('Provider')||gf('Landlord')||'Party A')+'</p><p style="font-size:10px;color:#666">Date: ________</p></div></div>';
-h+='<div style="text-align:center"><div style="border-top:1px solid #333;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">'+(gf('Client')||gf('Tenant')||'Party B')+'</p><p style="font-size:10px;color:#666">Date: ________</p></div></div>';
-h+='</div></div>';return h;
-}
-function renderTaxFinancial(name,logoH,co){
-var h='<div style="padding:30px">';h+=logoH;
-if(name==='Pay Stub'){
-h+='<div style="background:#1e293b;color:#fff;padding:15px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between"><div><h2 style="font-size:16px">'+(gf('Company Name')||'Company')+'</h2><p style="font-size:10px;opacity:.7">EARNINGS STATEMENT</p></div><div style="text-align:right"><p style="font-size:11px">Pay Date: '+(gf('Pay Date')||'__/__/____')+'</p><p style="font-size:11px">Period: '+(gf('Pay Period')||'________')+'</p></div></div>';
-h+='<div style="border:1px solid #e2e8f0;padding:15px"><div style="display:flex;justify-content:space-between"><div><p style="font-size:10px;color:#999">EMPLOYEE</p><p style="font-weight:bold;font-size:13px">'+(gf('Employee Name')||'________')+'</p></div><div><p style="font-size:10px;color:#999">ID</p><p style="font-size:13px">'+(gf('Employee ID')||'________')+'</p></div></div></div>';
-var hrs=parseFloat(gf('Hours Worked'))||0,rate=parseFloat(gf('Hourly Rate'))||0,gross=hrs*rate;
-h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:15px"><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">EARNINGS</th><th style="text-align:right;padding:8px">HOURS</th><th style="text-align:right;padding:8px">RATE</th><th style="text-align:right;padding:8px">AMOUNT</th></tr>';
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">Regular</td><td style="text-align:right;padding:8px">'+hrs+'</td><td style="text-align:right;padding:8px">$'+rate.toFixed(2)+'</td><td style="text-align:right;padding:8px">$'+gross.toFixed(2)+'</td></tr>';
-h+='<tr style="font-weight:bold;background:#f1f5f9"><td colspan="3" style="padding:8px">GROSS PAY</td><td style="text-align:right;padding:8px">$'+(gf('Gross Pay')||gross.toFixed(2))+'</td></tr></table>';
-var fed=gf('Federal Tax')||'0',st=gf('State Tax')||'0',ss=gf('SS Tax')||'0',med=gf('Medicare')||'0';
-h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><tr style="background:#fef2f2"><th style="padding:8px;text-align:left" colspan="2">DEDUCTIONS</th></tr>';
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:6px">Federal Income Tax</td><td style="text-align:right;padding:6px">$'+fed+'</td></tr>';
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:6px">State Income Tax</td><td style="text-align:right;padding:6px">$'+st+'</td></tr>';
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:6px">Social Security</td><td style="text-align:right;padding:6px">$'+ss+'</td></tr>';
-h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:6px">Medicare</td><td style="text-align:right;padding:6px">$'+med+'</td></tr>';
-var td=(parseFloat(fed)+parseFloat(st)+parseFloat(ss)+parseFloat(med))||0;
-h+='<tr style="font-weight:bold;background:#fef2f2"><td style="padding:8px">TOTAL DEDUCTIONS</td><td style="text-align:right;padding:8px">$'+td.toFixed(2)+'</td></tr></table>';
-h+='<div style="background:#22c55e;color:#fff;padding:15px;border-radius:0 0 8px 8px;text-align:center;margin-top:15px"><p style="font-size:10px;opacity:.8">NET PAY</p><p style="font-size:24px;font-weight:800">$'+(gf('Net Pay')||(gross-td).toFixed(2))+'</p></div>';
-}else if(name==='W-2 Form'){
-h+='<div style="border:2px solid #000;padding:0"><div style="background:#000;color:#fff;padding:8px;text-align:center;font-size:11px">Form W-2 Wage and Tax Statement '+new Date().getFullYear()+'</div>';
-h+='<div style="display:grid;grid-template-columns:1fr 1fr;font-size:11px">';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">a Employee SSN</p><p>'+(gf('Employee SSN')||'XXX-XX-XXXX')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">b Employer EIN</p><p>'+(gf('Employer EIN')||'XX-XXXXXXX')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">c Employer</p><p style="font-weight:bold">'+(gf('Employer Name')||'________')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">e Employee</p><p style="font-weight:bold">'+(gf('Employee Name')||'________')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">1 Wages</p><p style="font-weight:bold">$'+(gf('Wages')||'0.00')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">2 Federal tax</p><p style="font-weight:bold">$'+(gf('Federal Tax Withheld')||'0.00')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">3 SS wages</p><p>$'+(gf('SS Wages')||'0.00')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">4 SS tax</p><p>$'+(gf('SS Tax')||'0.00')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">5 Medicare wages</p><p>$'+(gf('Medicare Wages')||'0.00')+'</p></div>';
-h+='<div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">6 Medicare tax</p><p>$'+(gf('Medicare Tax')||'0.00')+'</p></div></div></div>';
-}else{
-h+='<div style="border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:20px"><h2 style="font-size:18px">'+name+'</h2><p style="font-size:11px;color:#666">'+co+'</p></div>';
-h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';
-(FM[name]||[]).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});
-h+='</table>';
-}
-h+='</div>';return h;
-  }
-function renderLegalGov(name,logoH,co){
-var h='<div style="padding:30px">';h+=logoH;
-h+='<div style="text-align:center;margin-bottom:25px"><p style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:2px">United States of America</p>';
-h+='<h1 style="font-size:20px;border-bottom:2px solid #000;border-top:2px solid #000;padding:10px 0;margin:8px 0">'+name.toUpperCase()+'</h1></div>';
-if(name==='Power of Attorney'){
-h+='<p style="font-size:13px;line-height:1.8;margin-bottom:15px">I, <strong>'+(gf('Principal Name')||'________')+'</strong>, hereby appoint <strong>'+(gf('Agent Name')||'________')+'</strong> as my attorney-in-fact.</p>';
-h+='<p style="font-size:13px;line-height:1.8;margin-bottom:15px"><strong>Powers:</strong> '+(gf('Powers Granted')||'________')+'</p>';
-if(gf('Limitations'))h+='<p style="font-size:13px;margin-bottom:15px"><strong>Limitations:</strong> '+gf('Limitations')+'</p>';
-h+='<p style="font-size:13px;margin-bottom:15px"><strong>Duration:</strong> '+(gf('Duration')||'Until revoked')+' | <strong>State:</strong> '+(gf('State')||'________')+'</p>';
-}else if(name==='Last Will Testament'){
-h+='<p style="font-size:13px;line-height:1.8;margin-bottom:15px">I, <strong>'+(gf('Testator Name')||'________')+'</strong>, of the State of <strong>'+(gf('State')||'________')+'</strong>, being of sound mind, declare this my Last Will and Testament.</p>';
-h+='<h3 style="font-size:14px;margin-bottom:8px">Article I - Executor</h3><p style="font-size:13px;margin-bottom:15px">I appoint <strong>'+(gf('Executor')||'________')+'</strong> as Executor.</p>';
-h+='<h3 style="font-size:14px;margin-bottom:8px">Article II - Bequests</h3>';
-h+='<p style="font-size:13px;margin-bottom:8px">To <strong>'+(gf('Beneficiary 1')||'________')+'</strong>: '+(gf('Bequest 1')||'________')+'</p>';
-if(gf('Beneficiary 2'))h+='<p style="font-size:13px;margin-bottom:8px">To <strong>'+gf('Beneficiary 2')+'</strong>: '+(gf('Bequest 2')||'________')+'</p>';
-if(gf('Guardian'))h+='<h3 style="font-size:14px;margin-bottom:8px">Article III - Guardian</h3><p style="font-size:13px;margin-bottom:15px">I appoint <strong>'+gf('Guardian')+'</strong> as guardian of my minor children.</p>';
-}else if(name==='Bill of Sale'){
-h+='<p style="font-size:13px;line-height:1.8;margin-bottom:15px">Date: <strong>'+(gf('Date')||'__/__/____')+'</strong></p>';
-h+='<p style="font-size:13px;margin-bottom:10px"><strong>Seller:</strong> '+(gf('Seller')||'________')+' | <strong>Buyer:</strong> '+(gf('Buyer')||'________')+'</p>';
-h+='<div style="background:#f8fafc;padding:15px;border-radius:8px;margin-bottom:15px"><h4 style="font-size:13px;margin-bottom:8px">Item</h4><p style="font-size:13px">'+(gf('Item Description')||'________')+'</p>';
-if(gf('Serial Number'))h+='<p style="font-size:12px;color:#666;margin-top:4px">Serial: '+gf('Serial Number')+'</p>';
-h+='<p style="font-size:12px;margin-top:4px">Condition: '+(gf('Condition')||'________')+'</p></div>';
-h+='<p style="font-size:16px;font-weight:bold;text-align:center;margin-bottom:15px">Sale Price: $'+(gf('Sale Price')||'0.00')+'</p>';
-}else{
-h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';
-(FM[name]||[]).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});
-h+='</table>';
-}
-h+='<div style="margin-top:40px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #000;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Signature</p><p style="font-size:10px;color:#666">Date: ________</p></div></div><div style="text-align:center"><div style="border-top:1px solid #000;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Witness</p><p style="font-size:10px;color:#666">Date: ________</p></div></div></div></div>';
-return h;
-}
-function renderGeneric(name,logoH,co){
-var h='<div style="padding:30px">';h+=logoH;
-h+='<div style="border-bottom:2px solid var(--pri);padding-bottom:10px;margin-bottom:20px"><h2 style="font-size:18px">'+name+'</h2><p style="font-size:11px;color:#666">'+co+' | DocPro</p></div>';
-h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';
-(FM[name]||['Field 1','Field 2','Field 3','Field 4','Field 5']).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});
-h+='</table></div>';return h;
-}
-// Supabase loader
-async function loadFromSupabase(){
-try{
-var all=[],page=0,ps=1000,more=true;
-while(more){
-var{data,error}=await sb_client.from('templates').select('id,name,category,tier').range(page*ps,(page+1)*ps-1).order('category');
-if(error){console.log('Supabase load error:',error.message);break}
-if(data&&data.length>0){all=all.concat(data);page++}
-if(!data||data.length<ps)more=false;
-}
-if(all.length>0){
-var cm={};
-all.forEach(function(t){
-if(!cm[t.category])cm[t.category]={n:t.category,tier:t.tier||'free',docs:[]};
-cm[t.category].docs.push(t.name);
-if(t.tier==='business')cm[t.category].tier='business';
-else if(t.tier==='pro'&&cm[t.category].tier!=='business')cm[t.category].tier='pro';
-});
-CATS=Object.values(cm).sort(function(a,b){var o={free:0,pro:1,business:2};return(o[a.tier]||0)-(o[b.tier]||0)});
-console.log('Loaded '+all.length+' templates from Supabase in '+CATS.length+' categories');
-}else{console.log('Using built-in templates ('+CATS.reduce(function(s,c){return s+c.docs.length},0)+' docs)')}
-}catch(e){console.log('Supabase connection:',e.message)}
-}
-async function init(){
-await loadFromSupabase();
-updatePlanBadge();updatePricingBtns();renderSidebar();drawLogo();
-}
+function renderInvoiceReceipt(name,logoH,co){var h='<div style="padding:20px">';h+=logoH;if(name.indexOf('Receipt')>-1){h+='<div style="text-align:center;border-bottom:2px dashed #ccc;padding-bottom:15px;margin-bottom:15px"><h2 style="font-size:20px">'+co+'</h2><p style="font-size:11px;color:#666">'+name.toUpperCase()+'</p><p style="font-size:11px">Date: '+(gf('Date')||'__/__/____')+' | #: '+(gf('Receipt #')||'______')+'</p></div>';if(name==='Sales Receipt'){h+='<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(gf('Item 1')||'Item 1')+'</td><td style="text-align:right;padding:6px">$'+(gf('Price 1')||'0.00')+'</td></tr><tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(gf('Item 2')||'Item 2')+'</td><td style="text-align:right;padding:6px">$'+(gf('Price 2')||'0.00')+'</td></tr><tr style="border-top:2px solid #333;font-weight:bold;font-size:14px"><td style="padding:8px">TOTAL</td><td style="text-align:right;padding:8px">$'+(gf('Total')||'0.00')+'</td></tr></table>'}else{h+='<table style="width:100%;font-size:12px"><tr><td><strong>From:</strong> '+co+'</td></tr><tr><td><strong>To:</strong> '+(gf('Payer')||gf('Donor Name')||gf('Tenant')||'________')+'</td></tr><tr><td><strong>Amount:</strong> $'+(gf('Amount')||gf('Donation Amount')||'0.00')+'</td></tr></table>'}h+='<p style="text-align:center;margin-top:20px;font-size:10px;color:#999;border-top:2px dashed #ccc;padding-top:10px">Thank you!</p>'}else{h+='<div style="display:flex;justify-content:space-between;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:20px"><div><h1 style="font-size:24px;color:#2563eb">INVOICE</h1><p style="font-size:11px;color:#666">'+name+'</p></div><div style="text-align:right"><h2 style="font-size:16px">'+co+'</h2><p style="font-size:11px;color:#666">#: '+(gf('Invoice #')||'______')+' | '+(gf('Date')||'__/__/____')+'</p></div></div>';h+='<div style="display:flex;justify-content:space-between;margin-bottom:20px"><div><p style="font-size:10px;color:#999">BILL TO</p><p style="font-weight:600">'+(gf('Client Name')||gf('Client')||gf('Buyer')||'________')+'</p></div><div style="text-align:right"><p style="font-size:10px;color:#999">DUE</p><p style="font-weight:600">'+(gf('Due Date')||'________')+'</p></div></div>';var item1=gf('Item 1')||gf('Item Description')||gf('Project')||'Service',qty1=gf('Qty 1')||gf('Qty')||'1',rate1=gf('Rate 1')||gf('Rate')||gf('Unit Price')||'0.00';var amt1=(parseFloat(qty1)||0)*(parseFloat(rate1)||0);h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px"><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">Description</th><th style="padding:8px;text-align:center">Qty</th><th style="padding:8px;text-align:right">Rate</th><th style="padding:8px;text-align:right">Amount</th></tr><tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">'+item1+'</td><td style="padding:8px;text-align:center">'+qty1+'</td><td style="padding:8px;text-align:right">$'+rate1+'</td><td style="padding:8px;text-align:right">$'+amt1.toFixed(2)+'</td></tr>';if(gf('Item 2')){var qty2=gf('Qty 2')||'1',rate2=gf('Rate 2')||'0.00',amt2=(parseFloat(qty2)||0)*(parseFloat(rate2)||0);h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">'+gf('Item 2')+'</td><td style="padding:8px;text-align:center">'+qty2+'</td><td style="padding:8px;text-align:right">$'+rate2+'</td><td style="padding:8px;text-align:right">$'+amt2.toFixed(2)+'</td></tr>';amt1+=amt2}var tax=gf('Tax %')||'0',taxAmt=amt1*(parseFloat(tax)/100);h+='<tr style="font-weight:bold;font-size:14px;background:#f1f5f9"><td colspan="3" style="padding:10px;text-align:right">Total:</td><td style="padding:10px;text-align:right;color:#2563eb">$'+(amt1+taxAmt).toFixed(2)+'</td></tr></table>';if(gf('Notes'))h+='<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:11px"><strong>Notes:</strong> '+gf('Notes')+'</div>';h+='<p style="text-align:center;margin-top:20px;font-size:10px;color:#999">Thank you for your business!</p>'}h+='</div>';return h}
+function renderLetterMemo(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;if(name.indexOf('Memo')>-1){h+='<div style="border-bottom:3px solid #1e293b;padding-bottom:10px;margin-bottom:20px"><h2 style="font-size:18px">MEMORANDUM</h2></div><table style="font-size:12px;margin-bottom:20px;width:100%"><tr><td style="padding:4px 8px;font-weight:bold;width:60px">TO:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Recipient Name')||'________')+'</td></tr><tr><td style="padding:4px 8px;font-weight:bold">FROM:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Sender Name')||co)+'</td></tr><tr><td style="padding:4px 8px;font-weight:bold">DATE:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Date')||'__/__/____')+'</td></tr><tr><td style="padding:4px 8px;font-weight:bold">RE:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Subject')||'________')+'</td></tr></table><div style="font-size:13px;line-height:1.7">'+(gf('Body')||'Memo content...')+'</div>'}else{h+='<p style="font-size:12px">'+(gf('Sender Name')||gf('Your Name')||gf('Writer Name')||'________')+'</p><p style="font-size:12px;color:#666">'+(gf('Sender Address')||gf('Address')||'')+'</p><p style="font-size:12px;color:#666;margin:10px 0 20px">'+(gf('Date')||'__/__/____')+'</p><p style="font-size:12px">'+(gf('Recipient Name')||gf('Hiring Manager')||gf('Manager Name')||'________')+'</p><p style="font-size:12px;color:#666;margin-bottom:20px">'+(gf('Recipient Address')||gf('Company')||'')+'</p>';if(gf('Subject'))h+='<p style="font-size:12px;margin-bottom:15px"><strong>Re: '+gf('Subject')+'</strong></p>';h+='<p style="font-size:13px;margin-bottom:10px">Dear '+(gf('Recipient Name')||gf('Hiring Manager')||'Sir/Madam')+',</p><div style="font-size:13px;line-height:1.8"><p style="margin-bottom:10px">'+(gf('Body')||gf('Body Paragraph 1')||gf('Qualities')||'Letter content...')+'</p>';if(gf('Body Paragraph 2'))h+='<p style="margin-bottom:10px">'+gf('Body Paragraph 2')+'</p>';h+='</div><p style="font-size:13px;margin-top:20px">'+(gf('Closing')||'Sincerely')+',</p><p style="font-size:13px;margin-top:30px;font-style:italic">'+(gf('Sender Name')||gf('Your Name')||'________')+'</p>'}h+='</div>';return h}
+function renderResume(name,logoH,co){var h='<div style="padding:30px">';var fn=gf('Full Name')||gf('Your Name')||'Your Name';if(name.indexOf('Resume')>-1||name.indexOf('CV')>-1){h+='<div style="text-align:center;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:20px"><h1 style="font-size:24px;letter-spacing:2px">'+fn.toUpperCase()+'</h1><p style="font-size:12px;color:#666;margin-top:4px">';if(gf('Email'))h+=gf('Email')+' | ';if(gf('Phone'))h+=gf('Phone');h+='</p></div>';if(gf('Summary'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Summary</h3><p style="font-size:12px;line-height:1.6">'+gf('Summary')+'</p></div>';if(gf('Company 1'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Experience</h3><div><strong style="font-size:12px">'+gf('Title 1')+'</strong> <span style="font-size:11px;color:#666">'+gf('Dates 1')+'</span><p style="font-size:12px;color:#666">'+gf('Company 1')+'</p></div></div>';if(gf('Education'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Education</h3><p style="font-size:12px">'+gf('Education')+'</p></div>';if(gf('Skills'))h+='<div><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Skills</h3><p style="font-size:12px">'+gf('Skills')+'</p></div>'}else{h+='<h2 style="font-size:18px;border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:20px">'+name+'</h2><table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||[]).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table>'}h+='</div>';return h}
+function renderContract(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;h+='<div style="text-align:center;border-bottom:2px solid #1e293b;padding-bottom:15px;margin-bottom:25px"><h1 style="font-size:22px;letter-spacing:1px">'+name.toUpperCase()+'</h1><p style="font-size:11px;color:#666">Date: '+(gf('Effective Date')||gf('Date')||'__/__/____')+'</p></div>';h+='<div style="display:flex;justify-content:space-between;margin-bottom:25px;padding:15px;background:#f8fafc;border-radius:8px"><div><p style="font-size:10px;color:#999">PARTY A</p><p style="font-weight:bold">'+(gf('Provider')||gf('Landlord')||gf('Lessor')||gf('Disclosing Party')||co)+'</p></div><div style="text-align:right"><p style="font-size:10px;color:#999">PARTY B</p><p style="font-weight:bold">'+(gf('Client')||gf('Tenant')||gf('Lessee')||gf('Receiving Party')||'________')+'</p></div></div>';var secs=['Services','Compensation','Payment Terms','Duration','Property','Monthly Rent','Purpose','Governing Law'],sn=1;secs.forEach(function(s){if(gf(s)){h+='<div style="margin-bottom:15px"><h3 style="font-size:13px">Section '+sn+': '+s+'</h3><p style="font-size:12px;line-height:1.6;margin-top:4px">'+gf(s)+'</p></div>';sn++}});if(sn===1)h+='<p style="font-size:12px;color:#666">Fill in the form fields above to populate this document.</p>';h+='<div style="margin-top:40px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Party A</p></div></div><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Party B</p></div></div></div></div>';return h}
+function renderTaxFinancial(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;if(name==='Pay Stub'){h+='<div style="background:#1e293b;color:#fff;padding:15px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between"><div><h2 style="font-size:16px">'+(gf('Company Name')||'Company')+'</h2><p style="font-size:10px;opacity:.7">EARNINGS STATEMENT</p></div><div style="text-align:right"><p style="font-size:11px">Pay Date: '+(gf('Pay Date')||'____')+'</p></div></div>';var hrs=parseFloat(gf('Hours Worked'))||0,rate=parseFloat(gf('Hourly Rate'))||0,gross=hrs*rate;h+='<div style="border:1px solid #e2e8f0;padding:15px"><p style="font-weight:bold">'+(gf('Employee Name')||'________')+'</p></div>';h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">EARNINGS</th><th style="text-align:right;padding:8px">AMOUNT</th></tr><tr><td style="padding:8px">Regular ('+hrs+'h x $'+rate.toFixed(2)+')</td><td style="text-align:right;padding:8px">$'+gross.toFixed(2)+'</td></tr><tr style="font-weight:bold;background:#f1f5f9"><td style="padding:8px">GROSS</td><td style="text-align:right;padding:8px">$'+gross.toFixed(2)+'</td></tr></table>';var fed=parseFloat(gf('Federal Tax'))||0,st=parseFloat(gf('State Tax'))||0,ss=parseFloat(gf('SS Tax'))||0,med=parseFloat(gf('Medicare'))||0,td=fed+st+ss+med;h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><tr style="background:#fef2f2"><th style="padding:8px;text-align:left">DEDUCTIONS</th><th style="text-align:right;padding:8px"></th></tr><tr><td style="padding:6px">Federal</td><td style="text-align:right">$'+fed.toFixed(2)+'</td></tr><tr><td style="padding:6px">State</td><td style="text-align:right">$'+st.toFixed(2)+'</td></tr><tr><td style="padding:6px">SS</td><td style="text-align:right">$'+ss.toFixed(2)+'</td></tr><tr><td style="padding:6px">Medicare</td><td style="text-align:right">$'+med.toFixed(2)+'</td></tr></table>';h+='<div style="background:#22c55e;color:#fff;padding:15px;border-radius:0 0 8px 8px;text-align:center;margin-top:15px"><p style="font-size:10px;opacity:.8">NET PAY</p><p style="font-size:24px;font-weight:800">$'+(gf('Net Pay')||(gross-td).toFixed(2))+'</p></div>'}else if(name==='W-2 Form'){h+='<div style="border:2px solid #000"><div style="background:#000;color:#fff;padding:8px;text-align:center;font-size:11px">Form W-2 '+new Date().getFullYear()+'</div><div style="display:grid;grid-template-columns:1fr 1fr;font-size:11px"><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">Employer</p><p style="font-weight:bold">'+(gf('Employer Name')||'________')+'</p></div><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">Employee</p><p style="font-weight:bold">'+(gf('Employee Name')||'________')+'</p></div><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">1 Wages</p><p style="font-weight:bold">$'+(gf('Wages')||'0.00')+'</p></div><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">2 Federal tax</p><p style="font-weight:bold">$'+(gf('Federal Tax Withheld')||'0.00')+'</p></div></div></div>'}else{h+='<h2 style="font-size:18px;border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:20px">'+name+'</h2><table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||[]).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table>'}h+='</div>';return h}
+function renderLegalGov(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;h+='<div style="text-align:center;margin-bottom:25px"><p style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:2px">United States of America</p><h1 style="font-size:20px;border-bottom:2px solid #000;border-top:2px solid #000;padding:10px 0;margin:8px 0">'+name.toUpperCase()+'</h1></div>';h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||['Party 1','Party 2','Date','Terms','Conditions','Signatures']).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table><div style="margin-top:40px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #000;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Signature</p></div></div><div style="text-align:center"><div style="border-top:1px solid #000;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Witness</p></div></div></div></div>';return h}
+function renderGeneric(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;h+='<h2 style="font-size:18px;border-bottom:2px solid var(--pri);padding-bottom:10px;margin-bottom:20px">'+name+'</h2><p style="font-size:11px;color:#666;margin-bottom:15px">'+co+' | DocPro</p><table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||['Field 1','Field 2','Field 3','Field 4','Field 5']).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table></div>';return h}
+async function loadFromSupabase(){try{var all=[],page=0,ps=1000,more=true;while(more){var{data,error}=await sb_client.from('templates').select('id,name,category,tier').range(page*ps,(page+1)*ps-1).order('category');if(error){console.log('Supabase load error:',error.message);break}if(data&&data.length>0){all=all.concat(data);page++}if(!data||data.length<ps)more=false}if(all.length>0){var cm={};all.forEach(function(t){if(!cm[t.category])cm[t.category]={n:t.category,tier:t.tier||'free',docs:[]};cm[t.category].docs.push(t.name);if(t.tier==='business')cm[t.category].tier='business';else if(t.tier==='pro'&&cm[t.category].tier!=='business')cm[t.category].tier='pro'});CATS=Object.values(cm).sort(function(a,b){var o={free:0,pro:1,business:2};return(o[a.tier]||0)-(o[b.tier]||0)});console.log('Loaded '+all.length+' templates from Supabase in '+CATS.length+' categories')}else{console.log('Using built-in templates')}}catch(e){console.log('Supabase:',e.message)}}
+async function init(){await loadFromSupabase();updatePlanBadge();updatePricingBtns();renderSidebar();drawLogo()}
 init();
 </script>
 </body>
