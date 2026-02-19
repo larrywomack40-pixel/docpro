@@ -23,228 +23,982 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cat-btn{padding:6px 4px;font-size:10px;text-align:center;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--card);transition:.2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cat-btn:hover{border-color:var(--pri);color:var(--pri)}
 .cat-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
-.cat-toggle{width:100%;padding:4px;font-size:10px;color:var(--pri);background:none;border:1px dashed var(--border);border-radius:4px;cursor:pointer;margin-bottom:8px}
-.tier-filter{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
-.tier-btn{padding:3px 8px;font-size:10px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:var(--card)}
+.tier-filters{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.tier-btn{padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer;border:1px solid var(--border);background:var(--card)}
 .tier-btn:hover,.tier-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
-.doc-list{display:flex;flex-direction:column;gap:2px}
-.doc-item{padding:8px 10px;border-radius:6px;cursor:pointer;font-size:12px;display:flex;justify-content:space-between;align-items:center;transition:.15s}
-.doc-item:hover{background:#f1f5f9}
-.doc-item.active{background:#eff6ff;color:var(--pri)}
-.doc-item .tier-badge{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600}
-.tier-free{background:#dcfce7;color:#166534}.tier-pro{background:#dbeafe;color:#1e40af}.tier-business{background:#fef3c7;color:#92400e}
+.doc-list{list-style:none}
+.doc-item{padding:8px 12px;cursor:pointer;border-radius:6px;font-size:13px;display:flex;justify-content:space-between;align-items:center;transition:.15s}
+.doc-item:hover{background:var(--bg)}
+.doc-item.active{background:#eff6ff;color:var(--pri);font-weight:600}
+.doc-tier{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;text-transform:capitalize}
+.doc-tier.free{background:#dcfce7;color:#16a34a}
+.doc-tier.pro{background:#fef3c7;color:#d97706}
+.doc-tier.business{background:#fee2e2;color:#dc2626}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.main-header{padding:10px 20px;background:var(--card);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.main-header h2{font-size:16px}
+.main-header{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--card)}
+.main-header h2{font-size:18px}
 .header-actions{display:flex;gap:8px;align-items:center}
-.auth-btn{padding:6px 16px;background:var(--pri);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px}
-.auth-btn:hover{background:var(--pri-d)}
-.user-menu{position:relative}.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
-.user-dropdown{position:absolute;top:40px;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:200px;display:none;z-index:100}
-.user-dropdown.open{display:block}
-.user-dropdown a,.user-dropdown button{display:block;width:100%;padding:8px 16px;text-align:left;border:none;background:none;cursor:pointer;font-size:12px;color:var(--text);text-decoration:none}
-.user-dropdown a:hover,.user-dropdown button:hover{background:#f1f5f9}
-.admin-badge{background:#fbbf24;color:#000;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px}
-.plan-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
-.plan-free{background:#dcfce7;color:#166534}.plan-pro{background:#dbeafe;color:#1e40af}.plan-business{background:#fef3c7;color:#92400e}
-.preview-area{flex:1;overflow-y:auto;padding:20px;background:#f1f5f9}
-.preview-card{max-width:900px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden}
-.form-section{padding:20px;border-bottom:1px solid var(--border)}
-.form-section h3{font-size:14px;margin-bottom:12px;color:var(--pri)}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-.form-group label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px}
-.form-group textarea{min-height:60px;resize:vertical}
-.preview-section{padding:20px}
-.doc-preview{border:1px solid var(--border);border-radius:8px;padding:30px;min-height:400px;background:#fff}
-.toolbar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.toolbar select,.toolbar button{padding:5px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:#fff;cursor:pointer}
-.toolbar button:hover{background:#f1f5f9}
-.btn-pri{background:var(--pri)!important;color:#fff!important;border-color:var(--pri)!important}
-.btn-pri:hover{background:var(--pri-d)!important}
-.lock-overlay{position:relative}.lock-overlay::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);z-index:10;backdrop-filter:blur(2px)}
-.lock-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:11;text-align:center;padding:24px;background:var(--card);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
-.lock-msg h3{font-size:16px;margin-bottom:6px}.lock-msg p{font-size:12px;color:var(--muted);margin-bottom:12px}
-.lock-msg button{padding:8px 20px;background:var(--pri);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}.empty-state h3{font-size:18px;margin-bottom:8px;color:var(--text)}
-.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.active{display:flex}.modal{background:var(--card);border-radius:12px;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
-.modal-lg{max-width:800px}.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
-.modal h2{font-size:18px;margin-bottom:16px}
-.auth-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
-.auth-tab{padding:8px 20px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px}
-.auth-tab.active{color:var(--pri);border-bottom-color:var(--pri)}
-.auth-form{display:flex;flex-direction:column;gap:12px}
-.auth-form input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px}
-.auth-form button{padding:10px;background:var(--pri);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600}
-.auth-form button:hover{background:var(--pri-d)}
-.auth-error{color:var(--danger);font-size:12px;display:none}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.pricing-card{border:2px solid var(--border);border-radius:12px;padding:20px;text-align:center;transition:.2s}
-.pricing-card:hover{border-color:var(--pri)}.pricing-card.featured{border-color:var(--pri);background:#eff6ff}
-.pricing-card h3{font-size:16px;margin-bottom:4px}.pricing-card .price{font-size:28px;font-weight:800;color:var(--pri);margin:8px 0}
-.pricing-card .price span{font-size:13px;font-weight:400;color:var(--muted)}
-.pricing-card ul{list-style:none;text-align:left;margin:12px 0;font-size:12px}
-.pricing-card li{padding:4px 0;padding-left:18px;position:relative}.pricing-card li::before{content:'\2713';position:absolute;left:0;color:var(--success)}
-.pricing-card button{width:100%;padding:10px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
-.logo-search-results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;max-height:250px;overflow-y:auto}
-.logo-result{border:2px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
-.logo-result:hover,.logo-result.selected{border-color:var(--pri)}.logo-result img{max-width:60px;max-height:40px}
-.logo-creator{margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px}
-.logo-creator canvas{border:1px solid var(--border);border-radius:4px;display:block;margin:8px auto}
-.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;cursor:pointer;transition:.2s}
-.upload-zone:hover{border-color:var(--pri);background:#eff6ff}
-.theme-modern .doc-preview{font-family:'Segoe UI',sans-serif}
-.theme-classic .doc-preview{font-family:Georgia,serif;background:#fefef5}
-.theme-elegant .doc-preview{font-family:'Palatino',serif;background:#faf9f7}
-.theme-corporate .doc-preview{font-family:Arial,sans-serif;border:2px solid #1a365d}
-.theme-minimal .doc-preview{font-family:'Helvetica Neue',sans-serif;border:none;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.theme-bold .doc-preview{font-family:'Impact',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:40px}
-@media print{body>*{display:none!important}.preview-area{display:block!important;position:absolute;top:0;left:0;width:100%;padding:0;overflow:visible}.preview-card{box-shadow:none;border-radius:0}.form-section{display:none!important}.main-header,.sidebar,.modal-overlay{display:none!important}}
-@media(max-width:768px){.sidebar{display:none}.pricing-grid{grid-template-columns:1fr}}
+.btn{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid var(--border);background:var(--card);transition:.2s}
+.btn:hover{border-color:var(--pri)}
+.btn-pri{background:var(--pri);color:#fff;border-color:var(--pri)}
+.btn-pri:hover{background:var(--pri-d)}
+.badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:8px}
+.badge-free{background:#dcfce7;color:#16a34a}
+.badge-pro{background:#fef3c7;color:#d97706}
+.badge-biz{background:#dbeafe;color:#2563eb}
+.main-content{flex:1;overflow-y:auto;padding:24px;display:flex;gap:24px}
+.form-panel{width:50%;max-width:500px}
+.form-panel h3{font-size:15px;color:var(--pri);margin-bottom:12px}
+.form-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.form-row label{font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px}
+.form-row textarea{min-height:60px;resize:vertical}
+.form-field{flex:1;min-width:120px}
+.preview-panel{flex:1;min-width:300px}
+#docPreview{background:#fff;border:1px solid var(--border);border-radius:8px;padding:40px;min-height:500px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.toolbar select,.toolbar button{padding:6px 12px;border-radius:4px;border:1px solid var(--border);font-size:12px;cursor:pointer}
+/* Modal */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;z-index:1000}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:12px;padding:32px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto}
+.modal h2{margin-bottom:16px;font-size:20px}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.modal input[type="text"],.modal input[type="email"],.modal input[type="password"]{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;margin-bottom:12px;font-size:14px}
+.modal .btn{width:100%;padding:12px;font-size:14px;margin-top:8px}
+.tab-btns{display:flex;gap:0;margin-bottom:16px}
+.tab-btns button{flex:1;padding:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:13px}
+.tab-btns button.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.price-card{border:2px solid var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.2s}
+.price-card:hover,.price-card.popular{border-color:var(--pri)}
+.price-card.popular{position:relative}
+.price-card .price{font-size:28px;font-weight:800;color:var(--pri);margin:8px 0}
+.price-card .price span{font-size:14px;color:var(--muted)}
+.price-card ul{list-style:none;text-align:left;margin:12px 0;font-size:12px}
+.price-card li{padding:4px 0;border-bottom:1px solid var(--bg)}
+.price-card li::before{content:"\2713 ";color:var(--success)}
+/* Logo Studio */
+.logo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.logo-grid img{width:100%;height:80px;object-fit:contain;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:4px}
+.logo-grid img:hover{border-color:var(--pri)}
+/* Avatar */
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
+.user-menu{position:relative}
+.user-dropdown{position:absolute;top:40px;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;min-width:160px;display:none;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.user-dropdown.show{display:block}
+.user-dropdown a{display:block;padding:8px 12px;font-size:13px;color:var(--text);text-decoration:none;border-radius:4px}
+.user-dropdown a:hover{background:var(--bg)}
+.load-more-btn{width:100%;padding:8px;margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;color:var(--muted)}
+.load-more-btn:hover{border-color:var(--pri);color:var(--pri)}
+.doc-count{font-size:11px;color:var(--muted);padding:4px 12px;text-align:center}
+@media print{.sidebar,.main-header,.toolbar,.form-panel,.modal-overlay{display:none!important}.main-content{padding:0!important}#docPreview{border:none!important;box-shadow:none!important;padding:20px!important}}
 </style>
 </head>
 <body>
-<div class="sidebar"><div class="sidebar-header"><h1>DocPro</h1><p>Professional USA Document Generator</p><input class="search-box" id="globalSearch" type="text" placeholder="Search 10,000+ templates..." oninput="filterDocs(this.value)"></div><div class="sidebar-content" id="sidebarContent"></div></div>
-<div class="main"><div class="main-header"><div><h2 id="docTitle">Select a Document</h2><span id="planBadge" class="plan-badge plan-free">FREE PLAN</span></div><div class="header-actions"><button class="toolbar" onclick="openModal('logoModal')">Logo</button><button class="toolbar" onclick="openModal('uploadModal')">Upload</button><button class="toolbar btn-pri" onclick="openModal('pricingModal')">Upgrade</button><div id="authArea"><button class="auth-btn" onclick="openModal('authModal')">&#128100; Sign In</button></div></div></div>
-<div class="preview-area" id="previewArea"><div class="empty-state"><h3>Welcome to DocPro</h3><p>Select a document from the sidebar or search for templates</p><p style="margin-top:16px"><button class="btn-pri toolbar" onclick="openModal('pricingModal')" style="padding:10px 24px;font-size:14px">View Plans & Pricing</button></p></div></div></div>
-<div class="modal-overlay" id="authModal"><div class="modal"><button class="modal-close" onclick="closeModal('authModal')">&times;</button><h2>Welcome to DocPro</h2><div class="auth-tabs"><button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button><button class="auth-tab" onclick="switchAuthTab('register')">Create Account</button></div><div id="authError" class="auth-error"></div><form class="auth-form" id="authForm" onsubmit="handleAuth(event)"><input type="email" id="authEmail" placeholder="Email address" required><input type="password" id="authPass" placeholder="Password" required><div id="registerFields" style="display:none"><input type="text" id="authName" placeholder="Full Name" style="margin-top:12px"></div><button type="submit" id="authSubmitBtn">Sign In</button></form><p style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">By continuing, you agree to DocPro Terms of Service</p></div></div>
-<div class="modal-overlay" id="pricingModal"><div class="modal modal-lg"><button class="modal-close" onclick="closeModal('pricingModal')">&times;</button><h2 style="text-align:center">Choose Your Plan</h2><p style="text-align:center;color:var(--muted);margin-bottom:20px">Unlock premium templates and features</p><div class="pricing-grid"><div class="pricing-card"><h3>Free</h3><div class="price">$0<span>/mo</span></div><ul><li>Basic document templates</li><li>Invoices, receipts, letters</li><li>Resumes & cover letters</li><li>Memos & checklists</li><li>Standard themes</li></ul><button onclick="selectPlan('free')" style="background:var(--border);color:var(--text)" id="priceFreeBtn">Current Plan</button></div><div class="pricing-card featured"><h3>Pro</h3><div class="price">$9.99<span>/mo</span></div><ul><li>Everything in Free</li><li>Contracts & agreements</li><li>Tax documents & W-2s</li><li>Pay stubs & employment</li><li>All 6 premium themes</li><li>Priority support</li></ul><button class="btn-pri" onclick="selectPlan('pro')" id="priceProBtn">Upgrade to Pro</button></div><div class="pricing-card"><h3>Business</h3><div class="price">$24.99<span>/mo</span></div><ul><li>Everything in Pro</li><li>Legal & court documents</li><li>Financial statements</li><li>Insurance & medical</li><li>Government forms</li><li>Custom branding</li><li>Bulk generation</li></ul><button onclick="selectPlan('business')" style="background:#1e293b;color:#fff" id="priceBizBtn">Go Business</button></div></div></div></div>
-<div class="modal-overlay" id="logoModal"><div class="modal"><button class="modal-close" onclick="closeModal('logoModal')">&times;</button><h2>Logo Studio</h2><input type="text" class="search-box" id="logoSearchInput" placeholder="Search company logos..." oninput="searchLogos(this.value)"><div class="logo-search-results" id="logoResults"></div><div class="logo-creator"><h4 style="font-size:13px;margin-bottom:8px">Create Logo</h4><div class="form-grid"><div class="form-group"><label>Company Name</label><input type="text" id="logoText" oninput="drawLogo()"></div><div class="form-group"><label>Color</label><input type="color" id="logoColor" value="#2563eb" oninput="drawLogo()"></div><div class="form-group"><label>Shape</label><select id="logoShape" onchange="drawLogo()"><option>Circle</option><option>Square</option><option>Shield</option><option>Diamond</option></select></div></div><canvas id="logoCanvas" width="200" height="80"></canvas><button class="btn-pri toolbar" onclick="applyLogo()" style="margin-top:8px;width:100%">Apply Logo to Document</button></div></div></div>
-<div class="modal-overlay" id="uploadModal"><div class="modal"><button class="modal-close" onclick="closeModal('uploadModal')">&times;</button><h2>Upload Document</h2><div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)"><p style="font-size:32px">&#128196;</p><p style="margin-top:8px;font-weight:600">Drop file here or click to browse</p><p style="font-size:11px;color:var(--muted);margin-top:4px">PDF, DOCX, TXT, CSV, JSON supported</p></div><input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt,.csv,.json" onchange="handleUpload(this.files[0])"><div id="uploadResult" style="margin-top:12px"></div></div></div>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>DocPro</h1>
+    <p>Professional USA Document Generator</p>
+    <input class="search-box" id="searchBox" placeholder="Search 10,000+ templates..." oninput="filterDocs()">
+  </div>
+  <div class="sidebar-content">
+    <div class="cat-grid" id="catGrid"></div>
+    <div class="tier-filters" id="tierFilters">
+      <span class="tier-btn active" onclick="setTier('all')">All</span>
+      <span class="tier-btn" onclick="setTier('free')">Free</span>
+      <span class="tier-btn" onclick="setTier('pro')">Pro</span>
+      <span class="tier-btn" onclick="setTier('business')">Business</span>
+    </div>
+    <div class="doc-count" id="docCount"></div>
+    <ul class="doc-list" id="docList"></ul>
+    <button class="load-more-btn" id="loadMoreBtn" style="display:none" onclick="loadMoreDocs()">Load More...</button>
+  </div>
+</div>
+
+<!-- Main Area -->
+<div class="main">
+  <div class="main-header">
+    <div style="display:flex;align-items:center">
+      <h2 id="docTitle">Select a Document</h2>
+      <span class="badge badge-free" id="planBadge">FREE PLAN</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="openLogo()">Logo</button>
+      <button class="btn" onclick="openUpload()">Upload</button>
+      <button class="btn" onclick="openPricing()">Upgrade</button>
+      <div class="user-menu" id="userMenu">
+        <button class="btn" id="authBtn" onclick="openAuth()">Sign In</button>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="form-panel" id="formPanel">
+      <div class="toolbar">
+        <select id="themeSelect" onchange="applyTheme()">
+          <option value="modern">Modern</option>
+          <option value="classic">Classic</option>
+          <option value="elegant">Elegant</option>
+          <option value="corporate">Corporate</option>
+          <option value="minimal">Minimal</option>
+          <option value="bold">Bold</option>
+        </select>
+        <button class="btn" onclick="printDoc()">Print</button>
+        <button class="btn" onclick="resetForm()">Reset</button>
+        <button class="btn btn-pri" onclick="generatePDF()">Download PDF</button>
+      </div>
+      <div id="formFields"></div>
+    </div>
+    <div class="preview-panel">
+      <div id="docPreview">
+        <div style="text-align:center;padding:60px;color:var(--muted)">
+          <h3>Welcome to DocPro</h3>
+          <p style="margin-top:8px">Select a document from the sidebar to get started</p>
+          <p style="margin-top:16px;font-size:12px">10,000+ professional templates across 14 categories</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modals -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+    <h2 id="authTitle">Sign In</h2>
+    <div class="tab-btns">
+      <button class="active" onclick="switchAuthTab('login')">Login</button>
+      <button onclick="switchAuthTab('register')">Register</button>
+    </div>
+    <div id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPass" placeholder="Password">
+      <button class="btn btn-pri" onclick="doLogin()">Sign In</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <input type="text" id="regName" placeholder="Full Name">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPass" placeholder="Password (min 6 chars)">
+      <button class="btn btn-pri" onclick="doRegister()">Create Account</button>
+    </div>
+    <p id="authMsg" style="margin-top:8px;font-size:12px;color:var(--danger)"></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pricingModal">
+  <div class="modal" style="max-width:700px">
+    <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
+    <h2>Choose Your Plan</h2>
+    <p style="color:var(--muted);margin-bottom:16px">Unlock premium templates and features</p>
+    <div class="pricing-grid">
+      <div class="price-card" onclick="selectPlan('free')">
+        <h3>Free</h3>
+        <div class="price">$0<span>/mo</span></div>
+        <ul>
+          <li>Basic templates</li>
+          <li>Invoices & receipts</li>
+          <li>Letters & memos</li>
+          <li>Download as PDF</li>
+          <li>6 design themes</li>
+        </ul>
+        <button class="btn" style="width:100%">Current Plan</button>
+      </div>
+      <div class="price-card popular" onclick="selectPlan('pro')">
+        <h3>Pro</h3>
+        <div class="price">$9.99<span>/mo</span></div>
+        <ul>
+          <li>All Free templates</li>
+          <li>Contracts & agreements</li>
+          <li>Tax & financial forms</li>
+          <li>Real estate docs</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="btn btn-pri" style="width:100%">Upgrade to Pro</button>
+      </div>
+      <div class="price-card" onclick="selectPlan('business')">
+        <h3>Business</h3>
+        <div class="price">$24.99<span>/mo</span></div>
+        <ul>
+          <li>All Pro templates</li>
+          <li>Legal & government</li>
+          <li>Healthcare & medical</li>
+          <li>Insurance & claims</li>
+          <li>Custom branding</li>
+        </ul>
+        <button class="btn btn-pri" style="width:100%">Upgrade to Business</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="logoModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('logoModal')">&times;</button>
+    <h2>Logo Studio</h2>
+    <input type="text" id="logoSearch" placeholder="Search company logos..." oninput="searchLogos()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;margin-bottom:12px">
+    <div class="logo-grid" id="logoGrid"></div>
+    <hr style="margin:16px 0">
+    <h3 style="font-size:14px;margin-bottom:8px">Create Custom Logo</h3>
+    <input type="text" id="logoText" placeholder="Company Name" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;margin-bottom:8px">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input type="color" id="logoColor" value="#2563eb" style="width:40px;height:36px;border:none;cursor:pointer">
+      <select id="logoShape" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:4px">
+        <option value="circle">Circle</option>
+        <option value="square">Square</option>
+        <option value="rounded">Rounded</option>
+        <option value="text-only">Text Only</option>
+      </select>
+      <button class="btn btn-pri" onclick="createLogo()">Create</button>
+    </div>
+    <div id="logoPreview" style="text-align:center;padding:16px"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
+    <h2>Upload Document</h2>
+    <p style="color:var(--muted);margin-bottom:16px;font-size:13px">Upload JSON, CSV, or TXT files to generate documents</p>
+    <div style="border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;cursor:pointer" onclick="document.getElementById('fileInput').click()">
+      <p style="font-size:14px;color:var(--muted)">Click to upload or drag & drop</p>
+      <p style="font-size:11px;color:var(--muted);margin-top:4px">JSON, CSV, TXT supported</p>
+    </div>
+    <input type="file" id="fileInput" accept=".json,.csv,.txt" style="display:none" onchange="handleUpload(event)">
+    <div id="uploadResult" style="margin-top:12px"></div>
+  </div>
+</div>
 <script>
-var SUPA_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
-var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
-var sb_client=supabase.createClient(SUPA_URL,SUPA_KEY);
-var currentUser=null,userProfile=null;
-var CATS=[
-{n:'Invoices & Receipts',tier:'free',docs:['Standard Invoice','Commercial Invoice','Proforma Invoice','Freelance Invoice','Medical Invoice','Legal Services Invoice','Consulting Invoice','Contractor Invoice','Hourly Invoice','Recurring Invoice','Sales Receipt','Donation Receipt','Rent Receipt','Payment Receipt','Delivery Receipt','Service Receipt','Expense Receipt','Cash Receipt','Digital Payment Receipt','Refund Receipt']},
-{n:'Letters & Memos',tier:'free',docs:['Business Letter','Cover Letter','Recommendation Letter','Resignation Letter','Termination Letter','Thank You Letter','Complaint Letter','Reference Letter','Offer Letter','Demand Letter','Formal Memo','Office Memo','Policy Memo','Meeting Memo','Confidential Memo','Executive Memo','Department Memo','Project Update Memo','Action Required Memo','Weekly Report Memo']},
-{n:'Resumes & Employment',tier:'free',docs:['Professional Resume','Entry-Level Resume','Executive Resume','Technical Resume','Creative Resume','Federal Resume','Academic CV','Chronological Resume','Functional Resume','Combination Resume','Employment Application','Job Description','Employee Handbook Acknowledgment','Non-Compete Agreement','Employment Verification Letter','Timesheet','Work Schedule','Employee Evaluation','Performance Review','Exit Interview Form']},
-{n:'Contracts & Agreements',tier:'pro',docs:['Service Agreement','Rental Agreement','Lease Agreement','NDA','Independent Contractor Agreement','Employment Contract','Sales Contract','Partnership Agreement','Operating Agreement','Consulting Agreement','Subcontractor Agreement','Licensing Agreement','Franchise Agreement','Non-Solicitation Agreement','Joint Venture Agreement','Distribution Agreement','Commission Agreement','Retainer Agreement','Master Service Agreement','Statement of Work']},
-{n:'Tax & Financial',tier:'pro',docs:['W-2 Form','1099-MISC','1099-NEC','W-9 Form','Pay Stub','Profit Loss Statement','Balance Sheet','Cash Flow Statement','Income Statement','Budget Report','Expense Report','Financial Projection','Tax Summary','Quarterly Report','Annual Report','Bank Statement','Investment Summary','Depreciation Schedule','Tax Deduction Worksheet','Estimated Tax Payment']},
-{n:'Legal & Government',tier:'business',docs:['Power of Attorney','Last Will Testament','Living Will','Bill of Sale','Affidavit','Cease Desist Letter','Court Filing Cover','Motion Template','Subpoena Form','Deposition Notice','Divorce Petition','Child Custody Agreement','Restraining Order Application','Bankruptcy Petition','Immigration Application','Passport Application','Name Change Petition','Small Claims Filing','Appeal Brief','Legal Complaint']}
-];
-var FM={
-'Standard Invoice':['Company Name','Client Name','Invoice #','Date','Due Date','Item 1','Qty 1','Rate 1','Item 2','Qty 2','Rate 2','Tax %','Notes'],
-'Commercial Invoice':['Exporter','Importer','Invoice #','Date','Ship Date','Country of Origin','Commodity','Qty','Unit Price','Freight','Insurance','Total'],
-'Proforma Invoice':['Seller','Buyer','PI Number','Date','Validity','Item Description','Quantity','Unit Price','Total','Shipping Terms','Payment Terms','Notes'],
-'Freelance Invoice':['Freelancer Name','Client Name','Invoice #','Date','Due Date','Project','Hours','Rate','Subtotal','Tax','Total','Payment Method'],
-'Medical Invoice':['Provider Name','Patient Name','Invoice #','Date','Service Date','Procedure Code','Description','Qty','Charge','Insurance','Patient Due','Notes'],
-'Legal Services Invoice':['Firm Name','Client Name','Matter #','Invoice #','Date','Attorney','Hours','Rate','Expenses','Subtotal','Tax','Total Due'],
-'Consulting Invoice':['Consultant','Client','Invoice #','Date','Project','Phase','Hours','Rate','Expenses','Subtotal','Tax','Balance Due'],
-'Contractor Invoice':['Contractor Name','Client Name','Invoice #','Date','Project','Materials Cost','Labor Hours','Labor Rate','Subtotal','Tax','Total','Payment Terms'],
-'Sales Receipt':['Store Name','Date','Receipt #','Item 1','Price 1','Item 2','Price 2','Subtotal','Tax','Total','Payment Method','Cashier'],
-'Donation Receipt':['Organization','Donor Name','Date','Donation Amount','Purpose','Tax ID','Receipt #','Acknowledgment'],
-'Rent Receipt':['Landlord','Tenant','Property Address','Month','Date','Amount','Payment Method','Receipt #'],
-'Payment Receipt':['Company','Payer','Date','Receipt #','Amount','Payment Method','Reference #','Notes'],
-'Business Letter':['Sender Name','Sender Address','Date','Recipient Name','Recipient Address','Subject','Body','Closing'],
-'Cover Letter':['Your Name','Address','Date','Hiring Manager','Company','Position','Body Paragraph 1','Body Paragraph 2','Closing'],
-'Recommendation Letter':['Writer Name','Title','Organization','Date','Candidate Name','Relationship','Duration Known','Qualities','Recommendation'],
-'Resignation Letter':['Your Name','Date','Manager Name','Company','Position','Last Day','Reason','Gratitude Note'],
-'Professional Resume':['Full Name','Email','Phone','LinkedIn','Summary','Company 1','Title 1','Dates 1','Duties 1','Company 2','Title 2','Dates 2','Education','Skills'],
-'Service Agreement':['Provider','Client','Effective Date','Services','Compensation','Payment Terms','Duration','Termination Notice','Governing Law','Signatures'],
-'Rental Agreement':['Landlord','Tenant','Property Address','Monthly Rent','Security Deposit','Lease Start','Lease End','Pet Policy','Utilities','Late Fee'],
-'Lease Agreement':['Lessor','Lessee','Property','Term Start','Term End','Monthly Payment','Deposit','Maintenance','Insurance Req','Governing Law'],
-'NDA':['Disclosing Party','Receiving Party','Date','Purpose','Duration','Exclusions','Governing Law','Jurisdiction','Return of Materials','Remedies'],
-'W-2 Form':['Employer Name','Employer EIN','Employee Name','Employee SSN','Wages','Federal Tax Withheld','SS Wages','SS Tax','Medicare Wages','Medicare Tax','State','State Tax'],
-'Pay Stub':['Company Name','Employee Name','Employee ID','Pay Period','Pay Date','Hours Worked','Hourly Rate','Gross Pay','Federal Tax','State Tax','SS Tax','Medicare','Net Pay'],
-'Power of Attorney':['Principal Name','Agent Name','Date','Powers Granted','Limitations','Duration','State','Witnesses','Notary'],
-'Last Will Testament':['Testator Name','Date','Executor','Beneficiary 1','Bequest 1','Beneficiary 2','Bequest 2','Guardian','Witness 1','Witness 2','State'],
-'Bill of Sale':['Seller','Buyer','Date','Item Description','Serial Number','Sale Price','Payment Method','Condition','Warranty','Signatures']
-};
-var STYLES=[{n:'Modern',c:'theme-modern'},{n:'Classic',c:'theme-classic'},{n:'Elegant',c:'theme-elegant'},{n:'Corporate',c:'theme-corporate'},{n:'Minimal',c:'theme-minimal'},{n:'Bold',c:'theme-bold'}];
-var allDocs=[],selCatIdx=null,selDocIdx=null,curFields={},userPlan=localStorage.getItem('docpro_plan')||'free',curStyle=0,showAllCats=false,tierFilterVal='all',customLogo=null,authMode='login';
-function switchAuthTab(mode){authMode=mode;document.querySelectorAll('.auth-tab').forEach(function(t,i){t.classList.toggle('active',i===(mode==='login'?0:1))});document.getElementById('registerFields').style.display=mode==='register'?'block':'none';document.getElementById('authSubmitBtn').textContent=mode==='login'?'Sign In':'Create Account';document.getElementById('authError').style.display='none'}
-async function handleAuth(e){e.preventDefault();var email=document.getElementById('authEmail').value,pass=document.getElementById('authPass').value,errEl=document.getElementById('authError');errEl.style.display='none';try{if(authMode==='register'){var name=document.getElementById('authName').value||'';var{data,error}=await sb_client.auth.signUp({email:email,password:pass,options:{data:{display_name:name}}});if(error)throw error;closeModal('authModal')}else{var{data,error}=await sb_client.auth.signInWithPassword({email:email,password:pass});if(error)throw error;closeModal('authModal')}}catch(err){errEl.textContent=err.message;errEl.style.display='block'}}
-async function signOut(){await sb_client.auth.signOut();currentUser=null;userProfile=null;userPlan='free';localStorage.setItem('docpro_plan','free');updateAuthUI();updatePlanBadge();renderSidebar();renderPreview()}
-async function loadProfile(user){if(!user)return null;var{data}=await sb_client.from('profiles').select('*').eq('id',user.id).single();return data}
-function isAdmin(){return userProfile&&userProfile.role==='admin'}
-function updateAuthUI(){var area=document.getElementById('authArea');if(currentUser&&userProfile){var initials=(userProfile.display_name||currentUser.email||'U').substring(0,2).toUpperCase();var adminTag=isAdmin()?'<span class="admin-badge">ADMIN</span>':'';var adminItem=isAdmin()?'<a style="color:#f59e0b;font-weight:600">\u2B50 Admin - All Tiers Unlocked</a>':'';area.innerHTML='<div class="user-menu" onclick="toggleUserMenu()"><div class="user-avatar">'+initials+'</div><div class="user-dropdown" id="userDropdown">'+adminItem+'<a onclick="openModal(\'pricingModal\')">Manage Plan</a><button onclick="signOut()">Sign Out</button></div></div>'+adminTag}else{area.innerHTML='<button class="auth-btn" onclick="openModal(\'authModal\')">&#128100; Sign In</button>'}}
-function toggleUserMenu(){var dd=document.getElementById('userDropdown');if(dd)dd.classList.toggle('open')}
-document.addEventListener('click',function(e){var dd=document.getElementById('userDropdown');if(dd&&!e.target.closest('.user-menu'))dd.classList.remove('open')});
-sb_client.auth.onAuthStateChange(async function(event,session){if(session&&session.user){currentUser=session.user;userProfile=await loadProfile(session.user);if(userProfile){if(isAdmin()){userPlan='business';localStorage.setItem('docpro_plan','business')}else{userPlan=userProfile.plan||'free';localStorage.setItem('docpro_plan',userProfile.plan||'free')}}}else{currentUser=null;userProfile=null}updateAuthUI();updatePlanBadge();renderSidebar();renderPreview()});
-function tierName(t){return t==='business'?'Business':t==='pro'?'Pro':'Free'}
-function tierClass(t){return 'tier-'+t}
-function canAccess(docTier){if(isAdmin())return true;if(docTier==='free')return true;if(docTier==='pro')return userPlan==='pro'||userPlan==='business';if(docTier==='business')return userPlan==='business';return false}
-function selectPlan(plan){if(plan==='free'){userPlan='free';localStorage.setItem('docpro_plan','free');if(userProfile){sb_client.from('profiles').update({plan:'free'}).eq('id',currentUser.id).then(function(){userProfile.plan='free'})}closeModal('pricingModal');updatePlanBadge();updatePricingBtns();renderSidebar();renderPreview();return}if(!currentUser){closeModal('pricingModal');openModal('authModal');return}alert('Stripe Checkout coming soon. Plan: '+plan);userPlan=plan;localStorage.setItem('docpro_plan',plan);if(userProfile){sb_client.from('profiles').update({plan:plan}).eq('id',currentUser.id).then(function(){userProfile.plan=plan})}closeModal('pricingModal');updatePlanBadge();updatePricingBtns();renderSidebar();renderPreview()}
-function updatePlanBadge(){var b=document.getElementById('planBadge');if(!b)return;if(isAdmin()){b.textContent='ADMIN ACCESS';b.className='plan-badge plan-business';return}b.textContent=tierName(userPlan).toUpperCase()+' PLAN';b.className='plan-badge plan-'+userPlan}
-function updatePricingBtns(){var fb=document.getElementById('priceFreeBtn'),pb=document.getElementById('priceProBtn'),bb=document.getElementById('priceBizBtn');if(fb)fb.textContent=userPlan==='free'?'Current Plan':'Downgrade';if(pb){pb.textContent=userPlan==='pro'?'Current Plan':'Upgrade to Pro';pb.className=userPlan==='pro'?'':'btn-pri'}if(bb)bb.textContent=userPlan==='business'?'Current Plan':'Go Business'}
-function openModal(id){document.getElementById(id).classList.add('active')}
-function closeModal(id){document.getElementById(id).classList.remove('active')}
-function V(id){return document.getElementById(id)}
-function renderSidebar(){var container=V('sidebarContent');if(!container)return;var h='<div class="cat-grid">';var visibleCats=showAllCats?CATS:CATS.slice(0,6);visibleCats.forEach(function(c,i){h+='<div class="cat-btn'+(selCatIdx===i?' active':'')+'" onclick="selCat('+i+')" title="'+c.n+'">'+c.n.split(' ')[0]+'</div>'});h+='</div>';if(CATS.length>6)h+='<button class="cat-toggle" onclick="toggleCats()">'+(showAllCats?'Show Less':'Show All '+CATS.length+' Categories')+'</button>';h+='<div class="tier-filter">';['all','free','pro','business'].forEach(function(t){h+='<div class="tier-btn'+(tierFilterVal===t?' active':'')+'" onclick="setTierFilter(\''+t+'\')">'+( t==='all'?'All':tierName(t))+'</div>'});h+='</div><div class="doc-list">';var docs=getFilteredDocs();docs.forEach(function(d){h+='<div class="doc-item'+(selDocIdx===d.globalIdx?' active':'')+'" onclick="selDoc('+d.globalIdx+')"><span>'+d.name+'</span><span class="tier-badge '+tierClass(d.tier)+'">'+tierName(d.tier)+'</span></div>'});if(docs.length===0)h+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">No documents found</div>';h+='</div>';container.innerHTML=h}
-function getFilteredDocs(){var docs=[],searchVal=V('globalSearch')?V('globalSearch').value.toLowerCase():'';CATS.forEach(function(cat,ci){if(selCatIdx!==null&&selCatIdx!==ci)return;cat.docs.forEach(function(docName,di){var gIdx=0;for(var x=0;x<ci;x++)gIdx+=CATS[x].docs.length;gIdx+=di;if(tierFilterVal!=='all'&&cat.tier!==tierFilterVal)return;if(searchVal&&docName.toLowerCase().indexOf(searchVal)===-1)return;docs.push({name:docName,tier:cat.tier,catIdx:ci,docIdx:di,globalIdx:gIdx})})});return docs}
-function selCat(idx){selCatIdx=selCatIdx===idx?null:idx;selDocIdx=null;renderSidebar()}
-function selDoc(gIdx){var info=globalIdxToInfo(gIdx);if(!info)return;if(!canAccess(info.tier)){openModal('pricingModal');return}selDocIdx=gIdx;V('docTitle').textContent=info.name;curFields={};renderSidebar();renderPreview()}
-function globalIdxToInfo(gIdx){var idx=0;for(var ci=0;ci<CATS.length;ci++){for(var di=0;di<CATS[ci].docs.length;di++){if(idx===gIdx)return{name:CATS[ci].docs[di],tier:CATS[ci].tier,catIdx:ci,docIdx:di,catName:CATS[ci].n};idx++}}return null}
-function filterDocs(){renderSidebar()}
-function setTierFilter(t){tierFilterVal=t;renderSidebar()}
-function toggleCats(){showAllCats=!showAllCats;renderSidebar()}
-function setStyle(i){curStyle=i;renderPreview()}
-function uf(field,val){curFields[field]=val;renderPreview()}
-function searchLogos(query){var container=V('logoResults');if(!query||query.length<2){container.innerHTML='<p style="text-align:center;color:var(--muted);font-size:11px;grid-column:1/-1">Type to search...</p>';return}container.innerHTML='<div class="logo-result" onclick="pickLogo(\'https://logo.clearbit.com/'+query.toLowerCase().replace(/\s+/g,'')+'.com\')"><img src="https://logo.clearbit.com/'+query.toLowerCase().replace(/\s+/g,'')+'.com" onerror="this.parentElement.style.display=\'none\'"><p style="font-size:9px;margin-top:4px">'+query+'</p></div><div class="logo-result" onclick="drawLogo()"><p style="font-size:24px">\u270F\uFE0F</p><p style="font-size:9px">Create Custom</p></div>'}
-function pickLogo(url){customLogo=url;closeModal('logoModal');renderPreview()}
-function drawLogo(){var canvas=V('logoCanvas');if(!canvas)return;var ctx=canvas.getContext('2d');var text=V('logoText')?V('logoText').value:'Company';var color=V('logoColor')?V('logoColor').value:'#2563eb';var shape=V('logoShape')?V('logoShape').value:'Circle';ctx.clearRect(0,0,200,80);ctx.fillStyle=color;if(shape==='Circle'){ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill()}else if(shape==='Square'){ctx.fillRect(10,10,60,60)}else if(shape==='Shield'){ctx.beginPath();ctx.moveTo(40,5);ctx.lineTo(70,20);ctx.lineTo(70,50);ctx.lineTo(40,75);ctx.lineTo(10,50);ctx.lineTo(10,20);ctx.closePath();ctx.fill()}else{ctx.beginPath();ctx.moveTo(40,5);ctx.lineTo(70,40);ctx.lineTo(40,75);ctx.lineTo(10,40);ctx.closePath();ctx.fill()}ctx.fillStyle='#fff';ctx.font='bold 14px Arial';ctx.textAlign='center';ctx.fillText(text.substring(0,3).toUpperCase(),40,45);ctx.fillStyle='#333';ctx.font='bold 16px Arial';ctx.textAlign='left';ctx.fillText(text,85,45)}
-function applyLogo(){var canvas=V('logoCanvas');if(canvas){customLogo=canvas.toDataURL();closeModal('logoModal');renderPreview()}}
-function handleDrop(e){e.preventDefault();e.currentTarget.classList.remove('dragover');if(e.dataTransfer.files.length>0)handleUpload(e.dataTransfer.files[0])}
-function handleUpload(file){if(!file)return;var result=V('uploadResult');result.innerHTML='<p>Processing: <strong>'+file.name+'</strong></p>';var reader=new FileReader();reader.onload=function(e){var content=e.target.result;if(file.name.endsWith('.json')){try{curFields=JSON.parse(content);result.innerHTML='<p style="color:var(--success)">\u2713 JSON loaded</p>';renderPreview()}catch(err){result.innerHTML='<p style="color:var(--danger)">Invalid JSON</p>'}}else{result.innerHTML='<p style="color:var(--success)">\u2713 '+file.name+' loaded</p>'}};if(file.name.endsWith('.pdf'))result.innerHTML='<p style="color:var(--warn)">PDF requires server processing</p>';else reader.readAsText(file)}
-function generatePDF(){var docEl=document.getElementById('docPreview');if(!docEl){alert('No document to download');return}var btn=event.target;btn.textContent='Generating...';btn.disabled=true;html2canvas(docEl,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false}).then(function(canvas){var imgData=canvas.toDataURL('image/png');var pdf=new jspdf.jsPDF({orientation:canvas.width>canvas.height?'l':'p',unit:'px',format:[canvas.width,canvas.height]});pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);var info=globalIdxToInfo(selDocIdx);pdf.save((info?info.name.replace(/\s+/g,'_'):'document')+'_DocPro.pdf');btn.textContent='\u{1F4C4} Download PDF';btn.disabled=false}).catch(function(){btn.textContent='\u{1F4C4} Download PDF';btn.disabled=false;alert('PDF failed. Try Print.')})}
-function printDoc(){var docEl=document.getElementById('docPreview');if(!docEl)return;var win=window.open('','_blank');win.document.write('<html><head><title>DocPro</title><style>body{font-family:Arial,sans-serif;padding:30px}table{border-collapse:collapse;width:100%}td,th{padding:8px}</style></head><body>'+docEl.innerHTML+'</body></html>');win.document.close();win.focus();setTimeout(function(){win.print();win.close()},500)}
-function gf(field){return curFields[field]||''}
-function renderPreview(){
-var area=V('previewArea');
-if(selDocIdx===null){area.innerHTML='<div class="empty-state"><h3>Welcome to DocPro</h3><p>Select a document from the sidebar</p><p style="margin-top:16px"><button class="btn-pri toolbar" onclick="openModal(\'pricingModal\')" style="padding:10px 24px;font-size:14px">View Plans & Pricing</button></p></div>';return}
-var info=globalIdxToInfo(selDocIdx);if(!info)return;
-if(!canAccess(info.tier)){area.innerHTML='<div class="preview-card"><div class="lock-overlay" style="min-height:500px"><div class="lock-msg"><h3>&#128274; '+tierName(info.tier)+' Plan Required</h3><p>Upgrade to access this template</p><button onclick="openModal(\'pricingModal\')">View Plans</button></div></div></div>';return}
-var fields=FM[info.name]||['Field 1','Field 2','Field 3','Field 4','Field 5','Field 6'];
-var h='<div class="preview-card '+STYLES[curStyle].c+'"><div class="form-section"><div class="toolbar"><select onchange="setStyle(this.selectedIndex)">';
-STYLES.forEach(function(s,i){h+='<option'+(i===curStyle?' selected':'')+'>'+s.n+'</option>'});
-h+='</select><button onclick="printDoc()">&#128424; Print</button><button onclick="resetDoc()">&#128260; Reset</button><button class="btn-pri" onclick="generatePDF()">&#128196; Download PDF</button></div>';
-h+='<h3>'+info.name+'</h3><div class="form-grid">';
-fields.forEach(function(f){
-if(f.indexOf('Body')>-1||f.indexOf('Duties')>-1||f.indexOf('Summary')>-1||f.indexOf('Notes')>-1||f.indexOf('Paragraph')>-1)
-h+='<div class="form-group" style="grid-column:1/-1"><label>'+f+'</label><textarea oninput="uf(\''+f+'\',this.value)">'+gf(f)+'</textarea></div>';
-else h+='<div class="form-group"><label>'+f+'</label><input value="'+gf(f)+'" oninput="uf(\''+f+'\',this.value)"></div>';
-});
-h+='</div></div><div class="preview-section"><div class="doc-preview" id="docPreview">';
-h+=renderDoc(info.name,info.catName||'');
-h+='</div></div></div>';area.innerHTML=h}
-function resetDoc(){curFields={};renderPreview()}
-// FIXED: Route by category NAME instead of index - works with any Supabase category order
-function renderDoc(name,catName){
-var logoH='';if(customLogo)logoH='<img src="'+customLogo+'" style="max-height:50px;max-width:150px;margin-bottom:10px" onerror="this.style.display=\'none\'">';
-var co=gf('Company Name')||gf('Company')||gf('Seller')||gf('Provider')||gf('Firm Name')||gf('Exporter')||gf('Consultant')||gf('Contractor Name')||gf('Freelancer Name')||gf('Organization')||gf('Landlord')||gf('Store Name')||'Company Name';
-var cn=catName.toLowerCase();
-if(cn.indexOf('invoice')>-1||cn.indexOf('receipt')>-1)return renderInvoiceReceipt(name,logoH,co);
-if(cn.indexOf('letter')>-1||cn.indexOf('memo')>-1)return renderLetterMemo(name,logoH,co);
-if(cn.indexOf('resume')>-1||cn.indexOf('employ')>-1)return renderResume(name,logoH,co);
-if(cn.indexOf('contract')>-1||cn.indexOf('agreement')>-1)return renderContract(name,logoH,co);
-if(cn.indexOf('tax')>-1||cn.indexOf('financial')>-1||cn.indexOf('pay')>-1)return renderTaxFinancial(name,logoH,co);
-if(cn.indexOf('legal')>-1||cn.indexOf('gov')>-1)return renderLegalGov(name,logoH,co);
-if(cn.indexOf('insurance')>-1||cn.indexOf('health')>-1||cn.indexOf('medical')>-1)return renderLegalGov(name,logoH,co);
-if(cn.indexOf('real estate')>-1||cn.indexOf('property')>-1)return renderContract(name,logoH,co);
-if(cn.indexOf('business')>-1||cn.indexOf('operation')>-1)return renderGeneric(name,logoH,co);
-if(cn.indexOf('education')>-1||cn.indexOf('academic')>-1)return renderGeneric(name,logoH,co);
-// Fallback: try to detect from doc name
-var dn=name.toLowerCase();
-if(dn.indexOf('invoice')>-1||dn.indexOf('receipt')>-1)return renderInvoiceReceipt(name,logoH,co);
-if(dn.indexOf('letter')>-1||dn.indexOf('memo')>-1)return renderLetterMemo(name,logoH,co);
-if(dn.indexOf('resume')>-1||dn.indexOf('cv')>-1)return renderResume(name,logoH,co);
-if(dn.indexOf('agreement')>-1||dn.indexOf('contract')>-1||dn.indexOf('lease')>-1||dn.indexOf('nda')>-1)return renderContract(name,logoH,co);
-if(dn.indexOf('w-2')>-1||dn.indexOf('1099')>-1||dn.indexOf('pay stub')>-1||dn.indexOf('tax')>-1)return renderTaxFinancial(name,logoH,co);
-if(dn.indexOf('will')>-1||dn.indexOf('attorney')>-1||dn.indexOf('affidavit')>-1||dn.indexOf('deed')>-1)return renderLegalGov(name,logoH,co);
-return renderGeneric(name,logoH,co);
+/* ========== CONFIG ========== */
+const SUPA_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+/* ========== STATE ========== */
+let CATS=[];
+let currentCat=null;
+let currentTier='all';
+let currentDoc=null;
+let currentDocCat=null;
+let currentUser=null;
+let userPlan='free';
+let docPageSize=50;
+let docOffset=0;
+let totalFilteredDocs=0;
+let customLogo=null;
+
+/* ========== INIT ========== */
+async function init(){
+  try{
+    const allTemplates=await fetchAllTemplates();
+    if(allTemplates.length>0){
+      const catMap={};
+      allTemplates.forEach(t=>{
+        if(!catMap[t.category])catMap[t.category]={n:t.category,docs:[],tiers:{}};
+        catMap[t.category].docs.push({name:t.name,tier:t.tier,fields:t.fields});
+        catMap[t.category].tiers[t.tier]=(catMap[t.category].tiers[t.tier]||0)+1;
+      });
+      CATS=Object.values(catMap).sort((a,b)=>a.n.localeCompare(b.n));
+      console.log('Loaded '+allTemplates.length+' templates from Supabase in '+CATS.length+' categories');
+    }
+  }catch(e){console.error('Supabase load error:',e);useFallbackCats();}
+  renderSidebar();
+}
+
+async function fetchAllTemplates(){
+  let all=[];
+  let from=0;
+  const batchSize=1000;
+  while(true){
+    const{data,error}=await sb.from('templates').select('name,category,tier,fields').range(from,from+batchSize-1).order('category').order('name');
+    if(error){console.error('Fetch error:',error);break;}
+    if(!data||data.length===0)break;
+    all=all.concat(data);
+    if(data.length<batchSize)break;
+    from+=batchSize;
   }
-function renderInvoiceReceipt(name,logoH,co){var h='<div style="padding:20px">';h+=logoH;if(name.indexOf('Receipt')>-1){h+='<div style="text-align:center;border-bottom:2px dashed #ccc;padding-bottom:15px;margin-bottom:15px"><h2 style="font-size:20px">'+co+'</h2><p style="font-size:11px;color:#666">'+name.toUpperCase()+'</p><p style="font-size:11px">Date: '+(gf('Date')||'__/__/____')+' | #: '+(gf('Receipt #')||'______')+'</p></div>';if(name==='Sales Receipt'){h+='<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(gf('Item 1')||'Item 1')+'</td><td style="text-align:right;padding:6px">$'+(gf('Price 1')||'0.00')+'</td></tr><tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(gf('Item 2')||'Item 2')+'</td><td style="text-align:right;padding:6px">$'+(gf('Price 2')||'0.00')+'</td></tr><tr style="border-top:2px solid #333;font-weight:bold;font-size:14px"><td style="padding:8px">TOTAL</td><td style="text-align:right;padding:8px">$'+(gf('Total')||'0.00')+'</td></tr></table>'}else{h+='<table style="width:100%;font-size:12px"><tr><td><strong>From:</strong> '+co+'</td></tr><tr><td><strong>To:</strong> '+(gf('Payer')||gf('Donor Name')||gf('Tenant')||'________')+'</td></tr><tr><td><strong>Amount:</strong> $'+(gf('Amount')||gf('Donation Amount')||'0.00')+'</td></tr></table>'}h+='<p style="text-align:center;margin-top:20px;font-size:10px;color:#999;border-top:2px dashed #ccc;padding-top:10px">Thank you!</p>'}else{h+='<div style="display:flex;justify-content:space-between;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:20px"><div><h1 style="font-size:24px;color:#2563eb">INVOICE</h1><p style="font-size:11px;color:#666">'+name+'</p></div><div style="text-align:right"><h2 style="font-size:16px">'+co+'</h2><p style="font-size:11px;color:#666">#: '+(gf('Invoice #')||'______')+' | '+(gf('Date')||'__/__/____')+'</p></div></div>';h+='<div style="display:flex;justify-content:space-between;margin-bottom:20px"><div><p style="font-size:10px;color:#999">BILL TO</p><p style="font-weight:600">'+(gf('Client Name')||gf('Client')||gf('Buyer')||'________')+'</p></div><div style="text-align:right"><p style="font-size:10px;color:#999">DUE</p><p style="font-weight:600">'+(gf('Due Date')||'________')+'</p></div></div>';var item1=gf('Item 1')||gf('Item Description')||gf('Project')||'Service',qty1=gf('Qty 1')||gf('Qty')||'1',rate1=gf('Rate 1')||gf('Rate')||gf('Unit Price')||'0.00';var amt1=(parseFloat(qty1)||0)*(parseFloat(rate1)||0);h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px"><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">Description</th><th style="padding:8px;text-align:center">Qty</th><th style="padding:8px;text-align:right">Rate</th><th style="padding:8px;text-align:right">Amount</th></tr><tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">'+item1+'</td><td style="padding:8px;text-align:center">'+qty1+'</td><td style="padding:8px;text-align:right">$'+rate1+'</td><td style="padding:8px;text-align:right">$'+amt1.toFixed(2)+'</td></tr>';if(gf('Item 2')){var qty2=gf('Qty 2')||'1',rate2=gf('Rate 2')||'0.00',amt2=(parseFloat(qty2)||0)*(parseFloat(rate2)||0);h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">'+gf('Item 2')+'</td><td style="padding:8px;text-align:center">'+qty2+'</td><td style="padding:8px;text-align:right">$'+rate2+'</td><td style="padding:8px;text-align:right">$'+amt2.toFixed(2)+'</td></tr>';amt1+=amt2}var tax=gf('Tax %')||'0',taxAmt=amt1*(parseFloat(tax)/100);h+='<tr style="font-weight:bold;font-size:14px;background:#f1f5f9"><td colspan="3" style="padding:10px;text-align:right">Total:</td><td style="padding:10px;text-align:right;color:#2563eb">$'+(amt1+taxAmt).toFixed(2)+'</td></tr></table>';if(gf('Notes'))h+='<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:11px"><strong>Notes:</strong> '+gf('Notes')+'</div>';h+='<p style="text-align:center;margin-top:20px;font-size:10px;color:#999">Thank you for your business!</p>'}h+='</div>';return h}
-function renderLetterMemo(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;if(name.indexOf('Memo')>-1){h+='<div style="border-bottom:3px solid #1e293b;padding-bottom:10px;margin-bottom:20px"><h2 style="font-size:18px">MEMORANDUM</h2></div><table style="font-size:12px;margin-bottom:20px;width:100%"><tr><td style="padding:4px 8px;font-weight:bold;width:60px">TO:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Recipient Name')||'________')+'</td></tr><tr><td style="padding:4px 8px;font-weight:bold">FROM:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Sender Name')||co)+'</td></tr><tr><td style="padding:4px 8px;font-weight:bold">DATE:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Date')||'__/__/____')+'</td></tr><tr><td style="padding:4px 8px;font-weight:bold">RE:</td><td style="padding:4px 8px;border-bottom:1px solid #e2e8f0">'+(gf('Subject')||'________')+'</td></tr></table><div style="font-size:13px;line-height:1.7">'+(gf('Body')||'Memo content...')+'</div>'}else{h+='<p style="font-size:12px">'+(gf('Sender Name')||gf('Your Name')||gf('Writer Name')||'________')+'</p><p style="font-size:12px;color:#666">'+(gf('Sender Address')||gf('Address')||'')+'</p><p style="font-size:12px;color:#666;margin:10px 0 20px">'+(gf('Date')||'__/__/____')+'</p><p style="font-size:12px">'+(gf('Recipient Name')||gf('Hiring Manager')||gf('Manager Name')||'________')+'</p><p style="font-size:12px;color:#666;margin-bottom:20px">'+(gf('Recipient Address')||gf('Company')||'')+'</p>';if(gf('Subject'))h+='<p style="font-size:12px;margin-bottom:15px"><strong>Re: '+gf('Subject')+'</strong></p>';h+='<p style="font-size:13px;margin-bottom:10px">Dear '+(gf('Recipient Name')||gf('Hiring Manager')||'Sir/Madam')+',</p><div style="font-size:13px;line-height:1.8"><p style="margin-bottom:10px">'+(gf('Body')||gf('Body Paragraph 1')||gf('Qualities')||'Letter content...')+'</p>';if(gf('Body Paragraph 2'))h+='<p style="margin-bottom:10px">'+gf('Body Paragraph 2')+'</p>';h+='</div><p style="font-size:13px;margin-top:20px">'+(gf('Closing')||'Sincerely')+',</p><p style="font-size:13px;margin-top:30px;font-style:italic">'+(gf('Sender Name')||gf('Your Name')||'________')+'</p>'}h+='</div>';return h}
-function renderResume(name,logoH,co){var h='<div style="padding:30px">';var fn=gf('Full Name')||gf('Your Name')||'Your Name';if(name.indexOf('Resume')>-1||name.indexOf('CV')>-1){h+='<div style="text-align:center;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:20px"><h1 style="font-size:24px;letter-spacing:2px">'+fn.toUpperCase()+'</h1><p style="font-size:12px;color:#666;margin-top:4px">';if(gf('Email'))h+=gf('Email')+' | ';if(gf('Phone'))h+=gf('Phone');h+='</p></div>';if(gf('Summary'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Summary</h3><p style="font-size:12px;line-height:1.6">'+gf('Summary')+'</p></div>';if(gf('Company 1'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Experience</h3><div><strong style="font-size:12px">'+gf('Title 1')+'</strong> <span style="font-size:11px;color:#666">'+gf('Dates 1')+'</span><p style="font-size:12px;color:#666">'+gf('Company 1')+'</p></div></div>';if(gf('Education'))h+='<div style="margin-bottom:15px"><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Education</h3><p style="font-size:12px">'+gf('Education')+'</p></div>';if(gf('Skills'))h+='<div><h3 style="font-size:12px;color:#2563eb;text-transform:uppercase;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:8px">Skills</h3><p style="font-size:12px">'+gf('Skills')+'</p></div>'}else{h+='<h2 style="font-size:18px;border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:20px">'+name+'</h2><table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||[]).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table>'}h+='</div>';return h}
-function renderContract(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;h+='<div style="text-align:center;border-bottom:2px solid #1e293b;padding-bottom:15px;margin-bottom:25px"><h1 style="font-size:22px;letter-spacing:1px">'+name.toUpperCase()+'</h1><p style="font-size:11px;color:#666">Date: '+(gf('Effective Date')||gf('Date')||'__/__/____')+'</p></div>';h+='<div style="display:flex;justify-content:space-between;margin-bottom:25px;padding:15px;background:#f8fafc;border-radius:8px"><div><p style="font-size:10px;color:#999">PARTY A</p><p style="font-weight:bold">'+(gf('Provider')||gf('Landlord')||gf('Lessor')||gf('Disclosing Party')||co)+'</p></div><div style="text-align:right"><p style="font-size:10px;color:#999">PARTY B</p><p style="font-weight:bold">'+(gf('Client')||gf('Tenant')||gf('Lessee')||gf('Receiving Party')||'________')+'</p></div></div>';var secs=['Services','Compensation','Payment Terms','Duration','Property','Monthly Rent','Purpose','Governing Law'],sn=1;secs.forEach(function(s){if(gf(s)){h+='<div style="margin-bottom:15px"><h3 style="font-size:13px">Section '+sn+': '+s+'</h3><p style="font-size:12px;line-height:1.6;margin-top:4px">'+gf(s)+'</p></div>';sn++}});if(sn===1)h+='<p style="font-size:12px;color:#666">Fill in the form fields above to populate this document.</p>';h+='<div style="margin-top:40px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Party A</p></div></div><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Party B</p></div></div></div></div>';return h}
-function renderTaxFinancial(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;if(name==='Pay Stub'){h+='<div style="background:#1e293b;color:#fff;padding:15px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between"><div><h2 style="font-size:16px">'+(gf('Company Name')||'Company')+'</h2><p style="font-size:10px;opacity:.7">EARNINGS STATEMENT</p></div><div style="text-align:right"><p style="font-size:11px">Pay Date: '+(gf('Pay Date')||'____')+'</p></div></div>';var hrs=parseFloat(gf('Hours Worked'))||0,rate=parseFloat(gf('Hourly Rate'))||0,gross=hrs*rate;h+='<div style="border:1px solid #e2e8f0;padding:15px"><p style="font-weight:bold">'+(gf('Employee Name')||'________')+'</p></div>';h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><tr style="background:#f1f5f9"><th style="padding:8px;text-align:left">EARNINGS</th><th style="text-align:right;padding:8px">AMOUNT</th></tr><tr><td style="padding:8px">Regular ('+hrs+'h x $'+rate.toFixed(2)+')</td><td style="text-align:right;padding:8px">$'+gross.toFixed(2)+'</td></tr><tr style="font-weight:bold;background:#f1f5f9"><td style="padding:8px">GROSS</td><td style="text-align:right;padding:8px">$'+gross.toFixed(2)+'</td></tr></table>';var fed=parseFloat(gf('Federal Tax'))||0,st=parseFloat(gf('State Tax'))||0,ss=parseFloat(gf('SS Tax'))||0,med=parseFloat(gf('Medicare'))||0,td=fed+st+ss+med;h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><tr style="background:#fef2f2"><th style="padding:8px;text-align:left">DEDUCTIONS</th><th style="text-align:right;padding:8px"></th></tr><tr><td style="padding:6px">Federal</td><td style="text-align:right">$'+fed.toFixed(2)+'</td></tr><tr><td style="padding:6px">State</td><td style="text-align:right">$'+st.toFixed(2)+'</td></tr><tr><td style="padding:6px">SS</td><td style="text-align:right">$'+ss.toFixed(2)+'</td></tr><tr><td style="padding:6px">Medicare</td><td style="text-align:right">$'+med.toFixed(2)+'</td></tr></table>';h+='<div style="background:#22c55e;color:#fff;padding:15px;border-radius:0 0 8px 8px;text-align:center;margin-top:15px"><p style="font-size:10px;opacity:.8">NET PAY</p><p style="font-size:24px;font-weight:800">$'+(gf('Net Pay')||(gross-td).toFixed(2))+'</p></div>'}else if(name==='W-2 Form'){h+='<div style="border:2px solid #000"><div style="background:#000;color:#fff;padding:8px;text-align:center;font-size:11px">Form W-2 '+new Date().getFullYear()+'</div><div style="display:grid;grid-template-columns:1fr 1fr;font-size:11px"><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">Employer</p><p style="font-weight:bold">'+(gf('Employer Name')||'________')+'</p></div><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">Employee</p><p style="font-weight:bold">'+(gf('Employee Name')||'________')+'</p></div><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">1 Wages</p><p style="font-weight:bold">$'+(gf('Wages')||'0.00')+'</p></div><div style="padding:8px;border:1px solid #ccc"><p style="font-size:9px;color:#666">2 Federal tax</p><p style="font-weight:bold">$'+(gf('Federal Tax Withheld')||'0.00')+'</p></div></div></div>'}else{h+='<h2 style="font-size:18px;border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:20px">'+name+'</h2><table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||[]).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table>'}h+='</div>';return h}
-function renderLegalGov(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;h+='<div style="text-align:center;margin-bottom:25px"><p style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:2px">United States of America</p><h1 style="font-size:20px;border-bottom:2px solid #000;border-top:2px solid #000;padding:10px 0;margin:8px 0">'+name.toUpperCase()+'</h1></div>';h+='<table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||['Party 1','Party 2','Date','Terms','Conditions','Signatures']).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table><div style="margin-top:40px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #000;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Signature</p></div></div><div style="text-align:center"><div style="border-top:1px solid #000;width:200px;margin-top:40px;padding-top:5px"><p style="font-size:11px">Witness</p></div></div></div></div>';return h}
-function renderGeneric(name,logoH,co){var h='<div style="padding:30px">';h+=logoH;h+='<h2 style="font-size:18px;border-bottom:2px solid var(--pri);padding-bottom:10px;margin-bottom:20px">'+name+'</h2><p style="font-size:11px;color:#666;margin-bottom:15px">'+co+' | DocPro</p><table style="width:100%;font-size:12px;border-collapse:collapse">';(FM[name]||['Field 1','Field 2','Field 3','Field 4','Field 5']).forEach(function(f){h+='<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px;font-weight:bold;width:40%;background:#f8fafc">'+f+'</td><td style="padding:8px">'+(gf(f)||'________')+'</td></tr>'});h+='</table></div>';return h}
-async function loadFromSupabase(){try{var all=[],page=0,ps=1000,more=true;while(more){var{data,error}=await sb_client.from('templates').select('id,name,category,tier').range(page*ps,(page+1)*ps-1).order('category');if(error){console.log('Supabase load error:',error.message);break}if(data&&data.length>0){all=all.concat(data);page++}if(!data||data.length<ps)more=false}if(all.length>0){var cm={};all.forEach(function(t){if(!cm[t.category])cm[t.category]={n:t.category,tier:t.tier||'free',docs:[]};cm[t.category].docs.push(t.name);if(t.tier==='business')cm[t.category].tier='business';else if(t.tier==='pro'&&cm[t.category].tier!=='business')cm[t.category].tier='pro'});CATS=Object.values(cm).sort(function(a,b){var o={free:0,pro:1,business:2};return(o[a.tier]||0)-(o[b.tier]||0)});console.log('Loaded '+all.length+' templates from Supabase in '+CATS.length+' categories')}else{console.log('Using built-in templates')}}catch(e){console.log('Supabase:',e.message)}}
-async function init(){await loadFromSupabase();updatePlanBadge();updatePricingBtns();renderSidebar();drawLogo()}
+  return all;
+}
+
+function useFallbackCats(){
+  const cats=['Invoices & Receipts','Letters & Memos','Resumes & Employment','Contracts & Agreements','Tax & Financial','Legal & Government','Real Estate & Property','Healthcare & Medical','Insurance & Claims','Education & Academic','Business Operations','Banking & Financial','Transportation & Logistics','Technology & IT'];
+  const tiers=['free','free','free','pro','pro','business','pro','business','business','free','pro','pro','pro','pro'];
+  CATS=cats.map((n,i)=>{
+    const docs=[];
+    for(let j=1;j<=10;j++)docs.push({name:n.split('&')[0].trim()+' Template '+j,tier:tiers[i],fields:{}});
+    return{n,docs};
+  });
+}
+
+/* ========== SIDEBAR ========== */
+function renderSidebar(){
+  const grid=document.getElementById('catGrid');
+  grid.innerHTML=CATS.map((c,i)=>'<div class="cat-btn'+(currentCat===i?' active':'')+'" onclick="selectCat('+i+')">'+c.n.split('&')[0].trim()+'</div>').join('');
+  docOffset=0;
+  renderDocList();
+}
+
+function selectCat(i){
+  currentCat=currentCat===i?null:i;
+  document.querySelectorAll('.cat-btn').forEach((b,idx)=>b.classList.toggle('active',idx===i&&currentCat!==null));
+  if(currentCat===null)document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  docOffset=0;
+  renderDocList();
+}
+
+function setTier(t){
+  currentTier=t;
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===t));
+  docOffset=0;
+  renderDocList();
+}
+
+function getFilteredDocs(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  let docs=[];
+  CATS.forEach((c,ci)=>{
+    if(currentCat!==null&&currentCat!==ci)return;
+    c.docs.forEach(d=>{
+      if(currentTier!=='all'&&d.tier!==currentTier)return;
+      if(q&&!d.name.toLowerCase().includes(q)&&!c.n.toLowerCase().includes(q))return;
+      docs.push({...d,catIdx:ci,catName:c.n});
+    });
+  });
+  return docs;
+}
+
+function renderDocList(){
+  const docs=getFilteredDocs();
+  totalFilteredDocs=docs.length;
+  const page=docs.slice(0,docOffset+docPageSize);
+  const list=document.getElementById('docList');
+  list.innerHTML=page.map((d,i)=>'<li class="doc-item" onclick="openDoc('+i+')" data-idx="'+i+'"><span>'+d.name+'</span><span class="doc-tier '+d.tier+'">'+d.tier+'</span></li>').join('');
+  document.getElementById('docCount').textContent=totalFilteredDocs.toLocaleString()+' documents found';
+  const btn=document.getElementById('loadMoreBtn');
+  btn.style.display=page.length<totalFilteredDocs?'block':'none';
+}
+
+function loadMoreDocs(){
+  docOffset+=docPageSize;
+  renderDocList();
+}
+
+function filterDocs(){
+  docOffset=0;
+  renderDocList();
+}
+
+/* ========== DOCUMENT RENDERING ========== */
+function openDoc(listIdx){
+  const docs=getFilteredDocs();
+  const d=docs[listIdx];
+  if(!d)return;
+  if(!canAccess(d.tier)){openPricing();return;}
+  currentDoc=d;
+  currentDocCat=d.catName;
+  document.getElementById('docTitle').textContent=d.name;
+  document.querySelectorAll('.doc-item').forEach((el,i)=>el.classList.toggle('active',i===listIdx));
+  renderDoc(d.name,d.catName);
+}
+
+function canAccess(tier){
+  if(isAdmin())return true;
+  if(tier==='free')return true;
+  if(tier==='pro'&&(userPlan==='pro'||userPlan==='business'))return true;
+  if(tier==='business'&&userPlan==='business')return true;
+  return false;
+}
+
+function isAdmin(){
+  return currentUser&&currentUser.email&&(currentUser.email==='admin@docpro.com'||currentUser.email==='larrywomack40@gmail.com'||currentUser.role==='admin');
+}
+
+function renderDoc(name, catName){
+  const cn=catName.toLowerCase();
+  const nm=name.toLowerCase();
+  let renderer;
+  if(cn.includes('invoice')||cn.includes('receipt'))renderer=renderInvoiceReceipt;
+  else if(cn.includes('letter')||cn.includes('memo'))renderer=renderLetterMemo;
+  else if(cn.includes('resume')||cn.includes('employment'))renderer=renderResumeEmployment;
+  else if(cn.includes('contract')||cn.includes('agreement'))renderer=renderContract;
+  else if(cn.includes('tax')||cn.includes('financial'))renderer=renderTaxFinancial;
+  else if(cn.includes('legal')||cn.includes('government'))renderer=renderLegalGov;
+  else if(cn.includes('real estate')||cn.includes('property'))renderer=renderRealEstate;
+  else if(cn.includes('health')||cn.includes('medical'))renderer=renderHealthcare;
+  else if(cn.includes('insurance')||cn.includes('claim'))renderer=renderInsurance;
+  else if(cn.includes('education')||cn.includes('academic'))renderer=renderEducation;
+  else if(cn.includes('business')||cn.includes('operation'))renderer=renderBusiness;
+  else if(cn.includes('banking'))renderer=renderBanking;
+  else if(cn.includes('transport')||cn.includes('logistics'))renderer=renderTransport;
+  else if(cn.includes('tech')||cn.includes('it'))renderer=renderTechIT;
+  else{
+    if(nm.includes('invoice')||nm.includes('receipt'))renderer=renderInvoiceReceipt;
+    else if(nm.includes('letter')||nm.includes('memo'))renderer=renderLetterMemo;
+    else if(nm.includes('resume')||nm.includes('cv'))renderer=renderResumeEmployment;
+    else if(nm.includes('contract')||nm.includes('agreement'))renderer=renderContract;
+    else renderer=renderGenericDoc;
+  }
+  renderer(name);
+}
+
+function getThemeStyles(){
+  const t=document.getElementById('themeSelect').value;
+  const themes={
+    modern:{primary:'#2563eb',font:'system-ui',border:'2px solid #2563eb',headerBg:'#2563eb',headerColor:'#fff',radius:'8px'},
+    classic:{primary:'#1a1a1a',font:'Georgia, serif',border:'1px solid #333',headerBg:'#1a1a1a',headerColor:'#fff',radius:'0'},
+    elegant:{primary:'#7c3aed',font:"'Palatino Linotype', serif",border:'1px solid #7c3aed',headerBg:'linear-gradient(135deg,#7c3aed,#a855f7)',headerColor:'#fff',radius:'12px'},
+    corporate:{primary:'#0f172a',font:"'Segoe UI', sans-serif",border:'2px solid #0f172a',headerBg:'#0f172a',headerColor:'#f8fafc',radius:'4px'},
+    minimal:{primary:'#64748b',font:'Inter, sans-serif',border:'1px solid #e2e8f0',headerBg:'#f8fafc',headerColor:'#1e293b',radius:'6px'},
+    bold:{primary:'#dc2626',font:'Impact, sans-serif',border:'3px solid #dc2626',headerBg:'#dc2626',headerColor:'#fff',radius:'0'}
+  };
+  return themes[t]||themes.modern;
+}
+
+function applyTheme(){if(currentDoc)renderDoc(currentDoc.name,currentDocCat);}
+
+function logoHTML(){
+  if(customLogo)return '<img src="'+customLogo+'" style="max-height:50px;max-width:150px" alt="Logo">';
+  return '';
+}
+
+/* ========== RENDERERS ========== */
+function renderInvoiceReceipt(name){
+  const s=getThemeStyles();
+  const isReceipt=name.toLowerCase().includes('receipt');
+  const fields=isReceipt?[
+    {id:'from',label:'From',ph:'Your Company'},
+    {id:'to',label:'To',ph:'Client Name'},
+    {id:'rnum',label:'Receipt #',ph:'R-001'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'amount',label:'Amount',ph:'$0.00'},
+    {id:'method',label:'Payment Method',ph:'Cash/Card/Check'},
+    {id:'desc',label:'Description',ph:'Payment for...'},
+    {id:'notes',label:'Notes',ph:'Additional notes',type:'textarea'}
+  ]:[
+    {id:'company',label:'Company Name',ph:'Your Company'},
+    {id:'client',label:'Client Name',ph:'Client Co.'},
+    {id:'invnum',label:'Invoice #',ph:'INV-001'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'due',label:'Due Date',ph:'MM/DD/YYYY'},
+    {id:'item1',label:'Item 1',ph:'Service/Product'},
+    {id:'qty1',label:'Qty 1',ph:'1'},
+    {id:'rate1',label:'Rate 1',ph:'$0.00'},
+    {id:'item2',label:'Item 2',ph:'Service/Product'},
+    {id:'qty2',label:'Qty 2',ph:'1'},
+    {id:'rate2',label:'Rate 2',ph:'$0.00'},
+    {id:'tax',label:'Tax %',ph:'0'},
+    {id:'notes',label:'Notes',ph:'Payment terms...',type:'textarea'}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    const logo=logoHTML();
+    if(isReceipt){
+      document.getElementById('docPreview').innerHTML=
+        '<div style="font-family:'+s.font+';max-width:600px;margin:auto;padding:20px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">'+
+        '<div>'+logo+'<h1 style="color:'+s.primary+';font-size:28px;margin-top:8px">RECEIPT</h1><p style="color:#64748b;font-size:13px">'+name+'</p></div>'+
+        '<div style="text-align:right"><p style="font-weight:700">#'+(v.rnum||'___')+'</p><p style="color:#64748b;font-size:13px">'+(v.date||'___')+'</p></div></div>'+
+        '<div style="border-top:'+s.border+';padding-top:16px;margin-bottom:16px">'+
+        '<div style="display:flex;justify-content:space-between"><div><strong>From:</strong><br>'+(v.from||'________')+'</div><div style="text-align:right"><strong>To:</strong><br>'+(v.to||'________')+'</div></div></div>'+
+        '<table style="width:100%;border-collapse:collapse;margin:16px 0"><tr style="background:'+s.headerBg+';color:'+s.headerColor+'"><th style="padding:10px;text-align:left;border-radius:'+s.radius+' 0 0 0">Description</th><th style="padding:10px;text-align:right">Method</th><th style="padding:10px;text-align:right;border-radius:0 '+s.radius+' 0 0">Amount</th></tr>'+
+        '<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+(v.desc||'Payment')+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">'+(v.method||'—')+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0;font-weight:700">'+(v.amount||'$0.00')+'</td></tr></table>'+
+        '<div style="text-align:right;font-size:20px;font-weight:800;color:'+s.primary+';margin:16px 0">Total: '+(v.amount||'$0.00')+'</div>'+
+        (v.notes?'<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:12px;color:#64748b;margin-top:16px"><strong>Notes:</strong> '+v.notes+'</div>':'')+
+        '</div>';
+    }else{
+      const q1=parseFloat(v.qty1)||1,r1=parseFloat(v.rate1)||0;
+      const q2=parseFloat(v.qty2)||0,r2=parseFloat(v.rate2)||0;
+      const sub=q1*r1+q2*r2;
+      const tax=sub*(parseFloat(v.tax)||0)/100;
+      const total=sub+tax;
+      document.getElementById('docPreview').innerHTML=
+        '<div style="font-family:'+s.font+';max-width:650px;margin:auto;padding:20px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">'+
+        '<div>'+logo+'<h1 style="color:'+s.primary+';font-size:32px;margin-top:8px">INVOICE</h1><p style="color:#64748b;font-size:13px">'+name+'</p></div>'+
+        '<div style="text-align:right"><p style="font-weight:700;font-size:16px">'+(v.company||'Company Name')+'</p><p style="color:#64748b">#: '+(v.invnum||'___')+' | '+(v.date||'_/_/_')+'</p></div></div>'+
+        '<hr style="border:none;border-top:'+s.border+';margin:0 0 20px">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:24px"><div><strong>BILL TO</strong><br>'+(v.client||'________')+'</div><div style="text-align:right"><strong>DUE</strong><br>'+(v.due||'________')+'</div></div>'+
+        '<table style="width:100%;border-collapse:collapse"><tr style="background:'+s.headerBg+';color:'+s.headerColor+'"><th style="padding:10px;text-align:left">Description</th><th style="padding:10px;text-align:center">Qty</th><th style="padding:10px;text-align:right">Rate</th><th style="padding:10px;text-align:right">Amount</th></tr>'+
+        '<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+(v.item1||'Service')+'</td><td style="padding:10px;text-align:center;border-bottom:1px solid #e2e8f0">'+q1+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+r1.toFixed(2)+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+(q1*r1).toFixed(2)+'</td></tr>'+
+        (v.item2?'<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+v.item2+'</td><td style="padding:10px;text-align:center;border-bottom:1px solid #e2e8f0">'+q2+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+r2.toFixed(2)+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+(q2*r2).toFixed(2)+'</td></tr>':'')+
+        '</table>'+
+        '<div style="text-align:right;margin-top:16px"><p>Subtotal: $'+sub.toFixed(2)+'</p><p>Tax ('+(v.tax||'0')+'%): $'+tax.toFixed(2)+'</p><p style="font-size:22px;font-weight:800;color:'+s.primary+';margin-top:8px">Total: $'+total.toFixed(2)+'</p></div>'+
+        (v.notes?'<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:12px;color:#64748b;margin-top:20px"><strong>Notes:</strong> '+v.notes+'</div>':'')+
+        '</div>';
+    }
+  };
+  updatePreviewFn();
+}
+
+function renderLetterMemo(name){
+  const s=getThemeStyles();
+  const isMemo=name.toLowerCase().includes('memo');
+  const fields=isMemo?[
+    {id:'from',label:'From',ph:'Your Name'},
+    {id:'to',label:'To',ph:'Recipient'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'subject',label:'Subject',ph:'Memo Subject'},
+    {id:'body',label:'Body',ph:'Memo content...',type:'textarea'},
+    {id:'actions',label:'Action Items',ph:'List actions...',type:'textarea'}
+  ]:[
+    {id:'from',label:'From',ph:'Your Name'},
+    {id:'address',label:'Your Address',ph:'123 Main St'},
+    {id:'to',label:'To',ph:'Recipient Name'},
+    {id:'toaddr',label:'Recipient Address',ph:'456 Oak Ave'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'subject',label:'Subject',ph:'Re: Subject'},
+    {id:'body',label:'Body',ph:'Dear...',type:'textarea'},
+    {id:'closing',label:'Closing',ph:'Sincerely'},
+    {id:'sig',label:'Signature',ph:'Your Name'}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    const logo=logoHTML();
+    if(isMemo){
+      document.getElementById('docPreview').innerHTML=
+        '<div style="font-family:'+s.font+';max-width:600px;margin:auto;padding:30px">'+logo+
+        '<div style="background:'+s.headerBg+';color:'+s.headerColor+';padding:16px 20px;border-radius:'+s.radius+' '+s.radius+' 0 0;margin-top:12px"><h1 style="font-size:22px">MEMORANDUM</h1></div>'+
+        '<div style="border:'+s.border+';border-top:none;padding:20px;border-radius:0 0 '+s.radius+' '+s.radius+'">'+
+        '<table style="width:100%;font-size:13px;margin-bottom:16px"><tr><td style="padding:4px 0;width:80px;font-weight:700">TO:</td><td>'+(v.to||'_____')+'</td></tr><tr><td style="padding:4px 0;font-weight:700">FROM:</td><td>'+(v.from||'_____')+'</td></tr><tr><td style="padding:4px 0;font-weight:700">DATE:</td><td>'+(v.date||'_____')+'</td></tr><tr><td style="padding:4px 0;font-weight:700">RE:</td><td style="font-weight:700">'+(v.subject||'_____')+'</td></tr></table>'+
+        '<hr style="border:none;border-top:2px solid '+s.primary+';margin:16px 0">'+
+        '<div style="font-size:14px;line-height:1.6;white-space:pre-wrap">'+(v.body||'Memo content goes here...')+'</div>'+
+        (v.actions?'<div style="margin-top:20px;background:#f8fafc;padding:12px;border-radius:6px;border-left:4px solid '+s.primary+'"><strong>Action Items:</strong><div style="margin-top:8px;font-size:13px;white-space:pre-wrap">'+v.actions+'</div></div>':'')+
+        '</div></div>';
+    }else{
+      document.getElementById('docPreview').innerHTML=
+        '<div style="font-family:'+s.font+';max-width:600px;margin:auto;padding:30px">'+logo+
+        '<div style="margin-top:12px;margin-bottom:24px"><strong>'+(v.from||'Your Name')+'</strong><br><span style="color:#64748b;font-size:13px">'+(v.address||'Your Address')+'</span></div>'+
+        '<div style="margin-bottom:24px"><span style="color:#64748b;font-size:13px">'+(v.date||'Date')+'</span></div>'+
+        '<div style="margin-bottom:24px"><strong>'+(v.to||'Recipient')+'</strong><br><span style="color:#64748b;font-size:13px">'+(v.toaddr||'Recipient Address')+'</span></div>'+
+        '<div style="margin-bottom:16px"><strong>Re: '+(v.subject||'Subject')+'</strong></div>'+
+        '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap">'+(v.body||'Dear Sir/Madam,\n\nI am writing to...')+'</div>'+
+        '<div style="margin-top:32px"><p>'+(v.closing||'Sincerely')+'</p><p style="margin-top:24px;font-weight:700;border-top:1px solid #333;display:inline-block;padding-top:4px">'+(v.sig||'Signature')+'</p></div></div>';
+    }
+  };
+  updatePreviewFn();
+}
+
+function renderResumeEmployment(name){
+  const s=getThemeStyles();
+  const isResume=name.toLowerCase().includes('resume')||name.toLowerCase().includes('cv');
+  const fields=isResume?[
+    {id:'fullname',label:'Full Name',ph:'John Smith'},
+    {id:'email',label:'Email',ph:'john@email.com'},
+    {id:'phone',label:'Phone',ph:'(555) 123-4567'},
+    {id:'address',label:'Location',ph:'City, State'},
+    {id:'summary',label:'Professional Summary',ph:'Experienced professional...',type:'textarea'},
+    {id:'exp',label:'Experience',ph:'Company - Title - Years\nDescription...',type:'textarea'},
+    {id:'edu',label:'Education',ph:'University - Degree - Year',type:'textarea'},
+    {id:'skills',label:'Skills',ph:'Skill 1, Skill 2, Skill 3'}
+  ]:[
+    {id:'empname',label:'Employee Name',ph:'John Smith'},
+    {id:'company',label:'Company',ph:'Acme Corp'},
+    {id:'position',label:'Position',ph:'Software Engineer'},
+    {id:'dept',label:'Department',ph:'Engineering'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'manager',label:'Manager',ph:'Jane Doe'},
+    {id:'details',label:'Details',ph:'Document details...',type:'textarea'},
+    {id:'sig',label:'Signature',ph:'Authorized Signatory'}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    const logo=logoHTML();
+    if(isResume){
+      document.getElementById('docPreview').innerHTML=
+        '<div style="font-family:'+s.font+';max-width:600px;margin:auto;padding:30px">'+
+        '<div style="text-align:center;padding:20px;background:'+s.headerBg+';color:'+s.headerColor+';border-radius:'+s.radius+';margin-bottom:20px">'+
+        '<h1 style="font-size:28px;letter-spacing:2px">'+(v.fullname||'YOUR NAME')+'</h1>'+
+        '<p style="margin-top:8px;font-size:13px;opacity:.9">'+(v.email||'email')+' | '+(v.phone||'phone')+' | '+(v.address||'location')+'</p></div>'+
+        (v.summary?'<div style="margin-bottom:20px"><h3 style="color:'+s.primary+';border-bottom:2px solid '+s.primary+';padding-bottom:4px;margin-bottom:8px">PROFESSIONAL SUMMARY</h3><p style="font-size:13px;line-height:1.6">'+v.summary+'</p></div>':'')+
+        (v.exp?'<div style="margin-bottom:20px"><h3 style="color:'+s.primary+';border-bottom:2px solid '+s.primary+';padding-bottom:4px;margin-bottom:8px">EXPERIENCE</h3><div style="font-size:13px;line-height:1.6;white-space:pre-wrap">'+v.exp+'</div></div>':'')+
+        (v.edu?'<div style="margin-bottom:20px"><h3 style="color:'+s.primary+';border-bottom:2px solid '+s.primary+';padding-bottom:4px;margin-bottom:8px">EDUCATION</h3><div style="font-size:13px;line-height:1.6;white-space:pre-wrap">'+v.edu+'</div></div>':'')+
+        (v.skills?'<div><h3 style="color:'+s.primary+';border-bottom:2px solid '+s.primary+';padding-bottom:4px;margin-bottom:8px">SKILLS</h3><div style="display:flex;flex-wrap:wrap;gap:6px">'+v.skills.split(',').map(sk=>'<span style="background:#eff6ff;color:'+s.primary+';padding:4px 10px;border-radius:12px;font-size:12px">'+sk.trim()+'</span>').join('')+'</div></div>':'')+
+        '</div>';
+    }else{
+      document.getElementById('docPreview').innerHTML=
+        '<div style="font-family:'+s.font+';max-width:600px;margin:auto;padding:30px">'+logo+
+        '<h1 style="color:'+s.primary+';font-size:22px;text-align:center;margin-bottom:4px">'+name+'</h1>'+
+        '<p style="text-align:center;color:#64748b;font-size:13px;margin-bottom:24px">'+(v.company||'Company Name')+'</p>'+
+        '<table style="width:100%;font-size:13px;margin-bottom:20px;border-collapse:collapse">'+
+        '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;width:35%;background:#f8fafc">Employee</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.empname||'_____')+'</td></tr>'+
+        '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc">Position</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.position||'_____')+'</td></tr>'+
+        '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc">Department</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.dept||'_____')+'</td></tr>'+
+        '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc">Manager</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.manager||'_____')+'</td></tr>'+
+        '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc">Date</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.date||'_____')+'</td></tr></table>'+
+        '<div style="font-size:14px;line-height:1.6;white-space:pre-wrap;margin-bottom:30px">'+(v.details||'Details will appear here...')+'</div>'+
+        '<div style="margin-top:40px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;padding-top:4px">'+(v.sig||'Authorized Signature')+'</div></div><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;padding-top:4px">Employee Signature</div></div></div></div>';
+    }
+  };
+  updatePreviewFn();
+}
+
+function renderContract(name){
+  const s=getThemeStyles();
+  const fields=[
+    {id:'partyA',label:'Party A (First Party)',ph:'Company/Individual Name'},
+    {id:'partyB',label:'Party B (Second Party)',ph:'Company/Individual Name'},
+    {id:'effDate',label:'Effective Date',ph:'MM/DD/YYYY'},
+    {id:'term',label:'Term/Duration',ph:'12 months'},
+    {id:'scope',label:'Scope of Agreement',ph:'This agreement covers...',type:'textarea'},
+    {id:'payment',label:'Payment Terms',ph:'$X per month, due on...',type:'textarea'},
+    {id:'termination',label:'Termination Clause',ph:'Either party may terminate...',type:'textarea'},
+    {id:'law',label:'Governing Law',ph:'State of California'}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    document.getElementById('docPreview').innerHTML=
+      '<div style="font-family:'+s.font+';max-width:650px;margin:auto;padding:30px">'+logoHTML()+
+      '<h1 style="text-align:center;color:'+s.primary+';font-size:24px;margin:20px 0 4px">'+name.toUpperCase()+'</h1>'+
+      '<p style="text-align:center;color:#64748b;font-size:12px;margin-bottom:24px">Effective Date: '+(v.effDate||'_________')+'</p>'+
+      '<div style="font-size:13px;line-height:1.8">'+
+      '<p>This '+name+' ("Agreement") is entered into as of <strong>'+(v.effDate||'_________')+'</strong> by and between:</p>'+
+      '<div style="background:#f8fafc;padding:12px;border-radius:6px;margin:12px 0;border-left:4px solid '+s.primary+'"><strong>Party A:</strong> '+(v.partyA||'_________')+'<br><strong>Party B:</strong> '+(v.partyB||'_________')+'</div>'+
+      '<h3 style="color:'+s.primary+';margin-top:20px">1. TERM</h3><p>This Agreement shall remain in effect for a period of <strong>'+(v.term||'_________')+'</strong> from the Effective Date.</p>'+
+      '<h3 style="color:'+s.primary+';margin-top:16px">2. SCOPE</h3><p style="white-space:pre-wrap">'+(v.scope||'The scope of this agreement includes...')+'</p>'+
+      '<h3 style="color:'+s.primary+';margin-top:16px">3. PAYMENT TERMS</h3><p style="white-space:pre-wrap">'+(v.payment||'Payment details to be specified...')+'</p>'+
+      '<h3 style="color:'+s.primary+';margin-top:16px">4. TERMINATION</h3><p style="white-space:pre-wrap">'+(v.termination||'Termination terms to be specified...')+'</p>'+
+      '<h3 style="color:'+s.primary+';margin-top:16px">5. GOVERNING LAW</h3><p>This Agreement shall be governed by the laws of <strong>'+(v.law||'_________')+'</strong>.</p>'+
+      '<div style="margin-top:40px;display:flex;justify-content:space-between"><div><strong>Party A:</strong><br><br><div style="border-top:1px solid #333;width:200px;padding-top:4px">'+(v.partyA||'Signature')+'</div></div><div><strong>Party B:</strong><br><br><div style="border-top:1px solid #333;width:200px;padding-top:4px">'+(v.partyB||'Signature')+'</div></div></div></div></div>';
+  };
+  updatePreviewFn();
+}
+
+function renderTaxFinancial(name){
+  const s=getThemeStyles();
+  const fields=[
+    {id:'tname',label:'Taxpayer/Company Name',ph:'Full Legal Name'},
+    {id:'ein',label:'SSN/EIN',ph:'XX-XXXXXXX'},
+    {id:'year',label:'Tax Year/Period',ph:'2025'},
+    {id:'status',label:'Filing Status',ph:'Single/Married/Business'},
+    {id:'income',label:'Total Income',ph:'$0.00'},
+    {id:'deductions',label:'Deductions',ph:'$0.00'},
+    {id:'credits',label:'Credits',ph:'$0.00'},
+    {id:'due',label:'Tax Due/Refund',ph:'$0.00'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'sig',label:'Signature',ph:'Taxpayer Signature'}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    document.getElementById('docPreview').innerHTML=
+      '<div style="font-family:'+s.font+';max-width:650px;margin:auto;padding:30px">'+logoHTML()+
+      '<div style="background:'+s.headerBg+';color:'+s.headerColor+';padding:16px 20px;border-radius:'+s.radius+';margin-top:12px;text-align:center"><h1 style="font-size:20px">'+name.toUpperCase()+'</h1><p style="font-size:12px;opacity:.8">Tax Year: '+(v.year||'____')+'</p></div>'+
+      '<div style="padding:20px;border:'+s.border+';border-top:none;border-radius:0 0 '+s.radius+' '+s.radius+'">'+
+      '<table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:20px">'+
+      '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc;width:40%">Taxpayer Name</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.tname||'_____')+'</td></tr>'+
+      '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc">SSN/EIN</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.ein||'_____')+'</td></tr>'+
+      '<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc">Filing Status</td><td style="padding:8px;border:1px solid #e2e8f0">'+(v.status||'_____')+'</td></tr></table>'+
+      '<h3 style="color:'+s.primary+';margin-bottom:12px">Financial Summary</h3>'+
+      '<table style="width:100%;font-size:13px;border-collapse:collapse">'+
+      '<tr style="background:'+s.headerBg+';color:'+s.headerColor+'"><th style="padding:10px;text-align:left">Item</th><th style="padding:10px;text-align:right">Amount</th></tr>'+
+      '<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">Total Income</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">'+(v.income||'$0.00')+'</td></tr>'+
+      '<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">Deductions</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0;color:#dc2626">-'+(v.deductions||'$0.00')+'</td></tr>'+
+      '<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">Credits</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0;color:#16a34a">-'+(v.credits||'$0.00')+'</td></tr>'+
+      '<tr style="font-weight:700"><td style="padding:10px;border-top:2px solid '+s.primary+'">Tax Due / (Refund)</td><td style="padding:10px;text-align:right;border-top:2px solid '+s.primary+';color:'+s.primary+';font-size:18px">'+(v.due||'$0.00')+'</td></tr></table>'+
+      '<div style="margin-top:30px;display:flex;justify-content:space-between"><div><p style="font-size:12px;color:#64748b">Date: '+(v.date||'_____')+'</p></div><div style="text-align:center"><div style="border-top:1px solid #333;width:200px;padding-top:4px;font-size:12px">'+(v.sig||'Taxpayer Signature')+'</div></div></div></div></div>';
+  };
+  updatePreviewFn();
+}
+
+function renderGenericDoc(name){
+  const s=getThemeStyles();
+  const fields=[
+    {id:'title',label:'Document Title',ph:name},
+    {id:'from',label:'From',ph:'Your Name/Company'},
+    {id:'to',label:'To',ph:'Recipient'},
+    {id:'date',label:'Date',ph:'MM/DD/YYYY'},
+    {id:'ref',label:'Reference #',ph:'REF-001'},
+    {id:'body',label:'Content',ph:'Document content...',type:'textarea'},
+    {id:'sig',label:'Signature',ph:'Authorized Signatory'}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    document.getElementById('docPreview').innerHTML=
+      '<div style="font-family:'+s.font+';max-width:600px;margin:auto;padding:30px">'+logoHTML()+
+      '<div style="background:'+s.headerBg+';color:'+s.headerColor+';padding:16px 20px;border-radius:'+s.radius+';margin-top:12px;text-align:center"><h1 style="font-size:20px">'+(v.title||name).toUpperCase()+'</h1></div>'+
+      '<div style="padding:20px;border:'+s.border+';border-top:none;border-radius:0 0 '+s.radius+' '+s.radius+'">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:13px"><div><strong>From:</strong> '+(v.from||'_____')+'</div><div><strong>To:</strong> '+(v.to||'_____')+'</div></div>'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:20px;font-size:13px"><div><strong>Date:</strong> '+(v.date||'_____')+'</div><div><strong>Ref:</strong> '+(v.ref||'_____')+'</div></div>'+
+      '<hr style="margin-bottom:20px;border-color:#e2e8f0">'+
+      '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap">'+(v.body||'Document content goes here...')+'</div>'+
+      '<div style="margin-top:40px;text-align:right"><div style="border-top:1px solid #333;display:inline-block;width:200px;padding-top:4px;font-size:12px">'+(v.sig||'Signature')+'</div></div></div></div>';
+  };
+  updatePreviewFn();
+}
+
+/* Simplified renderers for remaining categories - use generic with category-specific headers */
+function renderLegalGov(n){renderCategoryDoc(n,'LEGAL DOCUMENT','Case #','Court','State','Jurisdiction','Filed By','Description','Terms/Conditions','Witness/Notary');}
+function renderRealEstate(n){renderCategoryDoc(n,'REAL ESTATE DOCUMENT','Property Address','Buyer','Seller','Price','Listing Agent','Description','Terms','Closing Date');}
+function renderHealthcare(n){renderCategoryDoc(n,'MEDICAL DOCUMENT','Patient Name','DOB','MRN','Provider','Facility','Diagnosis','Treatment Plan','Follow-Up');}
+function renderInsurance(n){renderCategoryDoc(n,'INSURANCE DOCUMENT','Policy #','Insured Name','Date of Loss','Claim #','Adjuster','Description','Amount','Status');}
+function renderEducation(n){renderCategoryDoc(n,'ACADEMIC DOCUMENT','School Name','Student','Teacher','Grade/Level','Subject','Date','Description','Score/Grade');}
+function renderBusiness(n){renderCategoryDoc(n,'BUSINESS DOCUMENT','Company','Department','Author','Date','Version','Description','Status','Approver');}
+function renderBanking(n){renderCategoryDoc(n,'BANKING DOCUMENT','Account Holder','Account #','Bank Name','Date','Amount','Description','Reference #','Branch');}
+function renderTransport(n){renderCategoryDoc(n,'SHIPPING DOCUMENT','Shipper','Consignee','Carrier','Origin','Destination','Date','Weight/Qty','Tracking #');}
+function renderTechIT(n){renderCategoryDoc(n,'TECHNICAL DOCUMENT','Project Name','Author','Version','Date','Status','Description','Reviewer','Approval');}
+
+function renderCategoryDoc(name,header,l1,l2,l3,l4,l5,l6,l7,l8){
+  const s=getThemeStyles();
+  const fields=[
+    {id:'f1',label:l1,ph:l1},{id:'f2',label:l2,ph:l2},{id:'f3',label:l3,ph:l3},{id:'f4',label:l4,ph:l4},
+    {id:'f5',label:l5,ph:l5},{id:'f6',label:l6,ph:l6,type:'textarea'},{id:'f7',label:l7,ph:l7,type:'textarea'},{id:'f8',label:l8,ph:l8}
+  ];
+  renderFormFields(fields);
+  updatePreviewFn=()=>{
+    const v=getFieldValues(fields);
+    let rows=fields.map(f=>'<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:700;background:#f8fafc;width:35%">'+f.label+'</td><td style="padding:8px;border:1px solid #e2e8f0;white-space:pre-wrap">'+(v[f.id]||'_____')+'</td></tr>').join('');
+    document.getElementById('docPreview').innerHTML=
+      '<div style="font-family:'+s.font+';max-width:650px;margin:auto;padding:30px">'+logoHTML()+
+      '<div style="background:'+s.headerBg+';color:'+s.headerColor+';padding:16px 20px;border-radius:'+s.radius+';margin:12px 0;text-align:center"><h1 style="font-size:18px">'+header+'</h1><p style="font-size:12px;opacity:.8">'+name+'</p></div>'+
+      '<table style="width:100%;font-size:13px;border-collapse:collapse">'+rows+'</table>'+
+      '<div style="margin-top:30px;display:flex;justify-content:space-between"><div style="text-align:center"><div style="border-top:1px solid #333;width:180px;padding-top:4px;font-size:11px">Authorized Signature</div></div><div style="text-align:center"><div style="border-top:1px solid #333;width:180px;padding-top:4px;font-size:11px">Date</div></div></div></div>';
+  };
+  updatePreviewFn();
+}
+
+/* ========== FORM HELPERS ========== */
+let updatePreviewFn=null;
+function renderFormFields(fields){
+  const fp=document.getElementById('formFields');
+  let html='<h3>'+((currentDoc&&currentDoc.name)||'Document')+'</h3>';
+  for(let i=0;i<fields.length;i+=2){
+    html+='<div class="form-row">';
+    html+=fieldHTML(fields[i]);
+    if(fields[i+1])html+=fieldHTML(fields[i+1]);
+    html+='</div>';
+  }
+  fp.innerHTML=html;
+  fp.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',()=>{if(updatePreviewFn)updatePreviewFn();}));
+}
+
+function fieldHTML(f){
+  if(f.type==='textarea')return '<div class="form-field"><label>'+f.label+'</label><textarea id="field_'+f.id+'" placeholder="'+f.ph+'"></textarea></div>';
+  return '<div class="form-field"><label>'+f.label+'</label><input id="field_'+f.id+'" placeholder="'+f.ph+'"></div>';
+}
+
+function getFieldValues(fields){
+  const v={};
+  fields.forEach(f=>{const el=document.getElementById('field_'+f.id);v[f.id]=el?el.value:'';});
+  return v;
+}
+
+function resetForm(){
+  document.querySelectorAll('#formFields input, #formFields textarea').forEach(el=>el.value='');
+  if(updatePreviewFn)updatePreviewFn();
+}
+
+/* ========== PDF & PRINT ========== */
+function generatePDF(){
+  const el=document.getElementById('docPreview');
+  if(!el||!el.innerHTML.trim()){alert('No document to download');return;}
+  const name=(currentDoc?currentDoc.name:'Document')+'_DocPro';
+  html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(canvas=>{
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    const iw=pdf.internal.pageSize.getWidth()-20;
+    const ih=canvas.height*iw/canvas.width;
+    let ph=pdf.internal.pageSize.getHeight()-20;
+    let y=10;
+    if(ih<=ph){
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',10,y,iw,ih);
+    }else{
+      let srcY=0;
+      const srcH=canvas.width*(ph/iw);
+      while(srcY<canvas.height){
+        const pageCanvas=document.createElement('canvas');
+        pageCanvas.width=canvas.width;
+        pageCanvas.height=Math.min(srcH,canvas.height-srcY);
+        const ctx=pageCanvas.getContext('2d');
+        ctx.drawImage(canvas,0,srcY,canvas.width,pageCanvas.height,0,0,pageCanvas.width,pageCanvas.height);
+        const pgH=pageCanvas.height*iw/pageCanvas.width;
+        if(srcY>0)pdf.addPage();
+        pdf.addImage(pageCanvas.toDataURL('image/png'),'PNG',10,10,iw,pgH);
+        srcY+=srcH;
+      }
+    }
+    pdf.save(name+'.pdf');
+  }).catch(err=>{console.error('PDF error:',err);alert('PDF generation failed. Try again.');});
+}
+
+function printDoc(){
+  const el=document.getElementById('docPreview');
+  if(!el)return;
+  const w=window.open('','_blank','width=800,height=600');
+  w.document.write('<html><head><title>Print</title></head><body style="font-family:system-ui;padding:20px">'+el.innerHTML+'</body></html>');
+  w.document.close();
+  w.focus();
+  w.print();
+}
+
+/* ========== AUTH ========== */
+function openAuth(){document.getElementById('authModal').classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+function switchAuthTab(tab){
+  const btns=document.querySelectorAll('.tab-btns button');
+  btns.forEach(b=>b.classList.remove('active'));
+  if(tab==='login'){btns[0].classList.add('active');document.getElementById('loginForm').style.display='block';document.getElementById('registerForm').style.display='none';document.getElementById('authTitle').textContent='Sign In';}
+  else{btns[1].classList.add('active');document.getElementById('loginForm').style.display='none';document.getElementById('registerForm').style.display='block';document.getElementById('authTitle').textContent='Create Account';}
+}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value;
+  const pass=document.getElementById('loginPass').value;
+  const msg=document.getElementById('authMsg');
+  if(!email||!pass){msg.textContent='Please fill in all fields';return;}
+  msg.textContent='Signing in...';msg.style.color='var(--pri)';
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){msg.textContent=error.message;msg.style.color='var(--danger)';return;}
+  msg.textContent='Success!';msg.style.color='var(--success)';
+  setTimeout(()=>closeModal('authModal'),500);
+}
+
+async function doRegister(){
+  const name=document.getElementById('regName').value;
+  const email=document.getElementById('regEmail').value;
+  const pass=document.getElementById('regPass').value;
+  const msg=document.getElementById('authMsg');
+  if(!name||!email||!pass){msg.textContent='Please fill in all fields';return;}
+  if(pass.length<6){msg.textContent='Password must be at least 6 characters';return;}
+  msg.textContent='Creating account...';msg.style.color='var(--pri)';
+  const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
+  if(error){msg.textContent=error.message;msg.style.color='var(--danger)';return;}
+  msg.textContent='Account created!';msg.style.color='var(--success)';
+  setTimeout(()=>closeModal('authModal'),500);
+}
+
+sb.auth.onAuthStateChange((event,session)=>{
+  if(session&&session.user){
+    currentUser=session.user;
+    const meta=currentUser.user_metadata||{};
+    const initials=(meta.full_name||currentUser.email||'U').substring(0,2).toUpperCase();
+    document.getElementById('userMenu').innerHTML=
+      '<div class="avatar" onclick="toggleUserMenu()">'+initials+'</div>'+
+      '<div class="user-dropdown" id="userDropdown">'+
+      '<a href="#" style="font-weight:700;color:var(--pri)">'+(meta.full_name||currentUser.email)+'</a>'+
+      '<a href="#" onclick="openPricing()">My Plan: '+userPlan.toUpperCase()+'</a>'+
+      '<a href="#" onclick="doLogout()">Sign Out</a></div>';
+    if(isAdmin()){userPlan='business';document.getElementById('planBadge').textContent='ADMIN';document.getElementById('planBadge').className='badge badge-biz';}
+    else{loadUserPlan();}
+    updatePlanBadge();
+  }else{
+    currentUser=null;userPlan='free';
+    document.getElementById('userMenu').innerHTML='<button class="btn" onclick="openAuth()">Sign In</button>';
+    updatePlanBadge();
+  }
+});
+
+function toggleUserMenu(){
+  const dd=document.getElementById('userDropdown');
+  if(dd)dd.classList.toggle('show');
+}
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('userDropdown');
+  if(dd&&!e.target.closest('.user-menu'))dd.classList.remove('show');
+});
+
+async function doLogout(){await sb.auth.signOut();}
+
+async function loadUserPlan(){
+  if(!currentUser)return;
+  try{
+    const{data}=await sb.from('profiles').select('plan,role').eq('id',currentUser.id).single();
+    if(data){userPlan=data.plan||'free';if(data.role==='admin'){currentUser.role='admin';userPlan='business';}}
+  }catch(e){}
+  updatePlanBadge();
+}
+
+function updatePlanBadge(){
+  const b=document.getElementById('planBadge');
+  if(isAdmin()){b.textContent='ADMIN';b.className='badge badge-biz';}
+  else if(userPlan==='business'){b.textContent='BUSINESS PLAN';b.className='badge badge-biz';}
+  else if(userPlan==='pro'){b.textContent='PRO PLAN';b.className='badge badge-pro';}
+  else{b.textContent='FREE PLAN';b.className='badge badge-free';}
+}
+
+/* ========== PRICING ========== */
+function openPricing(){document.getElementById('pricingModal').classList.add('show');}
+
+function selectPlan(plan){
+  if(plan==='free'){closeModal('pricingModal');return;}
+  if(!currentUser){closeModal('pricingModal');openAuth();return;}
+  alert('Stripe Checkout integration coming soon! Selected plan: '+plan.toUpperCase()+'\n\nPrice: '+(plan==='pro'?'$9.99':'$24.99')+'/month');
+  closeModal('pricingModal');
+}
+
+/* ========== LOGO ========== */
+function openLogo(){document.getElementById('logoModal').classList.add('show');}
+
+function searchLogos(){
+  const q=document.getElementById('logoSearch').value.trim();
+  const grid=document.getElementById('logoGrid');
+  if(!q){grid.innerHTML='<p style="grid-column:span 3;text-align:center;color:var(--muted);font-size:12px">Type a company name to search</p>';return;}
+  grid.innerHTML='<p style="grid-column:span 3;text-align:center;color:var(--muted);font-size:12px">Loading...</p>';
+  const urls=[
+    'https://logo.clearbit.com/'+q.toLowerCase().replace(/\s+/g,'')+'.com',
+    'https://logo.clearbit.com/'+q.toLowerCase().replace(/\s+/g,'-')+'.com',
+    'https://logo.clearbit.com/'+q.toLowerCase().split(' ')[0]+'.com'
+  ];
+  grid.innerHTML=urls.map(u=>'<img src="'+u+'" onerror="this.style.display=\'none\'" onclick="selectLogo(\''+u+'\')">').join('')+
+    '<p style="grid-column:span 3;font-size:11px;color:var(--muted);text-align:center;margin-top:4px">Click a logo to use it, or create a custom one below</p>';
+}
+
+function selectLogo(url){customLogo=url;if(updatePreviewFn)updatePreviewFn();closeModal('logoModal');}
+
+function createLogo(){
+  const text=document.getElementById('logoText').value||'Logo';
+  const color=document.getElementById('logoColor').value;
+  const shape=document.getElementById('logoShape').value;
+  const canvas=document.createElement('canvas');
+  canvas.width=200;canvas.height=80;
+  const ctx=canvas.getContext('2d');
+  const initials=text.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  if(shape==='text-only'){
+    ctx.fillStyle=color;ctx.font='bold 36px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,100,40);
+  }else{
+    const r=shape==='circle'?30:shape==='rounded'?8:0;
+    ctx.fillStyle=color;
+    if(shape==='circle'){ctx.beginPath();ctx.arc(40,40,30,0,Math.PI*2);ctx.fill();}
+    else{ctx.beginPath();ctx.roundRect(10,10,60,60,r);ctx.fill();}
+    ctx.fillStyle='#fff';ctx.font='bold 24px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(initials,40,42);
+    ctx.fillStyle=color;ctx.font='bold 18px system-ui';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(text,80,40);
+  }
+  customLogo=canvas.toDataURL();
+  document.getElementById('logoPreview').innerHTML='<img src="'+customLogo+'" style="max-height:60px"><p style="font-size:11px;color:var(--success);margin-top:4px">Logo created! Click a document to apply it.</p>';
+  if(updatePreviewFn)updatePreviewFn();
+}
+
+/* ========== UPLOAD ========== */
+function openUpload(){document.getElementById('uploadModal').classList.add('show');}
+
+function handleUpload(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const text=ev.target.result;
+    const res=document.getElementById('uploadResult');
+    try{
+      if(file.name.endsWith('.json')){
+        const data=JSON.parse(text);
+        res.innerHTML='<p style="color:var(--success)">JSON parsed successfully!</p><pre style="background:#f8fafc;padding:8px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto">'+JSON.stringify(data,null,2).substring(0,1000)+'</pre>';
+      }else if(file.name.endsWith('.csv')){
+        const lines=text.split('\n').filter(l=>l.trim());
+        res.innerHTML='<p style="color:var(--success)">CSV loaded: '+lines.length+' rows</p><pre style="background:#f8fafc;padding:8px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto">'+lines.slice(0,10).join('\n')+'</pre>';
+      }else{
+        res.innerHTML='<p style="color:var(--success)">File loaded: '+file.name+'</p><pre style="background:#f8fafc;padding:8px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto">'+text.substring(0,1000)+'</pre>';
+      }
+    }catch(err){res.innerHTML='<p style="color:var(--danger)">Error: '+err.message+'</p>';}
+  };
+  reader.readAsText(file);
+}
+
+/* ========== STARTUP ========== */
 init();
 </script>
 </body>
