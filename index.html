@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DocPro - Free Document Generator | Invoices, Contracts, Legal Forms</title>
+<title>DraftMyForms - Free Document Generator | Invoices, Contracts, Legal Forms</title>
 <meta name="description" content="Generate professional documents instantly. 10,000+ templates for invoices, contracts, legal forms, pay stubs, and more. Download as PDF free.">
 <meta name="keywords" content="free invoice template, contract template, legal forms, pay stub generator, document generator, fillable PDF">
-<meta property="og:title" content="DocPro - Free Document Generator">
+<meta property="og:title" content="DraftMyForms - Free Document Generator">
 <meta property="og:description" content="10,000+ professional document templates. Create invoices, contracts, legal forms instantly.">
 <meta property="og:type" content="website">
-<link rel="canonical" href="https://docpro-larrys-projects-37d3c0d4.vercel.app/">
+<link rel="canonical" href="https://draftmyforms.com/">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -155,8 +155,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <!-- Sidebar -->
 <div class="sidebar">
 <div class="sidebar-header">
-<h1>DocPro <span>10K+</span></h1>
-<p>Professional USA Document Generator</p>
+<h1>DraftMyForms <span>11K+</span></h1>
+<p>Free Professional Document Generator</p>
 <input class="search-box" id="searchBox" placeholder="Search invoices, contracts, forms..." oninput="filterDocs()">
 </div>
 <div class="sidebar-content">
@@ -192,13 +192,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div style="display:flex;align-items:center">
 <h2 id="docTitle">Select a Document</h2>
 <span class="badge badge-free" id="planBadge">FREE PLAN</span>
-<span class="save-indicator" id="saveIndicator">\u2713 Saved</span>
+<span class="save-indicator" id="saveIndicator">✓ Saved</span>
 </div>
 <div class="header-actions">
 <div class="theme-toggle" id="themeToggle">
-<button onclick="setColorTheme('light')" title="Light" id="themeLight">\u2600</button>
-<button onclick="setColorTheme('dark')" title="Dark" id="themeDark">\u263E</button>
-<button onclick="setColorTheme('system')" title="System" id="themeSystem" class="active">\u2699</button>
+<button onclick="setColorTheme('light')" title="Light" id="themeLight">☀</button>
+<button onclick="setColorTheme('dark')" title="Dark" id="themeDark">☾</button>
+<button onclick="setColorTheme('system')" title="System" id="themeSystem" class="active">⚙</button>
 </div>
 <button class="btn-ghost btn-sm" onclick="openLogo()" title="Add Logo">Logo</button>
 <button class="btn-ghost btn-sm" onclick="openUpload()" title="Upload Document">Upload</button>
@@ -375,7 +375,7 @@ async function loadSavedDocs(){
     const{data,error}=await sb.from('saved_documents').select('*').eq('user_id',currentUser.id).order('updated_at',{ascending:false});
     const el=document.getElementById('savedDocsList');
     if(error||!data||data.length===0){el.innerHTML='<p style="color:var(--muted);text-align:center;padding:20px">No saved documents yet. Open a template and click Save to get started.</p>';return;}
-    el.innerHTML=data.map(d=>'<div class="saved-doc-item" onclick="openSavedDoc('+d.id+',\''+d.template_name.replace(/'/g,"\\\'")+'\',\''+d.template_category.replace(/'/g,"\\\'")+'\')"><div><strong>'+d.template_name+'</strong><div class="saved-meta">'+d.template_category+' \u2022 '+new Date(d.updated_at).toLocaleDateString()+'</div></div><span class="delete-saved" onclick="event.stopPropagation();deleteSavedDoc('+d.id+')" title="Delete">\u2715</span></div>').join('');
+    el.innerHTML=data.map(d=>'<div class="saved-doc-item" onclick="openSavedDoc('+d.id+',\''+d.template_name.replace(/'/g,"\\\'")+'\',\''+d.template_category.replace(/'/g,"\\\'")+'\')"><div><strong>'+d.template_name+'</strong><div class="saved-meta">'+d.template_category+' • '+new Date(d.updated_at).toLocaleDateString()+'</div></div><span class="delete-saved" onclick="event.stopPropagation();deleteSavedDoc('+d.id+')" title="Delete">✕</span></div>').join('');
   }catch(e){console.error(e);document.getElementById('savedDocsList').innerHTML='<p style="color:var(--danger);text-align:center;padding:20px">Error loading documents.</p>';}
 }
 async function openSavedDoc(id,name,catName){
@@ -388,7 +388,7 @@ async function openSavedDoc(id,name,catName){
         document.getElementById('docTitle').textContent=name;
         document.getElementById('formPanel').style.display='block';
         history.replaceState(null,'','#'+slugify(name));
-        document.title=name+' Template - Free Download | DocPro';
+        document.title=name+' Template - Free Download | DraftMyForms';
         renderDoc(name,catName);
         // Load saved form data
         try{
@@ -448,7 +448,7 @@ function handleHashRoute(){
       currentDoc=CATS[ci].docs[di];currentDocCat=CATS[ci].n;
       document.getElementById('docTitle').textContent=currentDoc.name;
       document.getElementById('formPanel').style.display='block';
-      document.title=currentDoc.name+' Template - Free Download | DocPro';
+      document.title=currentDoc.name+' Template - Free Download | DraftMyForms';
       const meta=document.querySelector('meta[name="description"]');
       if(meta)meta.content='Free '+currentDoc.name+' template. Fill out, customize, and download as PDF instantly. Professional '+CATS[ci].n.toLowerCase()+' document generator.';
       renderDoc(currentDoc.name,currentDocCat);return;
@@ -502,7 +502,7 @@ function openDoc(listIdx){
   document.getElementById('saveDocBtn').style.display=currentUser?'inline-block':'none';
   document.querySelectorAll('.doc-item').forEach((el,i)=>el.classList.toggle('active',i===listIdx));
   history.replaceState(null,'','#'+slugify(d.name));
-  document.title=d.name+' Template - Free Download | DocPro';
+  document.title=d.name+' Template - Free Download | DraftMyForms';
   renderDoc(d.name,d.catName);showSeoContext(d.name,d.catName);
 }
 function showSeoContext(name,catName){
@@ -545,7 +545,7 @@ function renderInvoiceReceipt(name){
   const fields=isR?[{id:'from',label:'From',ph:'Your Company'},{id:'to',label:'To',ph:'Client'},{id:'rnum',label:'Receipt #',ph:'R-001'},{id:'date',label:'Date',ph:'MM/DD/YYYY'},{id:'amount',label:'Amount',ph:'$0.00'},{id:'method',label:'Payment Method',ph:'Cash/Card'},{id:'desc',label:'Description',ph:'Payment for...'},{id:'notes',label:'Notes',ph:'Notes...',type:'textarea'}]:[{id:'company',label:'Company',ph:'Your Co.'},{id:'client',label:'Client',ph:'Client Co.'},{id:'invnum',label:'Invoice #',ph:'INV-001'},{id:'date',label:'Date',ph:'MM/DD/YYYY'},{id:'due',label:'Due Date',ph:'MM/DD/YYYY'},{id:'item1',label:'Item 1',ph:'Service'},{id:'qty1',label:'Qty',ph:'1'},{id:'rate1',label:'Rate',ph:'$0'},{id:'item2',label:'Item 2',ph:''},{id:'qty2',label:'Qty',ph:'1'},{id:'rate2',label:'Rate',ph:'$0'},{id:'tax',label:'Tax %',ph:'0'},{id:'notes',label:'Notes',ph:'Terms...',type:'textarea'}];
   renderFormFields(fields);
   updatePreviewFn=()=>{const v=getFieldValues(fields);const logo=logoHTML();
-  if(isR){document.getElementById('docPreview').innerHTML='<div style="font-family:'+s.font+';max-width:600px;margin:auto"><div style="display:flex;justify-content:space-between;margin-bottom:20px"><div>'+logo+'<h1 style="color:'+s.primary+';font-size:28px;margin-top:8px">RECEIPT</h1><p style="color:#64748b;font-size:12px">'+name+'</p></div><div style="text-align:right"><strong>#'+(v.rnum||'___')+'</strong><br><span style="color:#64748b;font-size:12px">'+(v.date||'___')+'</span></div></div><div style="display:flex;justify-content:space-between;border-top:'+s.border+';padding-top:16px;margin-bottom:16px"><div><strong>From:</strong> '+(v.from||'___')+'</div><div><strong>To:</strong> '+(v.to||'___')+'</div></div><table style="width:100%;border-collapse:collapse"><tr style="background:'+s.headerBg+';color:'+s.headerColor+'"><th style="padding:10px;text-align:left">Description</th><th style="padding:10px;text-align:right">Method</th><th style="padding:10px;text-align:right">Amount</th></tr><tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+(v.desc||'Payment')+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">'+(v.method||'\u2014')+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0;font-weight:700">'+(v.amount||'$0.00')+'</td></tr></table><div style="text-align:right;font-size:20px;font-weight:800;color:'+s.primary+';margin:16px 0">Total: '+(v.amount||'$0.00')+'</div>'+(v.notes?'<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:12px;color:#64748b"><strong>Notes:</strong> '+v.notes+'</div>':'')+'</div>';}
+  if(isR){document.getElementById('docPreview').innerHTML='<div style="font-family:'+s.font+';max-width:600px;margin:auto"><div style="display:flex;justify-content:space-between;margin-bottom:20px"><div>'+logo+'<h1 style="color:'+s.primary+';font-size:28px;margin-top:8px">RECEIPT</h1><p style="color:#64748b;font-size:12px">'+name+'</p></div><div style="text-align:right"><strong>#'+(v.rnum||'___')+'</strong><br><span style="color:#64748b;font-size:12px">'+(v.date||'___')+'</span></div></div><div style="display:flex;justify-content:space-between;border-top:'+s.border+';padding-top:16px;margin-bottom:16px"><div><strong>From:</strong> '+(v.from||'___')+'</div><div><strong>To:</strong> '+(v.to||'___')+'</div></div><table style="width:100%;border-collapse:collapse"><tr style="background:'+s.headerBg+';color:'+s.headerColor+'"><th style="padding:10px;text-align:left">Description</th><th style="padding:10px;text-align:right">Method</th><th style="padding:10px;text-align:right">Amount</th></tr><tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+(v.desc||'Payment')+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">'+(v.method||'—')+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0;font-weight:700">'+(v.amount||'$0.00')+'</td></tr></table><div style="text-align:right;font-size:20px;font-weight:800;color:'+s.primary+';margin:16px 0">Total: '+(v.amount||'$0.00')+'</div>'+(v.notes?'<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:12px;color:#64748b"><strong>Notes:</strong> '+v.notes+'</div>':'')+'</div>';}
   else{const q1=parseFloat(v.qty1)||1,r1=parseFloat(v.rate1)||0,q2=parseFloat(v.qty2)||0,r2=parseFloat(v.rate2)||0;const sub=q1*r1+q2*r2,tax=sub*(parseFloat(v.tax)||0)/100,total=sub+tax;document.getElementById('docPreview').innerHTML='<div style="font-family:'+s.font+';max-width:650px;margin:auto"><div style="display:flex;justify-content:space-between;margin-bottom:24px"><div>'+logo+'<h1 style="color:'+s.primary+';font-size:30px;margin-top:8px">INVOICE</h1><p style="color:#64748b;font-size:12px">'+name+'</p></div><div style="text-align:right"><strong>'+(v.company||'Company')+'</strong><br><span style="color:#64748b;font-size:12px">#'+(v.invnum||'___')+' | '+(v.date||'_/_/_')+'</span></div></div><hr style="border:none;border-top:'+s.border+'"><div style="display:flex;justify-content:space-between;margin:20px 0"><div><strong>BILL TO</strong><br>'+(v.client||'___')+'</div><div style="text-align:right"><strong>DUE</strong><br>'+(v.due||'___')+'</div></div><table style="width:100%;border-collapse:collapse"><tr style="background:'+s.headerBg+';color:'+s.headerColor+'"><th style="padding:10px;text-align:left">Description</th><th style="padding:10px;text-align:center">Qty</th><th style="padding:10px;text-align:right">Rate</th><th style="padding:10px;text-align:right">Amount</th></tr><tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+(v.item1||'Service')+'</td><td style="padding:10px;text-align:center;border-bottom:1px solid #e2e8f0">'+q1+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+r1.toFixed(2)+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+(q1*r1).toFixed(2)+'</td></tr>'+(v.item2?'<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0">'+v.item2+'</td><td style="padding:10px;text-align:center;border-bottom:1px solid #e2e8f0">'+q2+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+r2.toFixed(2)+'</td><td style="padding:10px;text-align:right;border-bottom:1px solid #e2e8f0">$'+(q2*r2).toFixed(2)+'</td></tr>':'')+'</table><div style="text-align:right;margin-top:16px"><p>Subtotal: $'+sub.toFixed(2)+'</p><p>Tax: $'+tax.toFixed(2)+'</p><p style="font-size:22px;font-weight:800;color:'+s.primary+';margin-top:8px">Total: $'+total.toFixed(2)+'</p></div>'+(v.notes?'<div style="background:#f8fafc;padding:12px;border-radius:6px;font-size:12px;color:#64748b;margin-top:16px"><strong>Notes:</strong> '+v.notes+'</div>':'')+'</div>';}
   };updatePreviewFn();
   }
@@ -593,7 +593,7 @@ function getFieldValues(fields){const v={};fields.forEach(f=>{const el=document.
 function resetForm(){document.querySelectorAll('#formFields input,#formFields textarea').forEach(el=>el.value='');if(updatePreviewFn)updatePreviewFn();}
 
 /* PDF & Print */
-function generatePDF(){const el=document.getElementById('docPreview');if(!el||!el.innerHTML.trim()||el.querySelector('.welcome')){alert('Select a document first');return;}const name=(currentDoc?currentDoc.name:'Document')+'_DocPro';html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#fff'}).then(canvas=>{const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const iw=pdf.internal.pageSize.getWidth()-20;const ih=canvas.height*iw/canvas.width;let ph=pdf.internal.pageSize.getHeight()-20;if(ih<=ph){pdf.addImage(canvas.toDataURL('image/png'),'PNG',10,10,iw,ih);}else{let srcY=0;const srcH=canvas.width*(ph/iw);while(srcY<canvas.height){const pc=document.createElement('canvas');pc.width=canvas.width;pc.height=Math.min(srcH,canvas.height-srcY);pc.getContext('2d').drawImage(canvas,0,srcY,canvas.width,pc.height,0,0,pc.width,pc.height);if(srcY>0)pdf.addPage();pdf.addImage(pc.toDataURL('image/png'),'PNG',10,10,iw,pc.height*iw/pc.width);srcY+=srcH;}}pdf.save(name+'.pdf');}).catch(err=>{console.error(err);alert('PDF failed. Try again.');});}
+function generatePDF(){const el=document.getElementById('docPreview');if(!el||!el.innerHTML.trim()||el.querySelector('.welcome')){alert('Select a document first');return;}const name=(currentDoc?currentDoc.name:'Document')+'_DraftMyForms';html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#fff'}).then(canvas=>{const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const iw=pdf.internal.pageSize.getWidth()-20;const ih=canvas.height*iw/canvas.width;let ph=pdf.internal.pageSize.getHeight()-20;if(ih<=ph){pdf.addImage(canvas.toDataURL('image/png'),'PNG',10,10,iw,ih);}else{let srcY=0;const srcH=canvas.width*(ph/iw);while(srcY<canvas.height){const pc=document.createElement('canvas');pc.width=canvas.width;pc.height=Math.min(srcH,canvas.height-srcY);pc.getContext('2d').drawImage(canvas,0,srcY,canvas.width,pc.height,0,0,pc.width,pc.height);if(srcY>0)pdf.addPage();pdf.addImage(pc.toDataURL('image/png'),'PNG',10,10,iw,pc.height*iw/pc.width);srcY+=srcH;}}pdf.save(name+'.pdf');}).catch(err=>{console.error(err);alert('PDF failed. Try again.');});}
 function printDoc(){const el=document.getElementById('docPreview');if(!el)return;const w=window.open('','_blank');w.document.write('<html><head><title>Print</title></head><body style="font-family:system-ui;padding:20px">'+el.innerHTML+'</body></html>');w.document.close();w.focus();w.print();}
 
 /* Auth */
@@ -605,7 +605,7 @@ async function doRegister(){const name=document.getElementById('regName').value;
 sb.auth.onAuthStateChange((ev,session)=>{
   if(session&&session.user){
     currentUser=session.user;const meta=currentUser.user_metadata||{};const ini=(meta.full_name||currentUser.email||'U').substring(0,2).toUpperCase();
-    document.getElementById('userMenu').innerHTML='<div class="avatar" onclick="toggleUserMenu()">'+ini+'</div><div class="user-dropdown" id="userDropdown"><a href="#" style="font-weight:700;color:var(--pri)">'+(meta.full_name||currentUser.email)+'</a>'+(isAdmin()?'<a href="#" style="color:var(--success)">\u2605 Admin Access</a>':'<a href="#" onclick="openPricing()">Plan: '+userPlan.toUpperCase()+'</a>')+'<div class="divider"></div><a href="#" onclick="openSavedDocsModal()">\uD83D\uDCC4 My Documents</a><a href="#" onclick="openPricing()">\uD83D\uDCB3 Manage Plan</a><div class="divider"></div><a href="#" onclick="doLogout()">Sign Out</a></div>';
+    document.getElementById('userMenu').innerHTML='<div class="avatar" onclick="toggleUserMenu()">'+ini+'</div><div class="user-dropdown" id="userDropdown"><a href="#" style="font-weight:700;color:var(--pri)">'+(meta.full_name||currentUser.email)+'</a>'+(isAdmin()?'<a href="#" style="color:var(--success)">★ Admin Access</a>':'<a href="#" onclick="openPricing()">Plan: '+userPlan.toUpperCase()+'</a>')+'<div class="divider"></div><a href="#" onclick="openSavedDocsModal()">📄 My Documents</a><a href="#" onclick="openPricing()">💳 Manage Plan</a><div class="divider"></div><a href="#" onclick="doLogout()">Sign Out</a></div>';
     if(isAdmin()){userPlan='business';}else{loadUserPlan();}
     updatePlanBadge();
     document.getElementById('saveDocBtn').style.display=currentDoc?'inline-block':'none';
