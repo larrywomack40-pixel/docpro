@@ -28,6 +28,8 @@
         <script src="https://js.stripe.com/v3/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+footer{position:fixed!important;bottom:0;left:var(--sidebar-w);right:0;text-align:center;padding:6px 12px;font-size:11px;z-index:10;margin:0!important}
+@media(max-width:768px){footer{left:0}}
 :root{--pri:#2563eb;--pri-d:#1d4ed8;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--success:#22c55e;--warn:#f59e0b;--danger:#ef4444;--sidebar-w:320px;--doc-bg:#fff;--doc-text:#1e293b;--hover-bg:#f1f5f9}
 [data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--border:#334155;--doc-bg:#1e293b;--doc-text:#e2e8f0;--hover-bg:#334155}
 [data-theme="dark"] #docPreview{background:var(--card)!important;color:var(--text)!important;border-color:var(--border)!important}
