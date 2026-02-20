@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232563eb'/%3E%3Ctext x='50' y='68' font-size='52' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'%3EDF%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>DraftMyForms - Free Document Generator | Invoices, Contracts, Legal Forms</title>
 <meta name="description" content="Generate professional documents instantly. 10,000+ templates for invoices, contracts, legal forms, pay stubs, and more. Download as PDF free.">
@@ -9,6 +10,15 @@
 <meta property="og:title" content="DraftMyForms - Free Document Generator">
 <meta property="og:description" content="10,000+ professional document templates. Create invoices, contracts, legal forms instantly.">
 <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta property="og:url" content="https://draftmyforms.com/">
+    <meta property="og:image" content="https://draftmyforms.com/og-image.png">
+    <meta property="og:site_name" content="DraftMyForms">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DraftMyForms - Free Document Generator">
+    <meta name="twitter:description" content="Generate professional documents instantly. 10,000+ templates.">
+    <meta name="author" content="Wmk Speciality Services L.L.C.">
 <link rel="canonical" href="https://draftmyforms.com/">
     <meta name="google-site-verification" content="KBCx2c_AORe0Cw3cP2vDBCpMBlomwWaxvXUSpqQg8DM" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -152,6 +162,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .save-indicator.show{opacity:1}
 @media print{.sidebar,.main-header,.toolbar,.form-panel,.modal-overlay,.email-banner,.seo-context{display:none!important}.main-content{padding:0!important}#docPreview{border:none!important;box-shadow:none!important;padding:20px!important}}
 </style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"DraftMyForms","url":"https://draftmyforms.com","description":"Generate professional documents instantly. 10,000+ templates for invoices, contracts, legal forms, pay stubs and more.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"AggregateOffer","lowPrice":"0","highPrice":"24.99","priceCurrency":"USD"},"creator":{"@type":"Organization","name":"Wmk Speciality Services L.L.C."}}</script>
 </head>
 <body>
 <!-- Sidebar -->
@@ -787,9 +798,9 @@ function showSeoContext(name,catName){
   for(const[key,val]of Object.entries(SEO_CTX)){if(nm.includes(key)||cn.includes(key)){ctx=val;break;}}
   if(ctx){el.innerHTML='<h4>About This '+name+' Template</h4><p>'+ctx+' Customize the fields on the left, choose from 6 professional themes, and download your completed document as a PDF. All free templates require no sign-up.</p>';el.style.display='block';}else{el.style.display='none';}
 }
-function canAccess(tier){if(isAdmin())return true;if(tier==='free')return true;if(tier==='pro'&&(userPlan==='pro'||userPlan==='business'))return true;if(tier==='business'&&userPlan==='business')return true;return false;}
+function canAccess(tier){if(isAdmin())return true;if(tier==='free')return true;if(tier==='pro'){if(userPlan==='pro'||userPlan==='business')return true;var fpt=JSON.parse(localStorage.getItem('docpro_free_pro_templates')||'[]');if(currentDoc&&fpt.indexOf(currentDoc.name)>-1)return true;}if(tier==='business'&&userPlan==='business')return true;return false;}
 function isAdmin(){return currentUser&&currentUser.email&&(currentUser.email==='admin@docpro.com'||currentUser.email==='larrywomack40@gmail.com'||currentUser.role==='admin');}
-function captureEmail(e){e.preventDefault();const email=document.getElementById('captureEmailInput').value;if(!email)return;try{sb.from('email_leads').insert({email,source:'sidebar_banner'});}catch(ex){}localStorage.setItem('docpro_email',email);localStorage.setItem('docpro_pro_unlock','3');document.getElementById('emailBanner').innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">Check any Pro template to use your free credits</p>';}
+function captureEmail(e){e.preventDefault();const email=document.getElementById('captureEmailInput').value;if(!email)return;try{sb.from('email_leads').insert({email,source:'sidebar_banner'});}catch(ex){}localStorage.setItem('docpro_email',email);localStorage.setItem('docpro_free_pro_templates',JSON.stringify(['1099-B Form V11','1099-B Form V13','1099-B Form V15']));const banners=document.querySelectorAll('.email-banner');banners.forEach(function(eb){eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">1099-B V11, V13 & V15 are now free for you.</p>';});setTimeout(function(){openAuth();},1500);}
 /* ========== RENDERERS ========== */
 function renderDoc(name,catName){
   const cn=catName.toLowerCase();const nm=name.toLowerCase();let r;
@@ -883,7 +894,7 @@ sb.auth.onAuthStateChange((ev,session)=>{
   if(session&&session.user){
     currentUser=session.user;const meta=currentUser.user_metadata||{};const ini=(meta.full_name||currentUser.email||'U').substring(0,2).toUpperCase();
     document.getElementById('userMenu').innerHTML='<div class="avatar" onclick="toggleUserMenu()">'+ini+'</div><div class="user-dropdown" id="userDropdown"><a href="#" style="font-weight:700;color:var(--pri)">'+(meta.full_name||currentUser.email)+'</a>'+(isAdmin()?'<a href="#" style="color:var(--success)">★ Admin Access</a>':'<a href="#" onclick="openPricing()">Plan: '+userPlan.toUpperCase()+'</a>')+'<div class="divider"></div><a href="#" onclick="openSavedDocsModal()">📄 My Documents</a><a href="#" onclick="openPricing()">💳 Manage Plan</a><div class="divider"></div><a href="#" onclick="doLogout()">Sign Out</a></div>';
-    if(isAdmin()){userPlan='business';}else{loadUserPlan();}
+    if(isAdmin()){userPlan='business';}else{loadUserPlan();document.querySelectorAll('.email-banner').forEach(function(e){e.style.display='none';});}
     updatePlanBadge();
     document.getElementById('saveDocBtn').style.display=currentDoc?'inline-block':'none';
     // Load theme preference from profile
@@ -916,9 +927,10 @@ function createLogo(){const text=document.getElementById('logoText').value||'Log
 function openUpload(){document.getElementById('uploadModal').classList.add('show');}
 function handleUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){const t=ev.target.result;const res=document.getElementById('uploadResult');try{if(f.name.endsWith('.json')){const d=JSON.parse(t);res.innerHTML='<p style="color:var(--success)">JSON parsed!</p><pre style="background:#f8fafc;padding:8px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto">'+JSON.stringify(d,null,2).substring(0,500)+'</pre>';}else if(f.name.endsWith('.csv')){const l=t.split('\n').filter(x=>x.trim());res.innerHTML='<p style="color:var(--success)">CSV: '+l.length+' rows</p>';}else{res.innerHTML='<p style="color:var(--success)">Loaded: '+f.name+'</p>';}}catch(err){res.innerHTML='<p style="color:var(--danger)">Error: '+err.message+'</p>';}};r.readAsText(f);}
 /* Hide email banner if already captured */
-if(localStorage.getItem('docpro_email')){const eb=document.getElementById('emailBanner');if(eb)eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">Use them on any Pro template</p>';}
+if(localStorage.getItem('docpro_email')){const ebs=document.querySelectorAll('.email-banner');ebs.forEach(function(eb){eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">1099-B V11, V13 & V15 are now free. <a href="#" onclick="openAuth();return false" style="color:var(--pri)">Sign up</a> to keep them.</p>';});}
 init();
 </script>
+<footer style="text-align:center;padding:18px 12px 14px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:32px;background:var(--bg)"><span style="opacity:.7">A product of <strong>Wmk Speciality Services L.L.C.</strong></span></footer>
 </body>
 </html>
 
@@ -1158,9 +1170,9 @@ function showSeoContext(name,catName){
   for(const[key,val]of Object.entries(SEO_CTX)){if(nm.includes(key)||cn.includes(key)){ctx=val;break;}}
   if(ctx){el.innerHTML='<h4>About This '+name+' Template</h4><p>'+ctx+' Customize the fields on the left, choose from 6 professional themes, and download your completed document as a PDF. All free templates require no sign-up.</p>';el.style.display='block';}else{el.style.display='none';}
 }
-function canAccess(tier){if(isAdmin())return true;if(tier==='free')return true;if(tier==='pro'&&(userPlan==='pro'||userPlan==='business'))return true;if(tier==='business'&&userPlan==='business')return true;return false;}
+function canAccess(tier){if(isAdmin())return true;if(tier==='free')return true;if(tier==='pro'){if(userPlan==='pro'||userPlan==='business')return true;var fpt=JSON.parse(localStorage.getItem('docpro_free_pro_templates')||'[]');if(currentDoc&&fpt.indexOf(currentDoc.name)>-1)return true;}if(tier==='business'&&userPlan==='business')return true;return false;}
 function isAdmin(){return currentUser&&currentUser.email&&(currentUser.email==='admin@docpro.com'||currentUser.email==='larrywomack40@gmail.com'||currentUser.role==='admin');}
-function captureEmail(e){e.preventDefault();const email=document.getElementById('captureEmailInput').value;if(!email)return;try{sb.from('email_leads').insert({email,source:'sidebar_banner'});}catch(ex){}localStorage.setItem('docpro_email',email);localStorage.setItem('docpro_pro_unlock','3');document.getElementById('emailBanner').innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">Check any Pro template to use your free credits</p>';}
+function captureEmail(e){e.preventDefault();const email=document.getElementById('captureEmailInput').value;if(!email)return;try{sb.from('email_leads').insert({email,source:'sidebar_banner'});}catch(ex){}localStorage.setItem('docpro_email',email);localStorage.setItem('docpro_free_pro_templates',JSON.stringify(['1099-B Form V11','1099-B Form V13','1099-B Form V15']));const banners=document.querySelectorAll('.email-banner');banners.forEach(function(eb){eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">1099-B V11, V13 & V15 are now free for you.</p>';});setTimeout(function(){openAuth();},1500);}
 /* ========== RENDERERS ========== */
 function renderDoc(name,catName){
   const cn=catName.toLowerCase();const nm=name.toLowerCase();let r;
@@ -1254,7 +1266,7 @@ sb.auth.onAuthStateChange((ev,session)=>{
   if(session&&session.user){
     currentUser=session.user;const meta=currentUser.user_metadata||{};const ini=(meta.full_name||currentUser.email||'U').substring(0,2).toUpperCase();
     document.getElementById('userMenu').innerHTML='<div class="avatar" onclick="toggleUserMenu()">'+ini+'</div><div class="user-dropdown" id="userDropdown"><a href="#" style="font-weight:700;color:var(--pri)">'+(meta.full_name||currentUser.email)+'</a>'+(isAdmin()?'<a href="#" style="color:var(--success)">★ Admin Access</a>':'<a href="#" onclick="openPricing()">Plan: '+userPlan.toUpperCase()+'</a>')+'<div class="divider"></div><a href="#" onclick="openSavedDocsModal()">📄 My Documents</a><a href="#" onclick="openPricing()">💳 Manage Plan</a><div class="divider"></div><a href="#" onclick="doLogout()">Sign Out</a></div>';
-    if(isAdmin()){userPlan='business';}else{loadUserPlan();}
+    if(isAdmin()){userPlan='business';}else{loadUserPlan();document.querySelectorAll('.email-banner').forEach(function(e){e.style.display='none';});}
     updatePlanBadge();
     document.getElementById('saveDocBtn').style.display=currentDoc?'inline-block':'none';
     // Load theme preference from profile
@@ -1287,7 +1299,7 @@ function createLogo(){const text=document.getElementById('logoText').value||'Log
 function openUpload(){document.getElementById('uploadModal').classList.add('show');}
 function handleUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){const t=ev.target.result;const res=document.getElementById('uploadResult');try{if(f.name.endsWith('.json')){const d=JSON.parse(t);res.innerHTML='<p style="color:var(--success)">JSON parsed!</p><pre style="background:#f8fafc;padding:8px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto">'+JSON.stringify(d,null,2).substring(0,500)+'</pre>';}else if(f.name.endsWith('.csv')){const l=t.split('\n').filter(x=>x.trim());res.innerHTML='<p style="color:var(--success)">CSV: '+l.length+' rows</p>';}else{res.innerHTML='<p style="color:var(--success)">Loaded: '+f.name+'</p>';}}catch(err){res.innerHTML='<p style="color:var(--danger)">Error: '+err.message+'</p>';}};r.readAsText(f);}
 /* Hide email banner if already captured */
-if(localStorage.getItem('docpro_email')){const eb=document.getElementById('emailBanner');if(eb)eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">Use them on any Pro template</p>';}
+if(localStorage.getItem('docpro_email')){const ebs=document.querySelectorAll('.email-banner');ebs.forEach(function(eb){eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">1099-B V11, V13 & V15 are now free. <a href="#" onclick="openAuth();return false" style="color:var(--pri)">Sign up</a> to keep them.</p>';});}
 init();
 </script>
 </body>
