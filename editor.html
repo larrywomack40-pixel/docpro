@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Document Editor | DraftMyForms</title>
+<meta name="description" content="Create, edit, and design professional documents with AI assistance. Free document editor by DraftMyForms.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23c99532'/%3E%3Cstop offset='100%25' stop-color='%23e8b94a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='24' fill='url(%23g)'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--gold:#c99532;--gold-light:#e8b94a;--gold-dark:#a67a28;
+--paper:#f9f4f3;--paper-dark:#f3ede8;
+--card:#fffcf9;--card-border:#e8ddd4;
+--text:#2d2926;--text-muted:#8a7f76;
+--success:#3a6633;--danger:#c24b3b;
+--sidebar-w:280px;--toolbar-h:48px;
+--font-heading:'Playfair Display',Georgia,serif;
+--font-body:'DM Sans',-apple-system,sans-serif;
+--font-mono:'DM Mono',monospace;
+}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+/* TOP NAV */
+.top-nav{display:flex;align-items:center;gap:12px;padding:8px 16px;background:#fff;border-bottom:1px solid var(--card-border);z-index:100;min-height:52px}
+.top-nav .brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gold);font-family:var(--font-heading);font-weight:700;font-size:18px}
+.top-nav .brand span{color:var(--text)}
+.doc-title-input{border:none;background:transparent;font-size:15px;font-family:var(--font-body);color:var(--text);padding:6px 12px;border-radius:6px;flex:1;max-width:300px}
+.doc-title-input:hover,.doc-title-input:focus{background:var(--paper);outline:none}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;transition:all .2s}
+.btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:var(--gold-dark)}
+.btn-outline{background:transparent;border:1px solid var(--card-border);color:var(--text)}.btn-outline:hover{background:var(--paper)}
+.btn-ghost{background:transparent;color:var(--text-muted);padding:8px}.btn-ghost:hover{color:var(--text);background:var(--paper)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{opacity:.9}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{opacity:.9}
+.btn-sm{padding:5px 10px;font-size:12px}
+/* MAIN LAYOUT */
+.main-layout{display:flex;flex:1;overflow:hidden}
+/* AI SIDEBAR */
+.ai-sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--card-border);display:flex;flex-direction:column;transition:width .3s;overflow:hidden}
+.ai-sidebar.collapsed{width:0;border:none}
+.ai-header{padding:12px 16px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between}
+.ai-header h3{font-family:var(--font-heading);font-size:15px;display:flex;align-items:center;gap:6px}
+.ai-header h3 .star{color:var(--gold)}
+.ai-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5;max-width:95%}
+.ai-msg.system{background:linear-gradient(135deg,#fdf6e8,#fef9f0);border:1px solid #f0ddb8;align-self:flex-start}
+.ai-msg.user{background:var(--gold);color:#fff;align-self:flex-end;border-radius:10px 10px 2px 10px}
+.ai-msg.assistant{background:#f5f0eb;align-self:flex-start;border-radius:10px 10px 10px 2px}
+.ai-input-area{padding:12px;border-top:1px solid var(--card-border);display:flex;flex-direction:column;gap:8px}
+.ai-prompt-input{width:100%;border:1px solid var(--card-border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:var(--font-body);resize:none;min-height:60px;outline:none;transition:border .2s}
+.ai-prompt-input:focus{border-color:var(--gold)}
+.ai-quick-actions{display:flex;flex-wrap:wrap;gap:4px}
+.ai-quick-btn{padding:4px 8px;border-radius:12px;border:1px solid var(--card-border);background:#fff;font-size:11px;cursor:pointer;color:var(--text-muted);transition:all .2s}
+.ai-quick-btn:hover{border-color:var(--gold);color:var(--gold)}
+/* EDITOR AREA */
+.editor-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+/* TOOLBAR */
+.editor-toolbar{display:flex;align-items:center;gap:2px;padding:4px 12px;background:#fff;border-bottom:1px solid var(--card-border);flex-wrap:wrap;min-height:var(--toolbar-h)}
+.toolbar-group{display:flex;align-items:center;gap:1px;padding:0 6px;border-right:1px solid var(--card-border)}
+.toolbar-group:last-child{border-right:none}
+.tool-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--text-muted);font-size:13px;transition:all .15s}
+.tool-btn:hover{background:var(--paper);color:var(--text)}
+.tool-btn.active{background:var(--gold);color:#fff}
+.tool-btn select{border:none;background:transparent;font-size:12px;font-family:var(--font-body);cursor:pointer;outline:none;color:inherit;padding:2px}
+.tool-btn input[type="color"]{width:20px;height:20px;border:none;cursor:pointer;background:transparent;padding:0}
+.font-select{border:1px solid var(--card-border);border-radius:4px;padding:4px 6px;font-size:12px;font-family:var(--font-body);outline:none;background:#fff;max-width:120px}
+.size-select{border:1px solid var(--card-border);border-radius:4px;padding:4px 4px;font-size:12px;outline:none;background:#fff;width:50px}
+/* EDITOR + PREVIEW SPLIT */
+.editor-split{flex:1;display:flex;overflow:hidden}
+.edit-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.canvas-wrapper{flex:1;overflow:auto;padding:32px;background:var(--paper);display:flex;justify-content:center}
+.doc-canvas{width:816px;min-height:1056px;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.08);border-radius:4px;padding:72px 72px 96px;outline:none;font-size:14px;line-height:1.7;color:var(--text);position:relative}
+.doc-canvas:empty::before{content:'Start typing or use AI to create your document...';color:var(--text-muted);font-style:italic;pointer-events:none}
+.doc-canvas h1{font-family:var(--font-heading);font-size:28px;margin-bottom:16px;color:var(--text)}
+.doc-canvas h2{font-family:var(--font-heading);font-size:22px;margin-bottom:12px;color:var(--text)}
+.doc-canvas h3{font-family:var(--font-heading);font-size:18px;margin-bottom:8px;color:var(--text)}
+.doc-canvas table{width:100%;border-collapse:collapse;margin:16px 0}
+.doc-canvas table th,.doc-canvas table td{border:1px solid var(--card-border);padding:8px 12px;text-align:left;font-size:13px}
+.doc-canvas table th{background:var(--gold);color:#fff;font-weight:600}
+.doc-canvas img{max-width:100%;border-radius:4px}
+.doc-canvas .logo-placeholder{width:120px;height:60px;border:2px dashed var(--card-border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);font-size:11px;transition:all .2s}
+.doc-canvas .logo-placeholder:hover{border-color:var(--gold);color:var(--gold)}
+/* PREVIEW PANE */
+.preview-divider{width:4px;background:var(--card-border);cursor:col-resize;transition:background .2s}
+.preview-divider:hover{background:var(--gold)}
+.preview-pane{width:45%;display:flex;flex-direction:column;overflow:hidden;background:var(--paper)}
+.preview-header{padding:8px 16px;background:#fff;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500}
+.preview-frame{flex:1;overflow:auto;padding:24px;display:flex;justify-content:center}
+.preview-doc{width:100%;max-width:700px;background:#fff;box-shadow:0 1px 10px rgba(0,0,0,.06);border-radius:4px;padding:48px;min-height:600px}
+/* UPLOAD OVERLAY */
+.upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
+.upload-overlay.active{display:flex}
+.upload-modal{background:#fff;border-radius:16px;padding:32px;max-width:500px;width:90%;text-align:center}
+.upload-modal h2{font-family:var(--font-heading);margin-bottom:8px}
+.upload-modal p{color:var(--text-muted);font-size:14px;margin-bottom:24px}
+.upload-zone{border:2px dashed var(--card-border);border-radius:12px;padding:48px 24px;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:var(--gold);background:rgba(201,149,50,.03)}
+.upload-zone i{font-size:36px;color:var(--gold);margin-bottom:12px}
+.upload-zone p{font-size:13px}
+/* TEMPLATE PANEL */
+.template-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
+.template-panel.active{display:flex}
+.template-modal{background:#fff;border-radius:16px;width:90%;max-width:900px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column}
+.template-modal-header{padding:20px 24px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between}
+.template-modal-header h2{font-family:var(--font-heading)}
+.template-tabs{display:flex;gap:4px;padding:12px 24px;border-bottom:1px solid var(--card-border);overflow-x:auto}
+.template-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--card-border);background:#fff;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .2s}
+.template-tab.active,.template-tab:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+.template-grid{flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.template-card{border:1px solid var(--card-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
+.template-card:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(201,149,50,.15);transform:translateY(-2px)}
+.template-card .preview{height:160px;background:var(--paper);overflow:hidden;padding:8px}
+.template-card .preview iframe{width:200%;height:200%;transform:scale(.5);transform-origin:top left;pointer-events:none;border:none}
+.template-card .info{padding:10px 12px}
+.template-card .info h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.template-card .info span{font-size:11px;color:var(--text-muted)}
+.template-card .badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px}
+.badge-free{background:#e8f5e2;color:var(--success)}
+.badge-pro{background:#fef3d8;color:var(--gold-dark)}
+.badge-biz{background:#fde8e6;color:var(--danger)}
+/* STATUS BAR */
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px;background:#fff;border-top:1px solid var(--card-border);font-size:11px;color:var(--text-muted)}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+/* LOGO MODAL */
+.logo-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center}
+.logo-modal.active{display:flex}
+.logo-modal-content{background:#fff;border-radius:16px;padding:32px;max-width:480px;width:90%}
+/* AI LOADING */
+.ai-loading{display:flex;align-items:center;gap:8px;padding:10px;font-size:12px;color:var(--text-muted)}
+.ai-loading .dots span{animation:blink 1.4s infinite both}
+.ai-loading .dots span:nth-child(2){animation-delay:.2s}
+.ai-loading .dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+/* MOBILE */
+@media(max-width:768px){
+.ai-sidebar{position:fixed;left:-100%;top:0;bottom:0;z-index:200;width:85%;max-width:320px;transition:left .3s}
+.ai-sidebar.open{left:0}
+.preview-pane,.preview-divider{display:none!important}
+.doc-canvas{width:100%;padding:24px;min-height:auto}
+.canvas-wrapper{padding:8px}
+.top-nav{flex-wrap:wrap}
+.template-grid{grid-template-columns:1fr 1fr}
+.editor-toolbar{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<!-- TOP NAVIGATION -->
+<nav class="top-nav">
+<a href="/" class="brand">✦ <span>DraftMyForms</span></a>
+<input class="doc-title-input" id="docTitle" value="Untitled Document" spellcheck="false">
+<div class="nav-actions">
+<button class="btn btn-ghost" onclick="toggleAI()" title="Toggle AI Panel"><i class="fas fa-robot"></i></button>
+<button class="btn btn-ghost" onclick="openTemplates()" title="Templates"><i class="fas fa-th-large"></i></button>
+<button class="btn btn-ghost" onclick="openUploadDoc()" title="Upload Document"><i class="fas fa-file-upload"></i></button>
+<button class="btn btn-ghost" onclick="openLogoUpload()" title="Upload Logo"><i class="fas fa-image"></i></button>
+<button class="btn btn-outline btn-sm" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+<button class="btn btn-outline btn-sm" onclick="downloadDocx()"><i class="fas fa-file-word"></i> DOCX</button>
+<button class="btn btn-gold btn-sm" onclick="saveDocument()"><i class="fas fa-save"></i> Save</button>
+<a href="/" class="btn btn-ghost btn-sm"><i class="fas fa-home"></i></a>
+</div>
+</nav>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+<!-- AI SIDEBAR -->
+<aside class="ai-sidebar" id="aiSidebar">
+<div class="ai-header">
+<h3><span class="star">✦</span> AI Assistant</h3>
+<button class="btn btn-ghost btn-sm" onclick="toggleAI()"><i class="fas fa-times"></i></button>
+</div>
+<div class="ai-messages" id="aiMessages">
+<div class="ai-msg system">
+<strong>Welcome to DraftMyForms AI</strong><br>
+I can help you create, edit, and perfect any document. Try:
+<br>• "Create a professional invoice"
+<br>• "Write a cover letter for a marketing role"
+<br>• "Generate an NDA agreement"
+<br>• "Help me improve this resume"
+<br>• "Create a company logo"
+</div>
+</div>
+<div class="ai-input-area">
+<div class="ai-quick-actions">
+<button class="ai-quick-btn" onclick="aiQuick('invoice')">📄 Invoice</button>
+<button class="ai-quick-btn" onclick="aiQuick('contract')">📋 Contract</button>
+<button class="ai-quick-btn" onclick="aiQuick('resume')">📝 Resume</button>
+<button class="ai-quick-btn" onclick="aiQuick('letter')">✉️ Letter</button>
+<button class="ai-quick-btn" onclick="aiQuick('proposal')">💼 Proposal</button>
+<button class="ai-quick-btn" onclick="aiQuick('nda')">🔒 NDA</button>
+<button class="ai-quick-btn" onclick="aiQuick('logo')">🎨 Logo</button>
+</div>
+<textarea class="ai-prompt-input" id="aiPrompt" placeholder="Describe your document or ask AI to edit..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI()}"></textarea>
+<div style="display:flex;gap:6px">
+<button class="btn btn-gold" style="flex:1" onclick="sendAI()"><i class="fas fa-paper-plane"></i> Send</button>
+<button class="btn btn-outline btn-sm" onclick="applyAIToDoc()" title="Apply AI changes to document"><i class="fas fa-magic"></i></button>
+</div>
+</div>
+</aside>
+
+<!-- EDITOR CONTAINER -->
+<div class="editor-container">
+
+<!-- TOOLBAR -->
+<div class="editor-toolbar" id="toolbar">
+<div class="toolbar-group">
+<button class="tool-btn" onclick="execCmd('undo')" title="Undo"><i class="fas fa-undo"></i></button>
+<button class="tool-btn" onclick="execCmd('redo')" title="Redo"><i class="fas fa-redo"></i></button>
+</div>
+<div class="toolbar-group">
+<select class="font-select" onchange="execCmd('fontName',this.value)" title="Font">
+<option value="DM Sans">DM Sans</option>
+<option value="Playfair Display">Playfair Display</option>
+<option value="Georgia">Georgia</option>
+<option value="Times New Roman">Times New Roman</option>
+<option value="Arial">Arial</option>
+<option value="Helvetica">Helvetica</option>
+<option value="Courier New">Courier New</option>
+<option value="Verdana">Verdana</option>
+<option value="Trebuchet MS">Trebuchet MS</option>
+</select>
+<select class="size-select" onchange="execCmd('fontSize',this.value)" title="Size">
+<option value="1">8</option>
+<option value="2">10</option>
+<option value="3" selected>12</option>
+<option value="4">14</option>
+<option value="5">18</option>
+<option value="6">24</option>
+<option value="7">36</option>
+</select>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" onclick="execCmd('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+<button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i class="fas fa-italic"></i></button>
+<button class="tool-btn" onclick="execCmd('underline')" title="Underline"><i class="fas fa-underline"></i></button>
+<button class="tool-btn" onclick="execCmd('strikeThrough')" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" title="Text Color"><input type="color" value="#2d2926" onchange="execCmd('foreColor',this.value)"></button>
+<button class="tool-btn" title="Highlight"><input type="color" value="#fef3d8" onchange="execCmd('hiliteColor',this.value)"></button>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" onclick="execCmd('justifyLeft')" title="Align Left"><i class="fas fa-align-left"></i></button>
+<button class="tool-btn" onclick="execCmd('justifyCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+<button class="tool-btn" onclick="execCmd('justifyRight')" title="Align Right"><i class="fas fa-align-right"></i></button>
+<button class="tool-btn" onclick="execCmd('justifyFull')" title="Justify"><i class="fas fa-align-justify"></i></button>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" onclick="execCmd('insertUnorderedList')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+<button class="tool-btn" onclick="execCmd('insertOrderedList')" title="Number List"><i class="fas fa-list-ol"></i></button>
+<button class="tool-btn" onclick="execCmd('indent')" title="Indent"><i class="fas fa-indent"></i></button>
+<button class="tool-btn" onclick="execCmd('outdent')" title="Outdent"><i class="fas fa-outdent"></i></button>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" onclick="insertHeading('h1')" title="Heading 1">H1</button>
+<button class="tool-btn" onclick="insertHeading('h2')" title="Heading 2">H2</button>
+<button class="tool-btn" onclick="insertHeading('h3')" title="Heading 3">H3</button>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" onclick="insertTable()" title="Insert Table"><i class="fas fa-table"></i></button>
+<button class="tool-btn" onclick="insertHR()" title="Horizontal Rule"><i class="fas fa-minus"></i></button>
+<button class="tool-btn" onclick="insertLink()" title="Insert Link"><i class="fas fa-link"></i></button>
+<button class="tool-btn" onclick="insertImage()" title="Insert Image"><i class="fas fa-image"></i></button>
+</div>
+<div class="toolbar-group">
+<button class="tool-btn" onclick="clearFormatting()" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
+<button class="tool-btn" onclick="printDoc()" title="Print"><i class="fas fa-print"></i></button>
+</div>
+</div>
+
+<!-- EDITOR SPLIT -->
+<div class="editor-split">
+
+<!-- EDIT PANE -->
+<div class="edit-pane">
+<div class="canvas-wrapper">
+<div class="doc-canvas" id="docCanvas" contenteditable="true" spellcheck="true">
+</div>
+</div>
+</div>
+
+<!-- DIVIDER -->
+<div class="preview-divider" id="previewDivider"></div>
+
+<!-- PREVIEW PANE -->
+<div class="preview-pane" id="previewPane">
+<div class="preview-header">
+<span><i class="fas fa-eye"></i> Live Preview</span>
+<div style="display:flex;gap:4px">
+<button class="btn btn-ghost btn-sm" onclick="togglePreview()"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="preview-frame">
+<div class="preview-doc" id="previewDoc"></div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+<span id="wordCount">0 words</span>
+<span id="saveStatus">Ready</span>
+<span id="aiCredits">AI Credits: ∞</span>
+</div>
+
+<!-- UPLOAD DOCUMENT OVERLAY -->
+<div class="upload-overlay" id="uploadOverlay">
+<div class="upload-modal">
+<h2>Upload Document</h2>
+<p>Upload a PDF, DOCX, or image to edit with AI assistance</p>
+<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+<i class="fas fa-cloud-upload-alt"></i>
+<p>Drag & drop or click to upload</p>
+<p style="font-size:11px;color:var(--text-muted);margin-top:4px">PDF, DOCX, DOC, TXT, RTF, PNG, JPG</p>
+</div>
+<input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt,.rtf,.png,.jpg,.jpeg" style="display:none" onchange="handleFileUpload(this)">
+<div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
+<button class="btn btn-outline" onclick="closeUpload()">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- LOGO UPLOAD MODAL -->
+<div class="logo-modal" id="logoModal">
+<div class="logo-modal-content">
+<h2 style="font-family:var(--font-heading);margin-bottom:8px">Add Your Logo</h2>
+<p style="color:var(--text-muted);font-size:14px;margin-bottom:16px">Upload your company logo or let AI create one</p>
+<div class="upload-zone" onclick="document.getElementById('logoInput').click()" style="margin-bottom:16px">
+<i class="fas fa-image"></i>
+<p>Upload logo (PNG, JPG, SVG)</p>
+</div>
+<input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.svg,.webp" style="display:none" onchange="handleLogoUpload(this)">
+<div style="text-align:center;margin-bottom:16px;color:var(--text-muted);font-size:12px">— or —</div>
+<div style="display:flex;gap:8px">
+<input type="text" id="logoCompanyName" placeholder="Company name for AI logo..." style="flex:1;padding:10px;border:1px solid var(--card-border);border-radius:8px;font-size:13px;outline:none">
+<button class="btn btn-gold" onclick="generateLogo()"><i class="fas fa-magic"></i> AI Logo</button>
+</div>
+<div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+<button class="btn btn-outline" onclick="closeLogoModal()">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- TEMPLATE PANEL -->
+<div class="template-panel" id="templatePanel">
+<div class="template-modal">
+<div class="template-modal-header">
+<h2>Document Templates</h2>
+<button class="btn btn-ghost" onclick="closeTemplates()"><i class="fas fa-times"></i></button>
+</div>
+<div class="template-tabs" id="templateTabs"></div>
+<div class="template-grid" id="templateGrid"></div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+// ==============================
+// GLOBAL STATE
+// ==============================
+let lastAIResponse = '';
+let currentTemplate = null;
+let previewVisible = true;
+let userLogo = null;
+
+// ==============================
+// TOOLBAR COMMANDS
+// ==============================
+function execCmd(cmd, val) {
+  document.execCommand(cmd, false, val || null);
+  docCanvas.focus();
+  updatePreview();
+}
+
+function insertHeading(tag) {
+  document.execCommand('formatBlock', false, tag);
+  docCanvas.focus();
+  updatePreview();
+}
+
+function insertTable() {
+  const rows = prompt('Number of rows:', '3');
+  const cols = prompt('Number of columns:', '3');
+  if (!rows || !cols) return;
+  let html = '<table><thead><tr>';
+  for (let c = 0; c < +cols; c++) html += '<th>Header ' + (c + 1) + '</th>';
+  html += '</tr></thead><tbody>';
+  for (let r = 0; r < +rows - 1; r++) {
+    html += '<tr>';
+    for (let c = 0; c < +cols; c++) html += '<td>&nbsp;</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table><p>&nbsp;</p>';
+  document.execCommand('insertHTML', false, html);
+  updatePreview();
+}
+
+function insertHR() {
+  document.execCommand('insertHTML', false, '<hr style="border:none;border-top:2px solid #c99532;margin:20px 0">');
+  updatePreview();
+}
+
+function insertLink() {
+  const url = prompt('Enter URL:', 'https://');
+  if (url) document.execCommand('createLink', false, url);
+  updatePreview();
+}
+
+function insertImage() {
+  const url = prompt('Enter image URL:');
+  if (url) document.execCommand('insertImage', false, url);
+  updatePreview();
+}
+
+function clearFormatting() {
+  document.execCommand('removeFormat');
+  updatePreview();
+}
+
+function printDoc() {
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>Print</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>body{font-family:DM Sans,sans-serif;padding:40px;color:#2d2926}h1,h2,h3{font-family:Playfair Display,serif}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}th{background:#c99532;color:#fff}</style></head><body>' + docCanvas.innerHTML + '</body></html>');
+  w.document.close();
+  w.print();
+}
+
+// ==============================
+// DOCUMENT CANVAS
+// ==============================
+const docCanvas = document.getElementById('docCanvas');
+const previewDoc = document.getElementById('previewDoc');
+
+docCanvas.addEventListener('input', () => {
+  updatePreview();
+  updateWordCount();
+});
+
+function updatePreview() {
+  if (previewDoc) previewDoc.innerHTML = docCanvas.innerHTML;
+}
+
+function updateWordCount() {
+  const text = docCanvas.innerText.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  document.getElementById('wordCount').textContent = words + ' words';
+}
+
+// ==============================
+// AI SIDEBAR
+// ==============================
+function toggleAI() {
+  const sb = document.getElementById('aiSidebar');
+  sb.classList.toggle('collapsed');
+}
+
+function addAIMessage(text, role) {
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + role;
+  div.innerHTML = text;
+  document.getElementById('aiMessages').appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth' });
+}
+
+function showAILoading() {
+  const div = document.createElement('div');
+  div.className = 'ai-loading';
+  div.id = 'aiLoading';
+  div.innerHTML = 'AI is thinking <span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+  document.getElementById('aiMessages').appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth' });
+}
+
+function removeAILoading() {
+  const el = document.getElementById('aiLoading');
+  if (el) el.remove();
+}
+
+function aiQuick(type) {
+  const prompts = {
+    invoice: 'Create a professional invoice template with company details, line items table, subtotal, tax, and total. Use elegant gold (#c99532) accents.',
+    contract: 'Create a professional business service contract with all necessary legal clauses, signature blocks, and clean formatting.',
+    resume: 'Create a modern professional resume template with sections for contact info, summary, experience, education, and skills.',
+    letter: 'Create a professional business letter template with proper formatting, sender/recipient blocks, and a formal structure.',
+    proposal: 'Create a professional business proposal template with executive summary, scope of work, timeline, pricing, and terms.',
+    nda: 'Create a comprehensive Non-Disclosure Agreement with standard clauses, definitions, obligations, and signature blocks.',
+    logo: 'Create a modern, professional company logo design concept using SVG. Make it elegant and suitable for business documents.'
+  };
+  document.getElementById('aiPrompt').value = prompts[type] || '';
+  sendAI();
+}
+
+async function sendAI() {
+  const prompt = document.getElementById('aiPrompt').value.trim();
+  if (!prompt) return;
+  
+  addAIMessage(prompt, 'user');
+  document.getElementById('aiPrompt').value = '';
+  showAILoading();
+  
+  const currentContent = docCanvas.innerHTML;
+  const hasContent = currentContent.trim().length > 0 && currentContent.trim() !== '<br>';
+  
+  try {
+    const res = await fetch('/api/ai-generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: prompt,
+        docType: 'custom',
+        currentContent: hasContent ? currentContent : null,
+        mode: hasContent ? 'edit' : 'create'
+      })
+    });
+    
+    removeAILoading();
+    
+    if (!res.ok) {
+      const err = await res.json();
+      addAIMessage('Error: ' + (err.error || 'Something went wrong'), 'system');
+      return;
+    }
+    
+    const data = await res.json();
+    lastAIResponse = data.html;
+    
+    // Auto-apply to canvas
+    docCanvas.innerHTML = data.html;
+    updatePreview();
+    updateWordCount();
+    
+    addAIMessage('Document updated! You can edit it directly in the canvas, or ask me to make more changes.', 'assistant');
+    
+  } catch (e) {
+    removeAILoading();
+    addAIMessage('Connection error. Please try again.', 'system');
+  }
+}
+
+function applyAIToDoc() {
+  if (lastAIResponse) {
+    docCanvas.innerHTML = lastAIResponse;
+    updatePreview();
+    updateWordCount();
+    showToast('AI content applied to document');
+  }
+}
+
+// ==============================
+// FILE UPLOAD
+// ==============================
+function openUploadDoc() {
+  document.getElementById('uploadOverlay').classList.add('active');
+}
+
+function closeUpload() {
+  document.getElementById('uploadOverlay').classList.remove('active');
+}
+
+async function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  closeUpload();
+  showToast('Processing ' + file.name + '...');
+  
+  if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+    const text = await file.text();
+    docCanvas.innerHTML = '<div style="white-space:pre-wrap;font-family:var(--font-body);line-height:1.7">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+    updatePreview();
+    updateWordCount();
+    document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
+    showToast('File loaded! You can now edit or ask AI to improve it.');
+  } else if (file.type === 'text/html' || file.name.endsWith('.html')) {
+    const text = await file.text();
+    docCanvas.innerHTML = text;
+    updatePreview();
+    updateWordCount();
+    showToast('HTML loaded!');
+  } else if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.execCommand('insertImage', false, e.target.result);
+      updatePreview();
+      showToast('Image inserted!');
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // For PDF/DOCX - send to AI for interpretation
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      addAIMessage('Processing uploaded file: ' + file.name, 'system');
+      showAILoading();
+      try {
+        const res = await fetch('/api/ai-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: 'Convert this uploaded document into a clean, editable HTML format. Preserve all content, formatting, and structure. File: ' + file.name,
+            docType: 'upload',
+            fileData: base64,
+            fileName: file.name
+          })
+        });
+        removeAILoading();
+        if (res.ok) {
+          const data = await res.json();
+          docCanvas.innerHTML = data.html;
+          updatePreview();
+          updateWordCount();
+          addAIMessage('Document processed and loaded into the editor!', 'assistant');
+          document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
+        }
+      } catch (e) {
+        removeAILoading();
+        addAIMessage('Error processing file. Try a different format.', 'system');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+  input.value = '';
+}
+
+// ==============================
+// LOGO UPLOAD
+// ==============================
+function openLogoUpload() {
+  document.getElementById('logoModal').classList.add('active');
+}
+
+function closeLogoModal() {
+  document.getElementById('logoModal').classList.remove('active');
+}
+
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    userLogo = e.target.result;
+    insertLogoInDoc(userLogo);
+    closeLogoModal();
+    showToast('Logo inserted! Drag to reposition.');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function insertLogoInDoc(src) {
+  const img = '<img src="' + src + '" style="max-width:180px;max-height:80px;cursor:move" class="doc-logo" draggable="true">';
+  // Insert at beginning of doc or at cursor
+  const sel = window.getSelection();
+  if (sel.rangeCount > 0 && docCanvas.contains(sel.anchorNode)) {
+    document.execCommand('insertHTML', false, img);
+  } else {
+    docCanvas.innerHTML = img + docCanvas.innerHTML;
+  }
+  updatePreview();
+}
+
+async function generateLogo() {
+  const name = document.getElementById('logoCompanyName').value.trim();
+  if (!name) { showToast('Enter a company name'); return; }
+  
+  closeLogoModal();
+  addAIMessage('Creating a logo for "' + name + '"...', 'system');
+  showAILoading();
+  
+  try {
+    const res = await fetch('/api/ai-generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: 'Create an elegant, professional SVG logo for a company called "' + name + '". The logo should be modern, clean, and suitable for business documents. Use gold (#c99532) as the primary accent color with dark text. Output ONLY the SVG code, nothing else.',
+        docType: 'logo',
+        mode: 'create'
+      })
+    });
+    removeAILoading();
+    if (res.ok) {
+      const data = await res.json();
+      const svgMatch = data.html.match(/<svg[\s\S]*?<\/svg>/i);
+      if (svgMatch) {
+        const blob = new Blob([svgMatch[0]], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(blob);
+        insertLogoInDoc(url);
+        addAIMessage('Logo created and inserted into your document!', 'assistant');
+      } else {
+        docCanvas.innerHTML = data.html + docCanvas.innerHTML;
+        updatePreview();
+        addAIMessage('Logo concept generated!', 'assistant');
+      }
+    }
+  } catch (e) {
+    removeAILoading();
+    addAIMessage('Error generating logo. Try again.', 'system');
+  }
+  }
+
+// ==============================
+// TEMPLATES (20 variations per type)
+// ==============================
+const TEMPLATES = {
+  'Invoices': [
+    { name: 'Executive Gold', tier: 'free', style: 'elegant gold accents, serif headings, clean table with gold header' },
+    { name: 'Minimal Clean', tier: 'free', style: 'ultra-minimal, lots of white space, thin borders, small sans-serif' },
+    { name: 'Corporate Bold', tier: 'free', style: 'bold dark header bar, professional corporate feel, structured layout' },
+    { name: 'Modern Stripe', tier: 'free', style: 'colorful left stripe accent, modern sans-serif, rounded table corners' },
+    { name: 'Classic Traditional', tier: 'free', style: 'traditional serif fonts, classic border, formal layout' },
+    { name: 'Creative Studio', tier: 'pro', style: 'artistic layout, asymmetric design, creative agency feel' },
+    { name: 'Tech Startup', tier: 'pro', style: 'tech-focused, monospace elements, modern grid layout' },
+    { name: 'Luxury Black', tier: 'pro', style: 'black and gold, premium feel, luxury brand aesthetic' },
+    { name: 'Fresh Green', tier: 'pro', style: 'eco-friendly green accents, clean modern layout, natural feel' },
+    { name: 'Warm Terracotta', tier: 'pro', style: 'warm earth tones, rounded elements, friendly feel' },
+    { name: 'Neon Gradient', tier: 'pro', style: 'bold gradient accents, modern design, eye-catching' },
+    { name: 'Blueprint', tier: 'pro', style: 'architectural/engineering feel, grid lines, technical' },
+    { name: 'Retro Vintage', tier: 'pro', style: 'vintage typography, retro colors, classic ornaments' },
+    { name: 'Swiss Design', tier: 'pro', style: 'Swiss/International style, grid-based, Helvetica, red accents' },
+    { name: 'Japanese Zen', tier: 'pro', style: 'minimalist Japanese aesthetic, zen garden inspired, subtle' },
+    { name: 'Geometric Art', tier: 'biz', style: 'geometric shapes, abstract art elements, bold colors' },
+    { name: 'Watercolor', tier: 'biz', style: 'soft watercolor background accents, artistic, premium' },
+    { name: 'Magazine', tier: 'biz', style: 'magazine-style layout, columns, editorial feel' },
+    { name: 'Dark Professional', tier: 'biz', style: 'dark mode design, white text on dark, sleek' },
+    { name: 'Royal Crest', tier: 'biz', style: 'ornate borders, royal crest feel, prestigious, gold and navy' }
+  ],
+  'Contracts': [
+    { name: 'Standard Legal', tier: 'free', style: 'clean legal formatting, numbered clauses, professional' },
+    { name: 'Modern Contract', tier: 'free', style: 'modern layout, clear sections, easy to read' },
+    { name: 'Simple Agreement', tier: 'free', style: 'simplified contract, plain language, minimal' },
+    { name: 'Corporate Master', tier: 'free', style: 'corporate master agreement style, detailed sections' },
+    { name: 'Freelancer', tier: 'free', style: 'freelancer-friendly, clear scope/payment terms' },
+    { name: 'Employment', tier: 'pro', style: 'employment contract, comprehensive terms' },
+    { name: 'Service Agreement', tier: 'pro', style: 'professional services agreement, detailed SLA' },
+    { name: 'Lease Agreement', tier: 'pro', style: 'property lease, residential/commercial' },
+    { name: 'Partnership', tier: 'pro', style: 'business partnership agreement, equity terms' },
+    { name: 'NDA Standard', tier: 'pro', style: 'standard non-disclosure agreement, mutual/one-way' },
+    { name: 'NDA Mutual', tier: 'pro', style: 'mutual NDA, bidirectional confidentiality' },
+    { name: 'Consulting', tier: 'pro', style: 'consulting agreement, deliverables focus' },
+    { name: 'Sales Contract', tier: 'pro', style: 'product sales agreement, warranty terms' },
+    { name: 'IP Assignment', tier: 'pro', style: 'intellectual property assignment, work for hire' },
+    { name: 'Joint Venture', tier: 'pro', style: 'joint venture agreement, shared responsibilities' },
+    { name: 'Licensing', tier: 'biz', style: 'software/IP licensing agreement, royalties' },
+    { name: 'Merger Agreement', tier: 'biz', style: 'M&A agreement, comprehensive due diligence' },
+    { name: 'Non-Compete', tier: 'biz', style: 'non-compete/non-solicitation agreement' },
+    { name: 'SaaS Terms', tier: 'biz', style: 'SaaS terms of service, data processing' },
+    { name: 'Investment', tier: 'biz', style: 'investment agreement, term sheet style' }
+  ],
+  'Resumes': [
+    { name: 'Professional Clean', tier: 'free', style: 'clean ATS-friendly resume, clear sections, professional' },
+    { name: 'Modern Two-Column', tier: 'free', style: 'two-column layout, skills sidebar, modern feel' },
+    { name: 'Classic Traditional', tier: 'free', style: 'traditional resume, Times New Roman, conservative' },
+    { name: 'Minimalist', tier: 'free', style: 'ultra-minimal, focus on content, no distractions' },
+    { name: 'Bold Header', tier: 'free', style: 'prominent name header, bold section dividers' },
+    { name: 'Creative Portfolio', tier: 'pro', style: 'creative/design resume, portfolio style' },
+    { name: 'Executive', tier: 'pro', style: 'C-suite executive resume, leadership focus' },
+    { name: 'Tech Developer', tier: 'pro', style: 'developer resume, code-inspired design, skill bars' },
+    { name: 'Academic CV', tier: 'pro', style: 'academic CV, publications, research focus' },
+    { name: 'Healthcare', tier: 'pro', style: 'medical/healthcare professional resume' },
+    { name: 'Marketing Pro', tier: 'pro', style: 'marketing professional, metrics-driven, visual' },
+    { name: 'Legal Professional', tier: 'pro', style: 'attorney/legal resume, formal, prestigious' },
+    { name: 'Sales Executive', tier: 'pro', style: 'sales resume, achievement-focused, numbers' },
+    { name: 'Teacher/Educator', tier: 'pro', style: 'education professional, certifications' },
+    { name: 'Federal Resume', tier: 'pro', style: 'US federal/government resume format, detailed' },
+    { name: 'Infographic', tier: 'biz', style: 'infographic-style, visual data, charts' },
+    { name: 'Video Resume', tier: 'biz', style: 'multimedia resume template, video embed ready' },
+    { name: 'International', tier: 'biz', style: 'europass-style international CV format' },
+    { name: 'Career Changer', tier: 'biz', style: 'functional resume for career transition' },
+    { name: 'Entry Level', tier: 'biz', style: 'new graduate, internships, coursework focus' }
+  ],
+  'Letters': [
+    { name: 'Business Formal', tier: 'free', style: 'formal business letter, standard block format' },
+    { name: 'Cover Letter', tier: 'free', style: 'job application cover letter, persuasive' },
+    { name: 'Recommendation', tier: 'free', style: 'letter of recommendation, positive professional' },
+    { name: 'Resignation', tier: 'free', style: 'professional resignation letter, graceful' },
+    { name: 'Thank You', tier: 'free', style: 'professional thank you letter, interview follow-up' },
+    { name: 'Complaint', tier: 'pro', style: 'formal complaint letter, structured grievance' },
+    { name: 'Demand Letter', tier: 'pro', style: 'legal demand letter, firm but professional' },
+    { name: 'Reference', tier: 'pro', style: 'character/professional reference letter' },
+    { name: 'Intent Letter', tier: 'pro', style: 'letter of intent, business/education' },
+    { name: 'Termination', tier: 'pro', style: 'employment termination letter, legal compliance' },
+    { name: 'Offer Letter', tier: 'pro', style: 'job offer letter, compensation details' },
+    { name: 'Acceptance', tier: 'pro', style: 'acceptance letter, job/admission' },
+    { name: 'Appeal', tier: 'pro', style: 'appeal letter, decision reconsideration' },
+    { name: 'Condolence', tier: 'pro', style: 'condolence/sympathy letter, sensitive' },
+    { name: 'Invitation', tier: 'pro', style: 'formal event invitation letter' },
+    { name: 'Authorization', tier: 'biz', style: 'authorization letter, power delegation' },
+    { name: 'Cease & Desist', tier: 'biz', style: 'cease and desist letter, legal warning' },
+    { name: 'Collection', tier: 'biz', style: 'debt collection letter, professional' },
+    { name: 'Sponsorship', tier: 'biz', style: 'sponsorship request letter, partnership' },
+    { name: 'Testimonial', tier: 'biz', style: 'client testimonial/endorsement letter' }
+  ],
+  'Proposals': [
+    { name: 'Business Plan', tier: 'free', style: 'business plan template, executive summary, financials' },
+    { name: 'Project Proposal', tier: 'free', style: 'project proposal, scope, timeline, budget' },
+    { name: 'Service Proposal', tier: 'free', style: 'professional services proposal, pricing tiers' },
+    { name: 'Grant Proposal', tier: 'free', style: 'grant application, research methodology' },
+    { name: 'Marketing Plan', tier: 'free', style: 'marketing strategy proposal, channels, KPIs' },
+    { name: 'Consulting Proposal', tier: 'pro', style: 'management consulting proposal, analysis' },
+    { name: 'Software Dev', tier: 'pro', style: 'software development proposal, tech stack, sprints' },
+    { name: 'Construction', tier: 'pro', style: 'construction bid proposal, materials, schedule' },
+    { name: 'Event Planning', tier: 'pro', style: 'event proposal, venue, catering, timeline' },
+    { name: 'Real Estate', tier: 'pro', style: 'real estate investment proposal, ROI analysis' },
+    { name: 'Design Proposal', tier: 'pro', style: 'creative/design proposal, portfolio samples' },
+    { name: 'Research', tier: 'pro', style: 'research proposal, hypothesis, methodology' },
+    { name: 'Training', tier: 'pro', style: 'corporate training proposal, curriculum' },
+    { name: 'Partnership', tier: 'pro', style: 'strategic partnership proposal, mutual benefits' },
+    { name: 'Nonprofit', tier: 'pro', style: 'nonprofit program proposal, impact metrics' },
+    { name: 'Merger Proposal', tier: 'biz', style: 'M&A proposal, synergies, valuation' },
+    { name: 'Government RFP', tier: 'biz', style: 'government RFP response, compliance matrix' },
+    { name: 'Franchise', tier: 'biz', style: 'franchise proposal, operations manual outline' },
+    { name: 'Venture Capital', tier: 'biz', style: 'VC pitch deck style, cap table, projections' },
+    { name: 'White Label', tier: 'biz', style: 'white label partnership proposal, licensing' }
+  ],
+  'Reports': [
+    { name: 'Annual Report', tier: 'free', style: 'company annual report, financials, highlights' },
+    { name: 'Progress Report', tier: 'free', style: 'project progress report, milestones, status' },
+    { name: 'Incident Report', tier: 'free', style: 'workplace incident report, detailed account' },
+    { name: 'Financial Report', tier: 'free', style: 'financial summary, P&L, balance sheet' },
+    { name: 'Meeting Minutes', tier: 'free', style: 'meeting minutes, action items, attendance' },
+    { name: 'Audit Report', tier: 'pro', style: 'internal audit report, findings, recommendations' },
+    { name: 'Sales Report', tier: 'pro', style: 'sales performance report, metrics, charts layout' },
+    { name: 'Market Research', tier: 'pro', style: 'market research report, analysis, trends' },
+    { name: 'HR Report', tier: 'pro', style: 'human resources report, headcount, turnover' },
+    { name: 'IT Status', tier: 'pro', style: 'IT infrastructure status report, uptime, incidents' },
+    { name: 'Risk Assessment', tier: 'pro', style: 'risk assessment report, matrix, mitigation' },
+    { name: 'Quality Report', tier: 'pro', style: 'quality assurance report, defects, compliance' },
+    { name: 'Expense Report', tier: 'pro', style: 'expense report, categorized, receipts layout' },
+    { name: 'Project Closure', tier: 'pro', style: 'project closure report, lessons learned' },
+    { name: 'Compliance', tier: 'pro', style: 'regulatory compliance report, checklist' },
+    { name: 'Board Report', tier: 'biz', style: 'board of directors report, executive dashboard' },
+    { name: 'Due Diligence', tier: 'biz', style: 'due diligence report, comprehensive analysis' },
+    { name: 'ESG Report', tier: 'biz', style: 'environmental/social/governance report' },
+    { name: 'Valuation', tier: 'biz', style: 'company valuation report, DCF, comparables' },
+    { name: 'Strategic Plan', tier: 'biz', style: 'strategic planning report, SWOT, goals' }
+  ],
+  'Forms': [
+    { name: 'Application Form', tier: 'free', style: 'job/membership application form, fields layout' },
+    { name: 'Registration', tier: 'free', style: 'event/course registration form' },
+    { name: 'Feedback Survey', tier: 'free', style: 'customer feedback form, rating scales' },
+    { name: 'Order Form', tier: 'free', style: 'product/service order form, calculations' },
+    { name: 'Contact Form', tier: 'free', style: 'professional contact information form' },
+    { name: 'Employee Onboard', tier: 'pro', style: 'new hire onboarding form, checklist' },
+    { name: 'Medical Intake', tier: 'pro', style: 'patient medical history intake form' },
+    { name: 'Consent Form', tier: 'pro', style: 'informed consent form, medical/legal' },
+    { name: 'Insurance Claim', tier: 'pro', style: 'insurance claim form, detailed sections' },
+    { name: 'Tax Worksheet', tier: 'pro', style: 'tax preparation worksheet, deductions' },
+    { name: 'Vendor Setup', tier: 'pro', style: 'new vendor registration form, banking' },
+    { name: 'Change Request', tier: 'pro', style: 'project change request form, impact analysis' },
+    { name: 'Leave Request', tier: 'pro', style: 'employee leave/vacation request form' },
+    { name: 'Purchase Order', tier: 'pro', style: 'purchase order form, itemized' },
+    { name: 'Evaluation', tier: 'pro', style: 'performance evaluation form, competencies' },
+    { name: 'Audit Checklist', tier: 'biz', style: 'audit checklist form, compliance items' },
+    { name: 'Risk Register', tier: 'biz', style: 'risk register form, probability/impact matrix' },
+    { name: 'Asset Inventory', tier: 'biz', style: 'asset tracking inventory form' },
+    { name: 'Incident Tracker', tier: 'biz', style: 'incident management tracking form' },
+    { name: 'KPI Dashboard', tier: 'biz', style: 'KPI tracking dashboard template' }
+  ]
+};
+
+function openTemplates() {
+  document.getElementById('templatePanel').classList.add('active');
+  renderTemplateTabs();
+  renderTemplateGrid(Object.keys(TEMPLATES)[0]);
+}
+
+function closeTemplates() {
+  document.getElementById('templatePanel').classList.remove('active');
+}
+
+function renderTemplateTabs() {
+  const tabs = document.getElementById('templateTabs');
+  tabs.innerHTML = Object.keys(TEMPLATES).map((cat, i) =>
+    '<button class="template-tab ' + (i === 0 ? 'active' : '') + '" onclick="selectTemplateTab(this,\'' + cat + '\')">' + cat + ' <span style=\"font-size:10px;opacity:.6\">(' + TEMPLATES[cat].length + ')</span></button>'
+  ).join('');
+}
+
+function selectTemplateTab(btn, cat) {
+  document.querySelectorAll('.template-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderTemplateGrid(cat);
+}
+
+function renderTemplateGrid(category) {
+  const grid = document.getElementById('templateGrid');
+  grid.innerHTML = TEMPLATES[category].map((t, i) => {
+    const badgeCls = t.tier === 'free' ? 'badge-free' : t.tier === 'pro' ? 'badge-pro' : 'badge-biz';
+    const tierLabel = t.tier.charAt(0).toUpperCase() + t.tier.slice(1);
+    return '<div class="template-card" onclick="loadTemplate(\'' + category + '\',' + i + ')">' +
+      '<div class="preview" style="display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--gold)">' +
+      '<i class="fas fa-file-alt"></i></div>' +
+      '<div class="info"><h4>' + t.name + ' <span class="badge ' + badgeCls + '">' + tierLabel + '</span></h4>' +
+      '<span>' + category.slice(0, -1) + '</span></div></div>';
+  }).join('');
+}
+
+async function loadTemplate(category, index) {
+  const template = TEMPLATES[category][index];
+  closeTemplates();
+  showToast('Generating ' + template.name + '...');
+  
+  addAIMessage('Generate a professional ' + category.slice(0,-1).toLowerCase() + ' using the "' + template.name + '" style: ' + template.style, 'user');
+  showAILoading();
+  
+  try {
+    const res = await fetch('/api/ai-generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: 'Create a professional ' + category.slice(0,-1).toLowerCase() + ' document. Style: "' + template.name + '" - ' + template.style + '. Fill in with realistic sample data. Make it look premium and polished with proper spacing, colors, and typography. Include all standard sections for this document type.',
+        docType: category.slice(0,-1).toLowerCase(),
+        mode: 'create',
+        templateStyle: template.style
+      })
+    });
+    removeAILoading();
+    if (res.ok) {
+      const data = await res.json();
+      docCanvas.innerHTML = data.html;
+      updatePreview();
+      updateWordCount();
+      document.getElementById('docTitle').value = template.name + ' ' + category.slice(0,-1);
+      addAIMessage('"' + template.name + '" template loaded! Edit any field directly.', 'assistant');
+    }
+  } catch (e) {
+    removeAILoading();
+    addAIMessage('Error loading template. Try again.', 'system');
+  }
+  }
+
+// ==============================
+// DOWNLOADS
+// ==============================
+async function downloadPDF() {
+  showToast('Generating PDF...');
+  try {
+    const canvas = await html2canvas(docCanvas, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgW = 210;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    let pos = 0;
+    const pageH = 297;
+    
+    while (pos < imgH) {
+      if (pos > 0) pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, -pos, imgW, imgH);
+      pos += pageH;
+    }
+    
+    const title = document.getElementById('docTitle').value || 'document';
+    pdf.save(title.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf');
+    showToast('PDF downloaded!');
+  } catch (e) {
+    showToast('Error generating PDF');
+  }
+}
+
+function downloadDocx() {
+  const html = docCanvas.innerHTML;
+  const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>body{font-family:Calibri,sans-serif;font-size:12pt;color:#2d2926}h1,h2,h3{font-family:Georgia,serif}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px}th{background:#c99532;color:#fff}</style></head><body>';
+  const footer = '</body></html>';
+  const blob = new Blob([header + html + footer], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const title = document.getElementById('docTitle').value || 'document';
+  a.download = title.replace(/[^a-zA-Z0-9]/g, '_') + '.doc';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Document downloaded!');
+}
+
+function saveDocument() {
+  const data = {
+    title: document.getElementById('docTitle').value,
+    content: docCanvas.innerHTML,
+    savedAt: new Date().toISOString()
+  };
+  localStorage.setItem('dmf_doc_' + Date.now(), JSON.stringify(data));
+  document.getElementById('saveStatus').textContent = 'Saved ' + new Date().toLocaleTimeString();
+  showToast('Document saved locally!');
+}
+
+// ==============================
+// PREVIEW TOGGLE + RESIZE
+// ==============================
+function togglePreview() {
+  const pane = document.getElementById('previewPane');
+  const divider = document.getElementById('previewDivider');
+  previewVisible = !previewVisible;
+  pane.style.display = previewVisible ? 'flex' : 'none';
+  divider.style.display = previewVisible ? 'block' : 'none';
+}
+
+// Resizable divider
+(function() {
+  const divider = document.getElementById('previewDivider');
+  const preview = document.getElementById('previewPane');
+  let isResizing = false;
+  
+  divider.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'col-resize';
+    e.preventDefault();
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const container = document.querySelector('.editor-split');
+    const rect = container.getBoundingClientRect();
+    const newWidth = rect.right - e.clientX;
+    if (newWidth > 200 && newWidth < rect.width * 0.7) {
+      preview.style.width = newWidth + 'px';
+    }
+  });
+  
+  document.addEventListener('mouseup', () => {
+    isResizing = false;
+    document.body.style.cursor = '';
+  });
+})();
+
+// ==============================
+// DRAG & DROP
+// ==============================
+docCanvas.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+docCanvas.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    const file = files[0];
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.createElement('img');
+        img.src = ev.target.result;
+        img.style.maxWidth = '100%';
+        img.style.borderRadius = '4px';
+        docCanvas.appendChild(img);
+        updatePreview();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+});
+
+// Upload zone drag/drop
+const uploadZone = document.getElementById('uploadZone');
+if (uploadZone) {
+  uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.style.borderColor = '#c99532'; });
+  uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = ''; });
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = '';
+    const fileInput = document.getElementById('fileInput');
+    fileInput.files = e.dataTransfer.files;
+    handleFileUpload(fileInput);
+  });
+}
+
+// ==============================
+// TOAST
+// ==============================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ==============================
+// KEYBOARD SHORTCUTS
+// ==============================
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveDocument();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    printDoc();
+  }
+});
+
+// ==============================
+// INIT: Load from URL params
+// ==============================
+(function init() {
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get('type');
+  const template = params.get('template');
+  
+  if (type) {
+    document.getElementById('aiPrompt').value = 'Create a professional ' + type + (template ? ' using ' + template + ' style' : '') + ' with sample data. Make it polished and professional.';
+    setTimeout(() => sendAI(), 500);
+  }
+  
+  // Auto-show AI sidebar on desktop
+  if (window.innerWidth > 768) {
+    document.getElementById('aiSidebar').classList.remove('collapsed');
+  }
+  
+  updatePreview();
+})();
+</script>
+
+<!-- LLC FOOTER -->
+<div style="position:fixed;bottom:0;left:0;right:0;text-align:center;padding:3px;font-size:10px;color:#8a7f76;background:rgba(255,255,255,.9);border-top:1px solid #e8ddd4;z-index:10;pointer-events:none">A product of <strong>Wmk Speciality Services L.L.C.</strong></div>
+
+</body>
+</html>
