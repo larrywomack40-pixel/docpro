@@ -31,7 +31,45 @@ h1,h2,h3,.brand-title{font-family:'Playfair Display',Georgia,serif!important}
 body{font-family:'DM Sans',system-ui,-apple-system,sans-serif!important}
 *{margin:0;padding:0;box-sizing:border-box}
 #llcFooter{position:fixed!important;bottom:0;left:var(--sidebar-w);right:0;text-align:center;padding:8px 12px;font-size:11px;z-index:100}
-@media(max-width:768px){footer{left:0}}
+.mobile-nav{display:none}.mobile-overlay{display:none}
+@media(max-width:768px){
+.sidebar{position:fixed;top:0;left:-100%;width:85vw;max-width:320px;height:100vh;z-index:1000;transition:left .3s ease;box-shadow:none}
+.sidebar.open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+.mobile-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999}
+.mobile-overlay.show{display:block}
+.mobile-nav{display:flex!important;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.mobile-nav .hamburger{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text);padding:4px 8px}
+.mobile-nav .mobile-brand{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--pri);font-weight:700}
+.mobile-nav .mobile-actions{display:flex;gap:8px;align-items:center}
+.mobile-nav .mobile-actions button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px}
+body{flex-direction:column;height:auto;overflow:auto}
+.main{width:100%!important;min-height:100vh}
+.main-header{flex-wrap:wrap;padding:8px 12px;gap:6px}
+.main-header h2{font-size:16px;width:100%;order:-1}
+.toolbar{flex-wrap:wrap;padding:6px 8px;gap:4px}
+.toolbar select{font-size:12px;padding:3px 6px}
+.form-panel{padding:12px}
+.form-panel .form-group{margin-bottom:8px}
+.form-panel input,.form-panel textarea,.form-panel select{font-size:16px!important}
+#docPreview{display:none}
+.welcome{padding:24px 16px}
+.welcome h2{font-size:20px}
+.welcome .stat{font-size:28px}
+.welcome .categories{flex-wrap:wrap;gap:4px;justify-content:center}
+.welcome .categories span{font-size:10px;padding:3px 8px}
+.welcome .cta-row{flex-direction:column;gap:8px}
+.welcome .cta-row a,.welcome .cta-row button{width:100%;text-align:center}
+.seo-context{padding:12px 16px}
+.cat-grid{grid-template-columns:repeat(3,1fr);gap:3px}
+.filter-row{flex-wrap:wrap;gap:4px}
+.modal{width:95vw!important;max-width:95vw!important;padding:16px!important;max-height:85vh!important}
+.price-card{min-width:auto!important;width:100%!important}
+.price-cards-container{flex-direction:column!important;gap:12px}
+.email-banner{flex-direction:column;padding:12px;gap:8px;text-align:center}
+.email-banner input{width:100%}
+.email-banner button{width:100%}
+#llcFooter{left:0!important}
+}
 :root{--pri:#c99532;--pri-d:#b8862d;--bg:#f9f4f3;--card:#fffcf9;--text:#2d2926;--muted:#8a7f76;--border:#e8ddd4;--success:#3a6633;--warn:#f59e0b;--danger:#c24b3b;--sidebar-w:320px;--doc-bg:#fff;--doc-text:#2d2622;--hover-bg:#f3ede8}
 [data-theme="dark"]{--bg:#1a1714;--card:#2d2622;--text:#ede5dc;--muted:#a89a8e;--border:#3d3530;--doc-bg:#2d2622;--doc-text:#ede5dc;--hover-bg:#3d3530}
 [data-theme="dark"] #docPreview{background:var(--card)!important;color:var(--text)!important;border-color:var(--border)!important}
@@ -170,6 +208,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"DraftMyForms","url":"https://draftmyforms.com","description":"Generate professional documents instantly. 10,000+ templates for invoices, contracts, legal forms, pay stubs and more.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"AggregateOffer","lowPrice":"0","highPrice":"24.99","priceCurrency":"USD"},"creator":{"@type":"Organization","name":"Wmk Speciality Services L.L.C."}}</script>
 </head>
 <body>
+<div class="mobile-nav" id="mobileNav">
+<button class="hamburger" onclick="toggleMobileSidebar()">☰</button>
+<span class="mobile-brand">✦ DraftMyForms</span>
+<div class="mobile-actions">
+<button onclick="openAuth()" title="Sign In">👤</button>
+<button onclick="document.querySelector('.sidebar').classList.contains('open')?toggleMobileSidebar():window.scrollTo(0,0)" title="Search">🔍</button>
+</div>
+</div>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileSidebar()"></div>
+
 <!-- Sidebar -->
 <div class="sidebar">
 <div class="sidebar-header">
@@ -218,7 +266,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <button onclick="setColorTheme('dark')" title="Dark" id="themeDark">☾</button>
 <button onclick="setColorTheme('system')" title="System" id="themeSystem" class="active">⚙</button>
 </div>
-<button class="btn-ghost btn-sm" onclick="openLogo()" title="Add Logo">Logo</button>
+<button class="btn btn-sm" onclick="openAiCreate()" style="background:var(--pri);color:#fff;font-weight:600;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;margin-right:4px">✦ AI Create</button><button class="btn-ghost btn-sm" onclick="openLogo()" title="Add Logo">Logo</button>
 <button class="btn-ghost btn-sm" onclick="openUpload()" title="Upload Document">Upload</button>
 <button class="btn btn-sm" onclick="openPricing()">Upgrade</button>
 <div class="user-menu" id="userMenu">
@@ -888,6 +936,43 @@ function resetForm(){document.querySelectorAll('#formFields input,#formFields te
 /* PDF & Print */
 function generatePDF(){const el=document.getElementById('docPreview');if(!el||!el.innerHTML.trim()||el.querySelector('.welcome')){alert('Select a document first');return;}const name=(currentDoc?currentDoc.name:'Document')+'_DraftMyForms';html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#fff'}).then(canvas=>{const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const iw=pdf.internal.pageSize.getWidth()-20;const ih=canvas.height*iw/canvas.width;let ph=pdf.internal.pageSize.getHeight()-20;if(ih<=ph){pdf.addImage(canvas.toDataURL('image/png'),'PNG',10,10,iw,ih);}else{let srcY=0;const srcH=canvas.width*(ph/iw);while(srcY<canvas.height){const pc=document.createElement('canvas');pc.width=canvas.width;pc.height=Math.min(srcH,canvas.height-srcY);pc.getContext('2d').drawImage(canvas,0,srcY,canvas.width,pc.height,0,0,pc.width,pc.height);if(srcY>0)pdf.addPage();pdf.addImage(pc.toDataURL('image/png'),'PNG',10,10,iw,pc.height*iw/pc.width);srcY+=srcH;}}pdf.save(name+'.pdf');}).catch(err=>{console.error(err);alert('PDF failed. Try again.');});}
 function printDoc(){const el=document.getElementById('docPreview');if(!el)return;const w=window.open('','_blank');w.document.write('<html><head><title>Print</title></head><body style="font-family:system-ui;padding:20px">'+el.innerHTML+'
+
+<div class="modal-overlay" id="aiCreateModal">
+<div class="modal" style="max-width:600px">
+<button class="modal-close" onclick="closeModal('aiCreateModal')">&times;</button>
+<h2 style="color:var(--pri);margin-bottom:4px">✦ AI Create</h2>
+<p style="color:var(--muted);margin-bottom:16px;font-size:13px">Describe any document and AI will generate it for you</p>
+<div id="aiCreditsDisplay" style="margin-bottom:12px;padding:8px 12px;background:var(--hover-bg);border-radius:8px;font-size:12px;color:var(--muted)"></div>
+<select id="aiDocType" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;background:var(--card);color:var(--text);font-size:14px">
+<option value="">Select document type (optional)</option>
+<option value="invoice">Invoice</option>
+<option value="receipt">Receipt</option>
+<option value="letter">Business Letter</option>
+<option value="memo">Memo</option>
+<option value="thank-you">Thank You Letter</option>
+<option value="contract">Service Contract</option>
+<option value="nda">NDA</option>
+<option value="proposal">Proposal</option>
+<option value="expense">Expense Report</option>
+<option value="offer-letter">Offer Letter</option>
+<option value="lease">Lease Agreement</option>
+<option value="resume">Resume</option>
+</select>
+<textarea id="aiPrompt" placeholder="Describe the document you need... e.g. Create a professional invoice for web design services, billed to Acme Corp for $2,500" style="width:100%;height:120px;padding:12px;border:1px solid var(--border);border-radius:8px;resize:vertical;font-size:14px;font-family:inherit;background:var(--card);color:var(--text);margin-bottom:12px"></textarea>
+<button id="aiGenerateBtn" onclick="aiGenerate()" style="width:100%;padding:12px;background:var(--pri);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer">Generate Document</button>
+<div id="aiResult" style="margin-top:16px;display:none">
+<div id="aiResultContent" style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--card);max-height:300px;overflow-y:auto"></div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<button onclick="aiCopyToEditor()" style="flex:1;padding:10px;background:var(--pri);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600">Open in Editor</button>
+<button onclick="aiDownloadPdf()" style="flex:1;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-weight:600">Download PDF</button>
+</div>
+</div>
+<div id="aiLoading" style="display:none;text-align:center;padding:24px">
+<div style="font-size:24px;margin-bottom:8px;animation:spin 1s linear infinite">&#10022;</div>
+<p style="color:var(--muted)">Generating your document...</p>
+</div>
+</div>
+</div>
 </body></html>');w.document.close();w.focus();w.print();}
 
 /* Auth */
@@ -1307,6 +1392,67 @@ function handleUpload(e){const f=e.target.files[0];if(!f)return;const r=new File
 /* Hide email banner if already captured */
 if(localStorage.getItem('docpro_email')){const ebs=document.querySelectorAll('.email-banner');ebs.forEach(function(eb){eb.innerHTML='<h4 style="margin:0">3 Pro Templates Unlocked!</h4><p style="margin:4px 0 0;opacity:.85">1099-B V11, V13 & V15 are now free. <a href="#" onclick="openAuth();return false" style="color:var(--pri)">Sign up</a> to keep them.</p>';});}
 
+
+// Mobile sidebar toggle
+function toggleMobileSidebar(){var sb=document.querySelector('.sidebar');var ov=document.getElementById('mobileOverlay');if(sb.classList.contains('open')){sb.classList.remove('open');ov.classList.remove('show');document.body.style.overflow='';}else{sb.classList.add('open');ov.classList.add('show');document.body.style.overflow='hidden';}}
+// Close sidebar when clicking a doc on mobile
+document.addEventListener('click',function(e){if(e.target.closest('.doc-item')&&window.innerWidth<=768){setTimeout(function(){toggleMobileSidebar();},100);}});
+
+// AI Create functions
+function openAiCreate(){
+if(!currentUser){openAuth();return;}
+document.getElementById('aiCreateModal').classList.add('show');
+var credits=document.getElementById('aiCreditsDisplay');
+if(userPlan==='business')credits.innerHTML='<strong>Business Plan</strong> - Unlimited AI credits';
+else if(userPlan==='pro')credits.innerHTML='<strong>Pro Plan</strong> - 50 AI credits/month';
+else credits.innerHTML='<strong>Free Plan</strong> - 5 AI credits/month';
+document.getElementById('aiPrompt').value='';
+document.getElementById('aiResult').style.display='none';
+document.getElementById('aiLoading').style.display='none';
+document.getElementById('aiGenerateBtn').disabled=false;
+}
+var lastAiHtml='';
+async function aiGenerate(){
+var prompt=document.getElementById('aiPrompt').value.trim();
+if(!prompt){alert('Please describe the document you need.');return;}
+var docType=document.getElementById('aiDocType').value;
+var btn=document.getElementById('aiGenerateBtn');
+btn.disabled=true;btn.textContent='Generating...';
+document.getElementById('aiLoading').style.display='block';
+document.getElementById('aiResult').style.display='none';
+try{
+var resp=await fetch('/api/ai-generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt,docType:docType,plan:userPlan,userId:currentUser.id})});
+var data=await resp.json();
+if(!resp.ok)throw new Error(data.error||'Generation failed');
+lastAiHtml=data.html;
+document.getElementById('aiResultContent').innerHTML=data.html;
+document.getElementById('aiResult').style.display='block';
+}catch(e){alert('Error: '+e.message);}
+finally{btn.disabled=false;btn.textContent='Generate Document';document.getElementById('aiLoading').style.display='none';}
+}
+function aiCopyToEditor(){
+if(!lastAiHtml)return;
+closeModal('aiCreateModal');
+var preview=document.getElementById('docPreview');
+if(preview)preview.innerHTML=lastAiHtml;
+var mainH=document.querySelector('.main-header h2');
+if(mainH)mainH.textContent='AI Generated Document';
+}
+function aiDownloadPdf(){
+if(!lastAiHtml)return;
+var container=document.createElement('div');
+container.innerHTML=lastAiHtml;
+container.style.cssText='position:fixed;top:-9999px;left:-9999px;width:800px;padding:40px;background:#fff;color:#000;font-family:Georgia,serif';
+document.body.appendChild(container);
+html2canvas(container,{scale:2}).then(function(canvas){
+var pdf=new jspdf.jsPDF('p','mm','a4');
+var w=pdf.internal.pageSize.getWidth();
+var h=(canvas.height*w)/canvas.width;
+pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
+pdf.save('AI-Document.pdf');
+document.body.removeChild(container);
+});
+}
 // Create LLC footer
 (function(){var ft=document.createElement('div');ft.id='llcFooter';ft.style.cssText='position:fixed;bottom:0;left:var(--sidebar-w,320px);right:0;text-align:center;padding:8px 12px;font-size:11px;color:var(--muted);background:var(--bg);border-top:1px solid var(--border);z-index:100;';ft.innerHTML='A product of <strong>Wmk Speciality Services L.L.C.</strong>';document.body.appendChild(ft);if(window.innerWidth<=768){ft.style.left='0';}window.addEventListener('resize',function(){ft.style.left=window.innerWidth<=768?'0':'var(--sidebar-w,320px)';});})();
 init();
