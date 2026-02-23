@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
-Sitemap: https://docpro-larrys-projects-37d3c0d4.vercel.app/sitemap.xml
+Sitemap: https://www.draftmyforms.com/sitemap.xml
 
-# DocPro - Professional Document Generator
-# 10,000+ templates for invoices, contracts, legal forms, and more
+# DraftMyForms - AI Documents & Resumes
+# 11,237+ templates for invoices, contracts, legal forms, and more
+# https://www.draftmyforms.com
