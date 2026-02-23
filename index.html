@@ -84,8 +84,7 @@ img{max-width:100%}
 .badge-free{background:#e8f5e2;color:var(--success)}
 .badge-pro{background:#fef3d8;color:var(--gold-dark)}
 .demo-doc-preview{flex:1;padding:32px;overflow:auto;display:flex;justify-content:center;background:var(--paper)}
-.demo-doc{background:var(--white);box-shadow:0 1px 8px rgba(0,0,0,.06);border-radius:4px;padding:40px;width:100%;max-width:600px;font-size:12px;line-height:1.6}
-.features{padding:100px 32px;background:var(--white)}
+.demo-doc{background:var(--white);box-shadow:0 1px 8px rgba(0,0,0,.06);border-radius:4px;padding:40px;width:100%;max-width:600px;font-size:12px;line-height:1.6}.features{padding:100px 32px;background:var(--white)}
 .section-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:16px}
 .section-title{font-family:var(--font-heading);font-size:clamp(28px,4vw,44px);font-weight:700;line-height:1.15;margin-bottom:16px}
 .section-subtitle{font-size:16px;color:var(--text-secondary);max-width:500px;line-height:1.6}
@@ -164,7 +163,6 @@ img{max-width:100%}
 .auth-error.show{display:block}
 .auth-success{background:#f0fdf4;border:1px solid #bbf7d0;color:var(--success);padding:10px 14px;border-radius:8px;font-size:13px;display:none}
 .auth-success.show{display:block}
-/* UPGRADE MODAL */
 .upgrade-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .upgrade-overlay.active{display:flex}
 .upgrade-modal{background:var(--white);border-radius:16px;padding:40px;width:90%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.2);position:relative;animation:modalIn .3s ease;text-align:center}
@@ -179,33 +177,19 @@ img{max-width:100%}
 .upgrade-plan-card ul{list-style:none;text-align:left;font-size:12px;color:var(--text-secondary)}
 .upgrade-plan-card ul li{padding:2px 0}
 .upgrade-plan-card ul li::before{content:'✓ ';color:var(--gold)}
-/* MOBILE */
 @media(max-width:768px){
-.navbar{padding:0 16px}
-.nav-links{display:none}
-.hero{padding:100px 20px 60px}
-.hero-ctas{flex-direction:column}
-.demo-content{flex-direction:column;height:auto}
-.demo-sidebar{width:100%;height:200px;border-right:none;border-bottom:1px solid var(--border)}
-.features-grid{grid-template-columns:1fr}
-.pricing-grid{grid-template-columns:1fr}
-.comparison .comp-row{font-size:12px}
-.comp-cell{padding:10px 12px}
-.footer-grid{grid-template-columns:1fr 1fr}
-.mobile-menu-btn{display:block!important}
-.upgrade-plans{flex-direction:column}
-.auth-modal{padding:28px}
+.navbar{padding:0 16px}.nav-links{display:none}.hero{padding:100px 20px 60px}.hero-ctas{flex-direction:column}
+.demo-content{flex-direction:column;height:auto}.demo-sidebar{width:100%;height:200px;border-right:none;border-bottom:1px solid var(--border)}
+.features-grid{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}.comparison .comp-row{font-size:12px}
+.comp-cell{padding:10px 12px}.footer-grid{grid-template-columns:1fr 1fr}.mobile-menu-btn{display:block!important}
+.upgrade-plans{flex-direction:column}.auth-modal{padding:28px}
 }
-@media(max-width:480px){
-.demo-browser{border-radius:8px}
-.demo-content{height:350px}
-.footer-grid{grid-template-columns:1fr}
-}
+@media(max-width:480px){.demo-browser{border-radius:8px}.demo-content{height:350px}.footer-grid{grid-template-columns:1fr}}
 .mobile-menu-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:8px}
 .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;bottom:0;background:var(--white);z-index:999;padding:24px;flex-direction:column;gap:4px}
 .mobile-menu.active{display:flex}
 .mobile-menu a{padding:14px 0;font-size:16px;font-weight:500;border-bottom:1px solid var(--border-light);color:var(--text);cursor:pointer}
-.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer;display:none}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--white);display:none;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer}
 .user-avatar.show{display:flex}
 .user-menu{position:absolute;top:56px;right:32px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.12);display:none;z-index:1001}
 .user-menu.show{display:block}
@@ -225,10 +209,10 @@ img{max-width:100%}
 <nav class="navbar">
 <a href="/" class="nav-brand"><span class="star">✦</span> DraftMyForms</a>
 <div class="nav-links">
-<a href="#features" onclick="smoothScroll('features')">Features</a>
-<a href="#templates" onclick="smoothScroll('demo')">Templates</a>
-<a href="#pricing" onclick="smoothScroll('pricing')">Pricing</a>
-<a href="#compare" onclick="smoothScroll('compare')">Compare</a>
+<a onclick="smoothScroll('features')">Features</a>
+<a onclick="smoothScroll('demo')">Templates</a>
+<a onclick="smoothScroll('pricing')">Pricing</a>
+<a onclick="smoothScroll('compare')">Compare</a>
 </div>
 <div class="nav-actions">
 <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
@@ -243,17 +227,17 @@ img{max-width:100%}
 <button onclick="handleLogout()" style="color:var(--danger)">Sign Out</button>
 </div>
 <a href="javascript:void(0)" class="btn btn-outline btn-sm" id="navSignIn" onclick="openAuthModal('login')">Sign in</a>
-<a href="javascript:void(0)" class="btn btn-primary btn-sm" id="navTryFree" onclick="openAuthModal('signup')">Try Free \u2192</a>
+<a href="javascript:void(0)" class="btn btn-primary btn-sm" id="navTryFree" onclick="openAuthModal('signup')">Try Free →</a>
 </div>
 <button class="mobile-menu-btn" onclick="document.querySelector('.mobile-menu').classList.toggle('active')"><i class="fas fa-bars"></i></button>
 </nav>
 <div class="mobile-menu">
-<a href="#features" onclick="smoothScroll('features');this.parentElement.classList.remove('active')">Features</a>
-<a href="#templates" onclick="smoothScroll('demo');this.parentElement.classList.remove('active')">Templates</a>
-<a href="#pricing" onclick="smoothScroll('pricing');this.parentElement.classList.remove('active')">Pricing</a>
-<a href="#compare" onclick="smoothScroll('compare');this.parentElement.classList.remove('active')">Compare</a>
+<a onclick="smoothScroll('features');this.parentElement.classList.remove('active')">Features</a>
+<a onclick="smoothScroll('demo');this.parentElement.classList.remove('active')">Templates</a>
+<a onclick="smoothScroll('pricing');this.parentElement.classList.remove('active')">Pricing</a>
+<a onclick="smoothScroll('compare');this.parentElement.classList.remove('active')">Compare</a>
 <a href="javascript:void(0)" onclick="openAuthModal('login');this.parentElement.classList.remove('active')">Sign in</a>
-<a href="javascript:void(0)" onclick="openAuthModal('signup');this.parentElement.classList.remove('active')" style="color:var(--gold);font-weight:600">Try Free \u2192</a>
+<a href="javascript:void(0)" onclick="openAuthModal('signup');this.parentElement.classList.remove('active')" style="color:var(--gold);font-weight:600">Try Free →</a>
 </div>
 
 <!-- AUTH MODAL -->
@@ -270,12 +254,12 @@ img{max-width:100%}
 <input type="text" id="authName" placeholder="John Doe">
 </div>
 <div class="auth-field">
-<label for="authEmail">Email Address</label>
-<input type="email" id="authEmail" placeholder="you@example.com" required>
+<label for="authEmailInput">Email Address</label>
+<input type="email" id="authEmailInput" placeholder="you@example.com" required>
 </div>
 <div class="auth-field">
 <label for="authPassword">Password</label>
-<input type="password" id="authPassword" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" required minlength="6">
+<input type="password" id="authPassword" placeholder="••••••••" required minlength="6">
 </div>
 <button type="submit" class="auth-submit primary" id="authSubmitBtn">Sign In</button>
 </form>
@@ -295,24 +279,12 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="upgrade-plan-card" onclick="selectUpgradePlan('pro')" id="upgradePro">
 <h3>Pro</h3>
 <div class="plan-price">$9.99<span>/mo</span></div>
-<ul>
-<li>50 AI credits/month</li>
-<li>Contracts, NDAs, proposals</li>
-<li>PDF, Word & HTML export</li>
-<li>Custom logo & branding</li>
-<li>E-signature (5/mo)</li>
-</ul>
+<ul><li>50 AI credits/month</li><li>Contracts, NDAs, proposals</li><li>PDF, Word & HTML export</li><li>Custom logo & branding</li><li>E-signature (5/mo)</li></ul>
 </div>
 <div class="upgrade-plan-card" onclick="selectUpgradePlan('business')" id="upgradeBusiness">
 <h3>Business</h3>
 <div class="plan-price">$24.99<span>/mo</span></div>
-<ul>
-<li>Unlimited AI credits</li>
-<li>ALL templates incl. sensitive</li>
-<li>Unlimited e-signatures</li>
-<li>Team collaboration</li>
-<li>API access</li>
-</ul>
+<ul><li>Unlimited AI credits</li><li>ALL templates incl. sensitive</li><li>Unlimited e-signatures</li><li>Team collaboration</li><li>API access</li></ul>
 </div>
 </div>
 <button class="btn btn-gold btn-lg" style="width:100%" onclick="startStripeCheckout()" id="upgradeCheckoutBtn">Start 14-day Free Trial</button>
@@ -326,7 +298,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <p>Create invoices, contracts, proposals, and legal forms with AI. No templates to wrestle with — just describe what you need.</p>
 <div class="hero-ctas">
 <a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free</a>
-<a href="#demo" class="btn btn-outline btn-lg" onclick="smoothScroll('demo')">See how it works</a>
+<a href="javascript:void(0)" class="btn btn-outline btn-lg" onclick="smoothScroll('demo')">See how it works</a>
 </div>
 <div class="hero-stats">
 <div class="hero-stat"><i class="fas fa-check-circle"></i> No credit card required</div>
@@ -336,24 +308,19 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 </div>
 </section>
 
-<!-- DEMO SECTION -->
+<!-- DEMO -->
 <section class="demo-section" id="demo">
 <div class="demo-tabs">
 <span style="font-size:13px;color:var(--text-muted);margin-right:8px">Explore by:</span>
-<button class="demo-tab active">All</button>
-<button class="demo-tab">Invoices</button>
-<button class="demo-tab">Contracts</button>
-<button class="demo-tab">Resumes</button>
+<button class="demo-tab active">All</button><button class="demo-tab">Invoices</button><button class="demo-tab">Contracts</button><button class="demo-tab">Resumes</button>
 </div>
 <div class="demo-browser">
 <div class="demo-browser-bar">
 <div class="demo-dots"><div class="demo-dot"></div><div class="demo-dot"></div><div class="demo-dot"></div></div>
 <div class="demo-url">draftmyforms.com/editor</div>
-<div style="display:flex;gap:6px">
-<button class="btn btn-gold btn-sm" onclick="handleStartFree()">✦ Open Editor</button>
+<div style="display:flex;gap:6px"><button class="btn btn-gold btn-sm" onclick="handleStartFree()">✦ Open Editor</button></div>
 </div>
-</div>
-<div class="demo-content" id="demoContent">
+<div class="demo-content">
 <div class="demo-sidebar">
 <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:4px 12px;margin-bottom:8px">Documents</div>
 <div class="demo-sidebar-item active" onclick="showDemo(0)"><span>Invoice</span><span class="demo-sidebar-badge badge-free">Free</span></div>
@@ -368,17 +335,10 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="demo-sidebar-item" onclick="showDemo(8)"><span>Budget Report</span><span class="demo-sidebar-badge badge-pro">Pro</span></div>
 </div>
 <div class="demo-doc-preview">
-<div class="demo-doc" id="demoDoc">
+<div class="demo-doc">
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">
-<div>
-<div style="font-family:var(--font-heading);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Apex Creative Studio</div>
-<div style="font-size:9px;color:var(--text-muted)">42 Oak Drive, Suite 204<br>San Francisco, CA 94102</div>
-</div>
-<div style="text-align:right">
-<div style="font-family:var(--font-heading);font-size:9px;color:var(--text-muted)">Invoice #INV-2024-009</div>
-<div style="font-size:9px;color:var(--text-muted)">November 18, 2024</div>
-<div style="font-size:9px;color:var(--text-muted)">Due: December 18, 2024</div>
-</div>
+<div><div style="font-family:var(--font-heading);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Apex Creative Studio</div><div style="font-size:9px;color:var(--text-muted)">42 Oak Drive, Suite 204<br>San Francisco, CA 94102</div></div>
+<div style="text-align:right"><div style="font-family:var(--font-heading);font-size:9px;color:var(--text-muted)">Invoice #INV-2024-009</div><div style="font-size:9px;color:var(--text-muted)">November 18, 2024</div><div style="font-size:9px;color:var(--text-muted)">Due: December 18, 2024</div></div>
 </div>
 <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">INVOICE</div>
 <div style="font-size:9px;color:var(--text-muted);margin-bottom:16px">INV-2024-009</div>
@@ -394,19 +354,11 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <tr><td style="padding:6px 10px;border-bottom:1px solid var(--border-light)">Website Design (5 pages)</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid var(--border-light)">1</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border-light)">$4,200.00</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border-light)">$4,200.00</td></tr>
 <tr><td style="padding:6px 10px;border-bottom:1px solid var(--border-light)">Development + Frontend</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid var(--border-light)">40 hrs</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border-light)">$85/hr</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border-light)">$3,400.00</td></tr>
 <tr><td style="padding:6px 10px">CMS Integration & Training</td><td style="padding:6px 10px;text-align:center">1</td><td style="padding:6px 10px;text-align:right">$800.00</td><td style="padding:6px 10px;text-align:right">$800.00</td></tr>
-</tbody>
-</table>
+</tbody></table>
 <div style="text-align:right;font-size:10px;color:var(--text-secondary)">
-<div>Subtotal: $11,900.00</div>
-<div>Discount: -$595.00</div>
-<div>Tax (8%): $904.40</div>
+<div>Subtotal: $11,900.00</div><div>Discount: -$595.00</div><div>Tax (8%): $904.40</div>
 <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">Total Due: $12,209.40</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-  </section>
+</div></div></div></div></div></section>
 <!-- FEATURES -->
 <section class="features" id="features">
 <div class="features-header">
@@ -415,12 +367,12 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="section-subtitle">A complete document platform that creates, edits, and manages all your professional documents in one place.</div>
 </div>
 <div class="features-grid">
-<div class="feature-card"><div class="feature-icon">📄</div><h3>AI Document Generation</h3><p>Describe your document in plain English. Our AI drafts it instantly — contracts, letters, forms, legal language and all. No template hunting required.</p></div>
-<div class="feature-card"><div class="feature-icon">👥</div><h3>Real-time Collaboration</h3><p>Work on documents with your team simultaneously. Live presence indicators, comments, and version history keep everyone aligned.</p></div>
-<div class="feature-card"><div class="feature-icon">✍️</div><h3>E-Signature Built-in</h3><p>Send for signature directly from DraftMyForms. Legally binding signatures with audit trail — no third-party app required.</p></div>
-<div class="feature-card"><div class="feature-icon">🔄</div><h3>Smart Auto-Fill</h3><p>Connect your CRM, tables, or Google Sheets. DraftMyForms pulls client data and auto-populates your documents in seconds.</p></div>
-<div class="feature-card"><div class="feature-icon">📊</div><h3>Document Analytics</h3><p>See who viewed your invoices and proposals. Get notified the moment your document is viewed or signed for instant follow-up.</p></div>
-<div class="feature-card"><div class="feature-icon">🔗</div><h3>50+ Integrations</h3><p>Works with Salesforce, Stripe, HubSpot, Zapier, and more. DraftMyForms fits into your existing workflow seamlessly.</p></div>
+<div class="feature-card"><div class="feature-icon">📄</div><h3>AI Document Generation</h3><p>Describe your document in plain English. Our AI drafts it instantly — contracts, letters, forms, legal language and all.</p></div>
+<div class="feature-card"><div class="feature-icon">👥</div><h3>Real-time Collaboration</h3><p>Work on documents with your team simultaneously. Live presence indicators, comments, and version history.</p></div>
+<div class="feature-card"><div class="feature-icon">✍️</div><h3>E-Signature Built-in</h3><p>Send for signature directly from DraftMyForms. Legally binding signatures with audit trail.</p></div>
+<div class="feature-card"><div class="feature-icon">🔄</div><h3>Smart Auto-Fill</h3><p>Connect your CRM, tables, or Google Sheets. DraftMyForms pulls client data and auto-populates your documents.</p></div>
+<div class="feature-card"><div class="feature-icon">📊</div><h3>Document Analytics</h3><p>See who viewed your invoices and proposals. Get notified the moment your document is viewed or signed.</p></div>
+<div class="feature-card"><div class="feature-icon">🔗</div><h3>50+ Integrations</h3><p>Works with Salesforce, Stripe, HubSpot, Zapier, and more. DraftMyForms fits into your existing workflow.</p></div>
 </div>
 </section>
 
@@ -456,52 +408,26 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 </div>
 <div class="pricing-grid">
 <div class="price-card">
-<div class="price-tier">Free</div>
-<div class="price-amount">$0</div>
-<div class="price-period">Forever free</div>
+<div class="price-tier">Free</div><div class="price-amount">$0</div><div class="price-period">Forever free</div>
 <div class="price-desc">Perfect for individuals who need occasional documents.</div>
 <ul class="price-features">
-<li><i class="fas fa-check"></i> 5 AI credits per month</li>
-<li><i class="fas fa-check"></i> Basic document types</li>
-<li><i class="fas fa-check"></i> Invoices & receipts</li>
-<li><i class="fas fa-check"></i> Letters & resumes</li>
-<li><i class="fas fa-check"></i> PDF download</li>
-<li><i class="fas fa-check"></i> 1 free template/month</li>
-<li><i class="fas fa-check"></i> Manual editor tools</li>
+<li><i class="fas fa-check"></i> 5 AI credits per month</li><li><i class="fas fa-check"></i> Basic document types</li><li><i class="fas fa-check"></i> Invoices & receipts</li><li><i class="fas fa-check"></i> Letters & resumes</li><li><i class="fas fa-check"></i> PDF download</li><li><i class="fas fa-check"></i> 1 free template/month</li><li><i class="fas fa-check"></i> Manual editor tools</li>
 </ul>
 <a href="javascript:void(0)" class="btn btn-outline btn-lg price-btn" onclick="handleStartFree()">Get started free</a>
 </div>
 <div class="price-card featured">
-<div class="price-tier">Pro</div>
-<div class="price-amount">$9.99</div>
-<div class="price-period">/month · billed monthly</div>
+<div class="price-tier">Pro</div><div class="price-amount">$9.99</div><div class="price-period">/month · billed monthly</div>
 <div class="price-desc">For freelancers, small businesses, and professionals.</div>
 <ul class="price-features">
-<li><i class="fas fa-check"></i> 50 AI credits per month</li>
-<li><i class="fas fa-check"></i> Unlimited document types</li>
-<li><i class="fas fa-check"></i> Contracts, NDAs, proposals</li>
-<li><i class="fas fa-check"></i> E-signature (5 sends/mo)</li>
-<li><i class="fas fa-check"></i> PDF, Word & HTML export</li>
-<li><i class="fas fa-check"></i> Custom logo & branding</li>
-<li><i class="fas fa-check"></i> Document open tracking</li>
-<li><i class="fas fa-check"></i> Priority support</li>
+<li><i class="fas fa-check"></i> 50 AI credits per month</li><li><i class="fas fa-check"></i> Unlimited document types</li><li><i class="fas fa-check"></i> Contracts, NDAs, proposals</li><li><i class="fas fa-check"></i> E-signature (5 sends/mo)</li><li><i class="fas fa-check"></i> PDF, Word & HTML export</li><li><i class="fas fa-check"></i> Custom logo & branding</li><li><i class="fas fa-check"></i> Document open tracking</li><li><i class="fas fa-check"></i> Priority support</li>
 </ul>
 <a href="javascript:void(0)" class="btn btn-gold btn-lg price-btn" onclick="handlePricingClick('pro')">Start 14-day free trial</a>
 </div>
 <div class="price-card">
-<div class="price-tier">Business</div>
-<div class="price-amount">$24.99</div>
-<div class="price-period">/month · billed monthly</div>
+<div class="price-tier">Business</div><div class="price-amount">$24.99</div><div class="price-period">/month · billed monthly</div>
 <div class="price-desc">For teams and growing businesses that need scale.</div>
 <ul class="price-features">
-<li><i class="fas fa-check"></i> Unlimited AI credits</li>
-<li><i class="fas fa-check"></i> Everything in Pro</li>
-<li><i class="fas fa-check"></i> Unlimited e-signatures</li>
-<li><i class="fas fa-check"></i> Team collaboration</li>
-<li><i class="fas fa-check"></i> CRM & Sheets auto-fill</li>
-<li><i class="fas fa-check"></i> 50+ integrations</li>
-<li><i class="fas fa-check"></i> API access</li>
-<li><i class="fas fa-check"></i> Dedicated account manager</li>
+<li><i class="fas fa-check"></i> Unlimited AI credits</li><li><i class="fas fa-check"></i> Everything in Pro</li><li><i class="fas fa-check"></i> Unlimited e-signatures</li><li><i class="fas fa-check"></i> Team collaboration</li><li><i class="fas fa-check"></i> CRM & Sheets auto-fill</li><li><i class="fas fa-check"></i> 50+ integrations</li><li><i class="fas fa-check"></i> API access</li><li><i class="fas fa-check"></i> Dedicated account manager</li>
 </ul>
 <a href="javascript:void(0)" class="btn btn-outline btn-lg price-btn" onclick="handlePricingClick('business')">Start 14-day free trial</a>
 </div>
@@ -512,7 +438,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <section class="cta-section">
 <h2>Ready to create professional<br>documents in seconds?</h2>
 <p>Join thousands of professionals who trust DraftMyForms for their document needs.</p>
-<a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free \u2192</a>
+<a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free →</a>
 </section>
 
 <!-- FOOTER -->
@@ -523,88 +449,60 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <p class="footer-desc">Create beautiful documents instantly and free. AI-powered, legally sound, and built for modern businesses.</p>
 <p style="font-size:11px;color:var(--text-muted);margin-top:12px">A product of <strong>WMK SPECIALITY SERVICES LLC</strong></p>
 </div>
-<div class="footer-col">
-<h4>Product</h4>
-<a href="javascript:void(0)" onclick="handleStartFree()">Templates</a>
-<a href="javascript:void(0)" onclick="handleStartFree()">AI Generator</a>
-<a href="#pricing" onclick="smoothScroll('pricing')">Pricing</a>
-<a href="javascript:void(0)" onclick="handleStartFree()">Integrations</a>
+<div class="footer-col"><h4>Product</h4>
+<a href="javascript:void(0)" onclick="handleStartFree()">Templates</a><a href="javascript:void(0)" onclick="handleStartFree()">AI Generator</a><a href="javascript:void(0)" onclick="smoothScroll('pricing')">Pricing</a><a href="javascript:void(0)" onclick="handleStartFree()">Integrations</a>
 </div>
-<div class="footer-col">
-<h4>Documents</h4>
-<a href="javascript:void(0)" onclick="handleStartFree()">Invoices</a>
-<a href="javascript:void(0)" onclick="handleStartFree()">Contracts</a>
-<a href="javascript:void(0)" onclick="handleStartFree()">Legal Forms</a>
-<a href="javascript:void(0)" onclick="handleStartFree()">Proposals</a>
-<a href="javascript:void(0)" onclick="handleStartFree()">HR Templates</a>
+<div class="footer-col"><h4>Documents</h4>
+<a href="javascript:void(0)" onclick="handleStartFree()">Invoices</a><a href="javascript:void(0)" onclick="handleStartFree()">Contracts</a><a href="javascript:void(0)" onclick="handleStartFree()">Legal Forms</a><a href="javascript:void(0)" onclick="handleStartFree()">Proposals</a><a href="javascript:void(0)" onclick="handleStartFree()">HR Templates</a>
 </div>
-<div class="footer-col">
-<h4>Company</h4>
-<a href="#">About</a>
-<a href="#">Blog</a>
-<a href="#">Privacy</a>
-<a href="#">Terms</a>
-<a href="#">Contact</a>
+<div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
 </div>
-</div>
-<div class="footer-bottom">
-<p>&copy; 2026 DraftMyForms. All rights reserved. Made with ✦ by <strong>WMK SPECIALITY SERVICES LLC</strong></p>
-</div>
+<div class="footer-bottom"><p>&copy; 2026 DraftMyForms. All rights reserved. Made with ✦ by <strong>WMK SPECIALITY SERVICES LLC</strong></p></div>
 </footer>
 <div style="text-align:center;padding:8px;background:var(--text);color:var(--text-muted);font-size:11px">WMK SPECIALITY SERVICES LLC</div>
 <script>
-// ===== SUPABASE INIT =====
-const SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var currentUser = null;
+var currentProfile = null;
+var selectedPlan = 'pro';
+var pendingPlan = null;
+var authMode = 'login';
 
-let currentUser = null;
-let currentProfile = null;
-let selectedPlan = 'pro';
-let pendingPlan = null; // plan user wants after signing up
-
-// ===== AUTH STATE =====
 async function checkSession() {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session && session.user) {
-      currentUser = session.user;
+    var r = await sb.auth.getSession();
+    if (r.data.session && r.data.session.user) {
+      currentUser = r.data.session.user;
       await loadProfile();
       updateUIForLoggedIn();
-    } else {
-      updateUIForLoggedOut();
-    }
-  } catch(e) { console.error('Session check error:', e); }
+    } else { updateUIForLoggedOut(); }
+  } catch(e) { console.error('Session error:', e); }
 }
 
 async function loadProfile() {
   if (!currentUser) return;
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', currentUser.id)
-    .single();
-  if (data) {
-    currentProfile = data;
-  }
+  var r = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  if (r.data) currentProfile = r.data;
 }
 
 function updateUIForLoggedIn() {
   document.getElementById('navSignIn').style.display = 'none';
   document.getElementById('navTryFree').style.display = 'none';
-  const avatar = document.getElementById('userAvatar');
+  var avatar = document.getElementById('userAvatar');
   avatar.classList.add('show');
-  const name = currentProfile?.display_name || currentUser.email;
-  avatar.textContent = name.charAt(0).toUpperCase();
-  document.getElementById('userDisplayName').textContent = currentProfile?.display_name || 'User';
+  var nm = currentProfile ? currentProfile.display_name : currentUser.email;
+  avatar.textContent = nm.charAt(0).toUpperCase();
+  document.getElementById('userDisplayName').textContent = currentProfile ? currentProfile.display_name : 'User';
   document.getElementById('userEmail').textContent = currentUser.email;
-  const planBadge = document.getElementById('userPlanBadge');
-  const plan = currentProfile?.plan || 'free';
-  planBadge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
-  planBadge.className = 'plan-badge plan-' + plan;
-  // Show/hide upgrade button based on plan
-  const menuUpgrade = document.getElementById('menuUpgradeBtn');
-  if (plan === 'business') menuUpgrade.style.display = 'none';
+  var badge = document.getElementById('userPlanBadge');
+  var plan = currentProfile ? currentProfile.plan : 'free';
+  badge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
+  badge.className = 'plan-badge plan-' + plan;
+  var upBtn = document.getElementById('menuUpgradeBtn');
+  if (plan === 'business') upBtn.style.display = 'none';
+  else upBtn.style.display = '';
 }
 
 function updateUIForLoggedOut() {
@@ -614,28 +512,19 @@ function updateUIForLoggedOut() {
   document.getElementById('userMenu').classList.remove('show');
 }
 
-function toggleUserMenu() {
-  document.getElementById('userMenu').classList.toggle('show');
-}
-// Close user menu on outside click
+function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('show'); }
 document.addEventListener('click', function(e) {
-  const menu = document.getElementById('userMenu');
-  const avatar = document.getElementById('userAvatar');
-  if (!menu.contains(e.target) && e.target !== avatar) {
-    menu.classList.remove('show');
-  }
+  var menu = document.getElementById('userMenu');
+  var avatar = document.getElementById('userAvatar');
+  if (!menu.contains(e.target) && e.target !== avatar) menu.classList.remove('show');
 });
-
-// ===== AUTH MODAL =====
-let authMode = 'login';
 
 function openAuthModal(mode) {
   authMode = mode || 'login';
-  const overlay = document.getElementById('authOverlay');
-  overlay.classList.add('active');
+  document.getElementById('authOverlay').classList.add('active');
   document.getElementById('authError').classList.remove('show');
   document.getElementById('authSuccess').classList.remove('show');
-  document.getElementById('authEmail').value = '';
+  document.getElementById('authEmailInput').value = '';
   document.getElementById('authPassword').value = '';
   document.getElementById('authName').value = '';
   if (authMode === 'signup') {
@@ -643,7 +532,7 @@ function openAuthModal(mode) {
     document.getElementById('authSubtitle').textContent = 'Start creating documents for free';
     document.getElementById('nameField').style.display = 'flex';
     document.getElementById('authSubmitBtn').textContent = 'Create Account';
-    document.getElementById('authToggle').innerHTML = 'Already have an account? <a onclick="switchAuthMode(\'login\')">Sign in</a>';
+    document.getElementById('authToggle').innerHTML = "Already have an account? <a onclick=\"switchAuthMode('login')\">Sign in</a>";
   } else {
     document.getElementById('authTitle').textContent = 'Sign In';
     document.getElementById('authSubtitle').textContent = 'Welcome back to DraftMyForms';
@@ -652,247 +541,143 @@ function openAuthModal(mode) {
     document.getElementById('authToggle').innerHTML = "Don't have an account? <a onclick=\"switchAuthMode('signup')\">Sign up free</a>";
   }
 }
-
-function closeAuthModal() {
-  document.getElementById('authOverlay').classList.remove('active');
-  pendingPlan = null;
-}
-
-function switchAuthMode(mode) {
-  openAuthModal(mode);
-}
-
+function closeAuthModal() { document.getElementById('authOverlay').classList.remove('active'); pendingPlan = null; }
+function switchAuthMode(mode) { openAuthModal(mode); }
 async function handleAuth(e) {
   e.preventDefault();
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value;
-  const errorEl = document.getElementById('authError');
-  const successEl = document.getElementById('authSuccess');
-  const submitBtn = document.getElementById('authSubmitBtn');
-  errorEl.classList.remove('show');
-  successEl.classList.remove('show');
-  submitBtn.disabled = true;
-  submitBtn.textContent = authMode === 'login' ? 'Signing in...' : 'Creating account...';
-
+  var email = document.getElementById('authEmailInput').value.trim();
+  var password = document.getElementById('authPassword').value;
+  var errEl = document.getElementById('authError');
+  var sucEl = document.getElementById('authSuccess');
+  var btn = document.getElementById('authSubmitBtn');
+  errEl.classList.remove('show');
+  sucEl.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = authMode === 'login' ? 'Signing in...' : 'Creating account...';
   try {
     if (authMode === 'signup') {
-      const name = document.getElementById('authName').value.trim();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { display_name: name || email.split('@')[0] } }
-      });
-      if (error) throw error;
-      if (data.user) {
-        // Create profile
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          email: email,
-          display_name: name || email.split('@')[0],
-          role: 'customer',
-          plan: 'free'
-        });
-        currentUser = data.user;
+      var name = document.getElementById('authName').value.trim();
+      var r = await sb.auth.signUp({ email: email, password: password, options: { data: { display_name: name || email.split('@')[0] } } });
+      if (r.error) throw r.error;
+      if (r.data.user) {
+        await sb.from('profiles').upsert({ id: r.data.user.id, email: email, display_name: name || email.split('@')[0], role: 'customer', plan: 'free' });
+        currentUser = r.data.user;
         await loadProfile();
         updateUIForLoggedIn();
         closeAuthModal();
-        // If there's a pending plan, open upgrade modal
-        if (pendingPlan) {
-          selectedPlan = pendingPlan;
-          pendingPlan = null;
-          openUpgradeModal(selectedPlan);
-        } else {
-          window.location.href = '/editor.html';
-        }
+        if (pendingPlan) { selectedPlan = pendingPlan; pendingPlan = null; openUpgradeModal(selectedPlan); }
+        else { window.location.href = '/editor.html'; }
       }
     } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      currentUser = data.user;
+      var r = await sb.auth.signInWithPassword({ email: email, password: password });
+      if (r.error) throw r.error;
+      currentUser = r.data.user;
       await loadProfile();
       updateUIForLoggedIn();
       closeAuthModal();
-      // If admin, go to admin page
-      if (currentProfile?.role === 'admin') {
-        window.location.href = '/admin.html';
-      } else if (pendingPlan) {
-        selectedPlan = pendingPlan;
-        pendingPlan = null;
-        openUpgradeModal(selectedPlan);
-      } else {
-        window.location.href = '/editor.html';
-      }
+      if (currentProfile && currentProfile.role === 'admin') { window.location.href = '/admin.html'; }
+      else if (pendingPlan) { selectedPlan = pendingPlan; pendingPlan = null; openUpgradeModal(selectedPlan); }
+      else { window.location.href = '/editor.html'; }
     }
   } catch(err) {
-    errorEl.textContent = err.message || 'An error occurred';
-    errorEl.classList.add('show');
+    errEl.textContent = err.message || 'An error occurred';
+    errEl.classList.add('show');
   }
-  submitBtn.disabled = false;
-  submitBtn.textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+  btn.disabled = false;
+  btn.textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
 }
 
 async function handleLogout() {
-  await supabase.auth.signOut();
-  currentUser = null;
-  currentProfile = null;
+  await sb.auth.signOut();
+  currentUser = null; currentProfile = null;
   updateUIForLoggedOut();
   document.getElementById('userMenu').classList.remove('show');
 }
-// ===== ROUTING FUNCTIONS =====
+
 function handleStartFree() {
-  if (currentUser) {
-    window.location.href = '/editor.html';
-  } else {
-    openAuthModal('signup');
-  }
+  if (currentUser) { window.location.href = '/editor.html'; }
+  else { openAuthModal('signup'); }
 }
 
 function handlePricingClick(plan) {
   if (currentUser) {
-    // Already logged in - go straight to upgrade
-    const userPlan = currentProfile?.plan || 'free';
-    if (userPlan === plan || (plan === 'pro' && userPlan === 'business')) {
-      // Already on this plan or higher
-      window.location.href = '/editor.html';
-      return;
-    }
+    var userPlan = currentProfile ? currentProfile.plan : 'free';
+    if (userPlan === plan || (plan === 'pro' && userPlan === 'business')) { window.location.href = '/editor.html'; return; }
     selectedPlan = plan;
     openUpgradeModal(plan);
-  } else {
-    // Not logged in - need to sign up first, then go to checkout
-    pendingPlan = plan;
-    openAuthModal('signup');
-  }
+  } else { pendingPlan = plan; openAuthModal('signup'); }
 }
 
 function handleUpgradeClick() {
   document.getElementById('userMenu').classList.remove('show');
-  const userPlan = currentProfile?.plan || 'free';
-  if (userPlan === 'free') {
-    selectedPlan = 'pro';
-  } else if (userPlan === 'pro') {
-    selectedPlan = 'business';
-  } else {
-    return; // already business
-  }
+  var userPlan = currentProfile ? currentProfile.plan : 'free';
+  if (userPlan === 'free') selectedPlan = 'pro';
+  else if (userPlan === 'pro') selectedPlan = 'business';
+  else return;
   openUpgradeModal(selectedPlan);
 }
 
-// ===== UPGRADE MODAL =====
 function openUpgradeModal(plan) {
   selectedPlan = plan || 'pro';
-  const overlay = document.getElementById('upgradeOverlay');
-  overlay.classList.add('active');
-  // Highlight selected plan
+  document.getElementById('upgradeOverlay').classList.add('active');
   document.getElementById('upgradePro').classList.toggle('selected', selectedPlan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', selectedPlan === 'business');
-  // Update button text
-  document.getElementById('upgradeCheckoutBtn').textContent = 
-    selectedPlan === 'pro' ? 'Start Pro - $9.99/mo (14-day free trial)' : 'Start Business - $24.99/mo (14-day free trial)';
+  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro - $9.99/mo (14-day free trial)' : 'Start Business - $24.99/mo (14-day free trial)';
 }
-
-function closeUpgradeModal() {
-  document.getElementById('upgradeOverlay').classList.remove('active');
-}
-
+function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('active'); }
 function selectUpgradePlan(plan) {
   selectedPlan = plan;
   document.getElementById('upgradePro').classList.toggle('selected', plan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', plan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = 
-    plan === 'pro' ? 'Start Pro - $9.99/mo (14-day free trial)' : 'Start Business - $24.99/mo (14-day free trial)';
+  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro - $9.99/mo (14-day free trial)' : 'Start Business - $24.99/mo (14-day free trial)';
 }
 
-// ===== STRIPE CHECKOUT =====
 async function startStripeCheckout() {
-  if (!currentUser) {
-    closeUpgradeModal();
-    pendingPlan = selectedPlan;
-    openAuthModal('signup');
-    return;
-  }
-  const btn = document.getElementById('upgradeCheckoutBtn');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to checkout...';
+  if (!currentUser) { closeUpgradeModal(); pendingPlan = selectedPlan; openAuthModal('signup'); return; }
+  var btn = document.getElementById('upgradeCheckoutBtn');
+  btn.disabled = true; btn.textContent = 'Redirecting to checkout...';
   try {
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        plan: selectedPlan,
-        userId: currentUser.id,
-        userEmail: currentUser.email
-      })
-    });
-    const data = await response.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error(data.error || 'Failed to create checkout session');
-    }
-  } catch(err) {
-    alert('Checkout error: ' + err.message);
-    btn.disabled = false;
-    btn.textContent = selectedPlan === 'pro' ? 'Start Pro - $9.99/mo' : 'Start Business - $24.99/mo';
-  }
+    var resp = await fetch('/api/create-checkout-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: selectedPlan, userId: currentUser.id, userEmail: currentUser.email }) });
+    var data = await resp.json();
+    if (data.url) { window.location.href = data.url; }
+    else { throw new Error(data.error || 'Failed to create checkout session'); }
+  } catch(err) { alert('Checkout error: ' + err.message); btn.disabled = false; btn.textContent = selectedPlan === 'pro' ? 'Start Pro - $9.99/mo' : 'Start Business - $24.99/mo'; }
 }
 
-// ===== SMOOTH SCROLL =====
 function smoothScroll(id) {
-  event?.preventDefault();
-  const el = document.getElementById(id);
-  if (el) {
-    const offset = 80; // navbar height
-    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
-    window.scrollTo({ top, behavior: 'smooth' });
-  }
+  if (event) event.preventDefault();
+  var el = document.getElementById(id);
+  if (el) { var top = el.getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({ top: top, behavior: 'smooth' }); }
 }
 
-// ===== DEMO =====
 function showDemo(index) {
-  document.querySelectorAll('.demo-sidebar-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.demo-sidebar-item').forEach(function(i) { i.classList.remove('active'); });
   document.querySelectorAll('.demo-sidebar-item')[index].classList.add('active');
 }
 
-// ===== NAVBAR SCROLL EFFECT =====
-window.addEventListener('scroll', () => {
-  const navbar = document.querySelector('.navbar');
-  if (window.scrollY > 10) {
-    navbar.style.boxShadow = '0 1px 10px rgba(0,0,0,.06)';
-  } else {
-    navbar.style.boxShadow = 'none';
-  }
+window.addEventListener('scroll', function() {
+  var navbar = document.querySelector('.navbar');
+  navbar.style.boxShadow = window.scrollY > 10 ? '0 1px 10px rgba(0,0,0,.06)' : 'none';
 });
 
-// ===== INTERSECTION OBSERVER FOR ANIMATIONS =====
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
-    }
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) { entry.target.style.opacity = '1'; entry.target.style.transform = 'translateY(0)'; }
   });
 }, { threshold: 0.1 });
-document.querySelectorAll('.feature-card, .price-card').forEach(card => {
-  card.style.opacity = '0';
-  card.style.transform = 'translateY(20px)';
+document.querySelectorAll('.feature-card, .price-card').forEach(function(card) {
+  card.style.opacity = '0'; card.style.transform = 'translateY(20px)';
   card.style.transition = 'opacity .6s ease, transform .6s ease';
   observer.observe(card);
 });
 
-// ===== CHECK FOR PAYMENT STATUS =====
-const urlParams = new URLSearchParams(window.location.search);
+var urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('payment') === 'success') {
-  // Show success message
-  setTimeout(() => {
-    alert('Payment successful! Your plan has been upgraded. Redirecting to editor...');
-    window.location.href = '/editor.html';
-  }, 500);
+  setTimeout(function() { alert('Payment successful! Your plan has been upgraded.'); window.location.href = '/editor.html'; }, 500);
 } else if (urlParams.get('payment') === 'cancelled') {
-  setTimeout(() => { alert('Payment was cancelled. You can try again anytime.'); }, 500);
+  setTimeout(function() { alert('Payment was cancelled. You can try again anytime.'); }, 500);
 }
 
-// ===== INIT =====
 checkSession();
 </script>
 </body>
