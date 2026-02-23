@@ -1,9 +1,10 @@
 {
-    "name": "docpro",
-    "version": "1.0.0",
-    "description": "DraftMyForms - Professional Document Generator",
-    "dependencies": {
-          "stripe": "^14.0.0",
-          "@supabase/supabase-js": "^2.39.0"
-    }
+        "name": "docpro",
+        "version": "1.0.0",
+        "description": "DraftMyForms - AI Documents & Resumes",
+        "dependencies": {
+                    "stripe": "^14.0.0",
+                    "@supabase/supabase-js": "^2.39.0",
+                    "@anthropic-ai/sdk": "^0.39.0"
+        }
 }
