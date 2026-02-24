@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DraftMyForms - Professional Documents Built in Seconds</title>
+<title>DraftMyForms - Professional Documents Buihlt in Seconds</title>
 <meta name="description" content="AI-powered document generation. Create invoices, contracts, resumes, legal forms and more. 50,000+ professional templates. Create, edit, and download as PDF in seconds.">
 <meta name="keywords" content="free invoice template, contract template, resume builder, legal forms, document generator, AI documents, professional templates">
 <meta property="og:title" content="DraftMyForms - AI Documents & Resumes">
-<meta property="og:description" content="Professional documents built in seconds with AI. 50,000+ templates.">
+<meta property="og:description" content="Professional documents built in seconds with AI. 50,0h00+ templates.">
 <meta property="og:type" content="website">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta property="og:url" content="https://draftmyforms.com/">
@@ -492,12 +492,12 @@ function updateUIForLoggedIn() {
   document.getElementById('navTryFree').style.display = 'none';
   var avatar = document.getElementById('userAvatar');
   avatar.classList.add('show');
-  var nm = currentProfile ? currentProfile.display_name : currentUser.email;
-  avatar.textContent = nm.charAt(0).toUpperCase();
-  document.getElementById('userDisplayName').textContent = currentProfile ? currentProfile.display_name : 'User';
+  var nm = (currentProfile && currentProfile.display_name) || (currentUser && currentUser.email) || 'User';
+  avatar.textContent = (nm || 'U').charAt(0).toUpperCase();
+  document.getElementById('userDisplayName').textContent = (currentProfile && currentProfile.display_name) || 'User';
   document.getElementById('userEmail').textContent = currentUser.email;
   var badge = document.getElementById('userPlanBadge');
-  var plan = currentProfile ? currentProfile.plan : 'free';
+  var plan = (currentProfile && currentProfile.plan) || 'free';
   badge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
   badge.className = 'plan-badge plan-' + plan;
   var upBtn = document.getElementById('menuUpgradeBtn');
@@ -601,7 +601,7 @@ function handleStartFree() {
 
 function handlePricingClick(plan) {
   if (currentUser) {
-    var userPlan = currentProfile ? currentProfile.plan : 'free';
+    var userPlan = (currentProfile && currentProfile.plan) || 'free';
     if (userPlan === plan || (plan === 'pro' && userPlan === 'business')) { window.location.href = '/editor.html'; return; }
     selectedPlan = plan;
     openUpgradeModal(plan);
@@ -610,7 +610,7 @@ function handlePricingClick(plan) {
 
 function handleUpgradeClick() {
   document.getElementById('userMenu').classList.remove('show');
-  var userPlan = currentProfile ? currentProfile.plan : 'free';
+  var userPlan = (currentProfile && currentProfile.plan) || 'free';
   if (userPlan === 'free') selectedPlan = 'pro';
   else if (userPlan === 'pro') selectedPlan = 'business';
   else return;
