@@ -137,7 +137,34 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 .ai-loading .dots span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 /* MOBILE */
-@media(max-width:768px){
+
+  /* MOBILE AI CHAT (Issue 12) */
+  .mobile-ai-btn{display:none;position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--gold);color:#fff;border:none;font-size:22px;box-shadow:0 4px 20px rgba(201,149,50,.4);z-index:300;cursor:pointer;transition:transform .2s}
+  .mobile-ai-btn:active{transform:scale(.9)}
+  .mobile-ai-overlay{display:none;position:fixed;bottom:0;left:0;right:0;top:0;background:rgba(0,0,0,.4);z-index:400}
+  .mobile-ai-overlay.active{display:block}
+  .mobile-ai-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:16px 16px 0 0;max-height:70vh;display:flex;flex-direction:column;z-index:401;transform:translateY(100%);transition:transform .3s ease}
+  .mobile-ai-sheet.active{transform:translateY(0)}
+  .mobile-ai-sheet .sheet-header{padding:12px 16px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between}
+  .mobile-ai-sheet .sheet-header h3{font-size:15px;font-family:var(--font-heading)}
+  .mobile-ai-sheet .sheet-messages{flex:1;overflow-y:auto;padding:12px;max-height:40vh}
+  .mobile-ai-sheet .sheet-input{padding:12px;border-top:1px solid var(--card-border);display:flex;gap:8px}
+  .mobile-ai-sheet .sheet-input input{flex:1;padding:12px;border:1px solid var(--card-border);border-radius:24px;font-size:14px;outline:none;font-family:var(--font-body)}
+  .mobile-ai-sheet .sheet-input input:focus{border-color:var(--gold)}
+  .mobile-ai-sheet .sheet-input button{width:44px;height:44px;border-radius:50%;background:var(--gold);color:#fff;border:none;font-size:16px;cursor:pointer}
+  @media(max-width:768px){
+    .mobile-ai-btn{display:flex;align-items:center;justify-content:center}
+    .editor-toolbar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:0}
+    .toolbar-group{flex-shrink:0;padding:0 4px}
+    .tool-btn{width:28px;height:28px;font-size:11px}
+    .font-select{max-width:90px;font-size:11px}
+    .size-select{width:40px;font-size:11px}
+    .top-nav .nav-actions{gap:4px}
+    .top-nav .nav-actions .btn{padding:6px 8px;font-size:11px}
+    .top-nav .nav-actions .btn-sm{padding:4px 6px}
+    .doc-title-input{max-width:120px;font-size:13px}
+  }
+  @media(max-width:768px){
 .ai-sidebar{position:fixed;left:-100%;top:0;bottom:0;z-index:200;width:85%;max-width:320px;transition:left .3s}
 .ai-sidebar.open{left:0}
 .preview-pane,.preview-divider{display:none!important}
@@ -152,17 +179,17 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <body>
 <!-- TOP NAVIGATION -->
 <nav class="top-nav">
-<a href="/" class="brand">✦ <span>DraftMyForms</span></a>
+<a href="/dashboard.html" class="brand">✦ <span>DraftMyForms</span></a>
 <input class="doc-title-input" id="docTitle" value="Untitled Document" spellcheck="false">
 <div class="nav-actions">
-<button class="btn btn-ghost" onclick="toggleAI()" title="Toggle AI Panel"><i class="fas fa-robot"></i></button>
-<button class="btn btn-ghost" onclick="openTemplates()" title="Templates"><i class="fas fa-th-large"></i></button>
-<button class="btn btn-ghost" onclick="openUploadDoc()" title="Upload Document"><i class="fas fa-file-upload"></i></button>
-<button class="btn btn-ghost" onclick="openLogoUpload()" title="Upload Logo"><i class="fas fa-image"></i></button>
-<button class="btn btn-outline btn-sm" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-<button class="btn btn-outline btn-sm" onclick="downloadDocx()"><i class="fas fa-file-word"></i> DOCX</button>
-<button class="btn btn-gold btn-sm" onclick="saveDocument()"><i class="fas fa-save"></i> Save</button>
-<a href="/" class="btn btn-ghost btn-sm"><i class="fas fa-home"></i></a>
+<button class="btn btn-ghost" onclick="toggleAI()" title="AI Assistant"><i class="fas fa-robot"></i></button>
+<button class="btn btn-ghost" onclick="openTemplates()" title="Browse 120+ Templates"><i class="fas fa-th-large"></i></button>
+<button class="btn btn-ghost" onclick="openUploadDoc()" title="Upload PDF, DOCX, or TXT"><i class="fas fa-file-upload"></i></button>
+<button class="btn btn-ghost" onclick="openLogoUpload()" title="Upload or Generate Logo"><i class="fas fa-image"></i></button>
+<button class="btn btn-outline btn-sm" onclick="downloadPDF()" title="Export as PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+<button class="btn btn-outline btn-sm" onclick="downloadDocx()" title="Export as Word Document"><i class="fas fa-file-word"></i> DOCX</button>
+<button class="btn btn-gold btn-sm" onclick="saveDocument()" title="Save Document (Ctrl+S)"><i class="fas fa-save"></i> Save</button>
+<a href="/dashboard.html" class="btn btn-ghost btn-sm" title="Back to Dashboard"><i class="fas fa-home"></i></a>
 </div>
 </nav>
 
@@ -355,16 +382,35 @@ I can help you create, edit, and perfect any document. Try:
 <div class="template-modal">
 <div class="template-modal-header">
 <h2>Document Templates</h2>
-<button class="btn btn-ghost" onclick="closeTemplates()"><i class="fas fa-times"></i></button>
+<div style="display:flex;gap:8px;align-items:center"><input type="text" id="templateSearch" placeholder="Search templates..." style="padding:8px 14px;border:1px solid var(--card-border);border-radius:8px;font-size:13px;outline:none;width:200px;font-family:var(--font-body)" oninput="filterTemplates(this.value)"><button class="btn btn-ghost" onclick="closeTemplates()"><i class="fas fa-times"></i></button></div>
 </div>
 <div class="template-tabs" id="templateTabs"></div>
 <div class="template-grid" id="templateGrid"></div>
 </div>
 </div>
 
+<!-- MOBILE AI (Issue 12) -->
+<button class="mobile-ai-btn" id="mobileAiBtn" onclick="openMobileAI()"><i class="fas fa-robot"></i></button>
+<div class="mobile-ai-overlay" id="mobileAiOverlay" onclick="closeMobileAI()"></div>
+<div class="mobile-ai-sheet" id="mobileAiSheet">
+<div class="sheet-header">
+<h3><span style="color:var(--gold)">✦</span> AI Assistant</h3>
+<button class="btn btn-ghost btn-sm" onclick="closeMobileAI()"><i class="fas fa-times"></i></button>
+</div>
+<div class="sheet-messages" id="mobileAiMessages">
+<div class="ai-msg system" style="font-size:12px">Tell me what document to create, or ask me to edit the current one.</div>
+</div>
+<div class="sheet-input">
+<input type="text" id="mobileAiInput" placeholder="Describe your document..." onkeydown="if(event.key==='Enter'){sendMobileAI()}">
+<button onclick="sendMobileAI()"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>if(window.pdfjsLib)window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -444,9 +490,11 @@ const docCanvas = document.getElementById('docCanvas');
 const previewDoc = document.getElementById('previewDoc');
 
 docCanvas.addEventListener('input', () => {
-  updatePreview();
-  updateWordCount();
-});
+    updatePreview();
+    updateWordCount();
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(autoSave, 3000);
+  })
 
 function updatePreview() {
   if (previewDoc) previewDoc.innerHTML = docCanvas.innerHTML;
@@ -597,39 +645,104 @@ async function handleFileUpload(input) {
       showToast('Image inserted!');
     };
     reader.readAsDataURL(file);
-  } else {
-    // For PDF/DOCX - send to AI for interpretation
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64 = e.target.result.split(',')[1];
-      addAIMessage('Processing uploaded file: ' + file.name, 'system');
-      showAILoading();
-      try {
+  } else if (file.name.endsWith('.pdf')) {
+    // PDF extraction using pdf.js
+    addAIMessage('Processing PDF: ' + file.name, 'system');
+    showAILoading();
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n\n';
+      }
+      removeAILoading();
+      if (fullText.trim()) {
+        addAIMessage('PDF text extracted (' + pdf.numPages + ' pages). Formatting with AI...', 'system');
+        showAILoading();
         const res = await fetch('/api/ai-generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            prompt: 'Convert this uploaded document into a clean, editable HTML format. Preserve all content, formatting, and structure. File: ' + file.name,
+            prompt: 'Convert this extracted PDF text into a clean, professionally formatted HTML document. Preserve all content and structure. Here is the text:\n\n' + fullText.substring(0, 8000),
             docType: 'upload',
-            fileData: base64,
-            fileName: file.name
+            mode: 'create'
           })
         });
         removeAILoading();
         if (res.ok) {
           const data = await res.json();
           docCanvas.innerHTML = data.html;
-          updatePreview();
-          updateWordCount();
-          addAIMessage('Document processed and loaded into the editor!', 'assistant');
+          updatePreview(); updateWordCount();
+          addAIMessage('PDF loaded and formatted! You can now edit it.', 'assistant');
           document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
+        } else {
+          docCanvas.innerHTML = '<div style="white-space:pre-wrap;font-family:var(--font-body);line-height:1.7">' + fullText.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+          updatePreview(); updateWordCount();
+          addAIMessage('PDF loaded as plain text. AI formatting unavailable.', 'system');
         }
-      } catch (e) {
+      } else {
         removeAILoading();
-        addAIMessage('Error processing file. Try a different format.', 'system');
+        addAIMessage('Could not extract text from this PDF. It may be image-based or encrypted.', 'system');
       }
-    };
-    reader.readAsDataURL(file);
+    } catch(err) {
+      removeAILoading();
+      addAIMessage('Error reading PDF: ' + err.message, 'system');
+    }
+    document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
+  } else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+    // DOCX - extract via JSZip-like approach or send text
+    addAIMessage('Processing Word document: ' + file.name, 'system');
+    showAILoading();
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8 = new Uint8Array(arrayBuffer);
+      // Simple DOCX text extraction (DOCX is a ZIP containing XML)
+      let text = '';
+      // Try to decode as text first
+      const decoder = new TextDecoder('utf-8', {fatal: false});
+      const rawText = decoder.decode(uint8);
+      // Extract readable text between XML tags
+      const xmlMatch = rawText.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+      if (xmlMatch) {
+        text = xmlMatch.map(m => m.replace(/<[^>]+>/g, '')).join(' ');
+      }
+      removeAILoading();
+      if (text.trim()) {
+        addAIMessage('Word document text extracted. Formatting...', 'system');
+        showAILoading();
+        const res = await fetch('/api/ai-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: 'Format this text from a Word document into clean, professional HTML. Preserve structure:\n\n' + text.substring(0, 8000),
+            docType: 'upload',
+            mode: 'create'
+          })
+        });
+        removeAILoading();
+        if (res.ok) {
+          const data = await res.json();
+          docCanvas.innerHTML = data.html;
+          addAIMessage('Word document loaded and formatted!', 'assistant');
+        } else {
+          docCanvas.innerHTML = '<div style="white-space:pre-wrap">' + text.replace(/</g,'&lt;') + '</div>';
+          addAIMessage('Document loaded as plain text.', 'system');
+        }
+      } else {
+        addAIMessage('Could not extract text. Try saving as .txt or .pdf first.', 'system');
+      }
+      updatePreview(); updateWordCount();
+    } catch(err) {
+      removeAILoading();
+      addAIMessage('Error processing Word file: ' + err.message, 'system');
+    }
+    document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
+  } else {
+    addAIMessage('Unsupported file format. Please upload PDF, DOCX, TXT, or HTML.', 'system');
   }
   input.value = '';
 }
@@ -1080,6 +1193,78 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
+
+
+  // AUTO-SAVE (Issue 13)
+  var autoSaveTimer = null;
+  function autoSave() {
+    var cnt = docCanvas.innerHTML;
+    if (!cnt || cnt.trim() === '' || cnt.trim() === '<br>') return;
+    var data = { title: document.getElementById('docTitle').value, content: cnt, savedAt: new Date().toISOString() };
+    localStorage.setItem('dmf_autosave', JSON.stringify(data));
+    document.getElementById('saveStatus').textContent = 'Auto-saved ' + new Date().toLocaleTimeString();
+  }
+
+  // MOBILE AI FUNCTIONS (Issue 12)
+  function openMobileAI() {
+    document.getElementById('mobileAiOverlay').classList.add('active');
+    document.getElementById('mobileAiSheet').classList.add('active');
+    setTimeout(function(){ document.getElementById('mobileAiInput').focus(); }, 300);
+  }
+  function closeMobileAI() {
+    document.getElementById('mobileAiOverlay').classList.remove('active');
+    document.getElementById('mobileAiSheet').classList.remove('active');
+  }
+  function sendMobileAI() {
+    var input = document.getElementById('mobileAiInput');
+    var prompt = input.value.trim();
+    if (!prompt) return;
+    input.value = '';
+    var msgs = document.getElementById('mobileAiMessages');
+    msgs.innerHTML += '<div class="ai-msg user" style="font-size:12px;margin-bottom:8px">' + prompt.replace(/</g,'&lt;') + '</div>';
+    msgs.innerHTML += '<div class="ai-loading" id="mobileLoading" style="font-size:12px">Generating<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>';
+    msgs.scrollTop = msgs.scrollHeight;
+    document.getElementById('aiPrompt').value = prompt;
+    sendAI().then(function() {
+      var el = document.getElementById('mobileLoading');
+      if (el) el.remove();
+      msgs.innerHTML += '<div class="ai-msg assistant" style="font-size:12px;margin-bottom:8px">Done! Check the editor.</div>';
+      msgs.scrollTop = msgs.scrollHeight;
+    });
+  }
+
+  // TEMPLATE SEARCH (Issue 11)
+  function filterTemplates(query) {
+    if (!query) { var activeTab = document.querySelector('.template-tab.active'); if (activeTab) { var cat = activeTab.textContent.split(' ')[0]; renderTemplateGrid(cat); } return; }
+    query = query.toLowerCase();
+    var results = [];
+    Object.keys(TEMPLATES).forEach(function(cat) {
+      TEMPLATES[cat].forEach(function(t, i) {
+        if (t.name.toLowerCase().includes(query) || t.style.toLowerCase().includes(query) || cat.toLowerCase().includes(query)) {
+          results.push({t: t, cat: cat, i: i});
+        }
+      });
+    });
+    var grid = document.getElementById('templateGrid');
+    if (!results.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">No templates match your search</div>'; return; }
+    grid.innerHTML = results.map(function(r) {
+      var b = r.t.tier === 'free' ? 'badge-free' : r.t.tier === 'pro' ? 'badge-pro' : 'badge-biz';
+      return '<div class="template-card" onclick="loadTemplate(\'' + r.cat + '\',' + r.i + ')"><div class="preview" style="display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:28px;background:var(--paper)"><i class="fas fa-file-alt"></i></div><div class="info"><h4>' + r.t.name + ' <span class="badge ' + b + '">' + r.t.tier.charAt(0).toUpperCase() + r.t.tier.slice(1) + '</span></h4><span>' + r.cat.slice(0,-1) + '</span></div></div>';
+    }).join('');
+  }
+
+  // LOAD FROM DASHBOARD / AUTOSAVE
+  (function loadSavedContent() {
+    var loadKey = sessionStorage.getItem('dmf_load_doc');
+    if (loadKey) {
+      sessionStorage.removeItem('dmf_load_doc');
+      try { var doc = JSON.parse(localStorage.getItem(loadKey)); if (doc && doc.content) { docCanvas.innerHTML = doc.content; document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); return; } } catch(e) {}
+    }
+    var auto = localStorage.getItem('dmf_autosave');
+    if (auto) {
+      try { var doc = JSON.parse(auto); if (doc.content && doc.content.trim() !== '' && doc.content.trim() !== '<br>') { docCanvas.innerHTML = doc.content; document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); } } catch(e) {}
+    }
+  })();
 
 // ==============================
 // KEYBOARD SHORTCUTS
