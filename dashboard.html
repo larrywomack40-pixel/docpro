@@ -259,9 +259,9 @@ document.getElementById('acctPlan').textContent=planLabel;
 document.getElementById('acctPlan').className='plan-badge plan-'+plan;
 var credits=plan==='business'?'\u221E':plan==='pro'?'50':'5';
 document.getElementById('statCredits').textContent=credits;
-if(currentUser.created_at){var d=new Date(currentUser.created_at);document.getElementById('acctSince').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'}
+if(currentUser.created_at){var d=new Date(currentUser.created_at);document.getElementById('acctSince').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 showUpgradeElements(plan);
-)}
+}
 }
 
 function loadSavedDocuments(){
