@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DraftMyForms - Professional Documents Buihlt in Seconds</title>
+<title>DraftMyForms - Professional Documents Built in Seconds</title>
 <meta name="description" content="AI-powered document generation. Create invoices, contracts, resumes, legal forms and more. 50,000+ professional templates. Create, edit, and download as PDF in seconds.">
 <meta name="keywords" content="free invoice template, contract template, resume builder, legal forms, document generator, AI documents, professional templates">
 <meta property="og:title" content="DraftMyForms - AI Documents & Resumes">
-<meta property="og:description" content="Professional documents built in seconds with AI. 50,0h00+ templates.">
+<meta property="og:description" content="Professional documents built in seconds with AI. 50,000+ templates.">
 <meta property="og:type" content="website">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta property="og:url" content="https://draftmyforms.com/">
@@ -177,7 +177,7 @@ img{max-width:100%}
 .upgrade-plan-card ul{list-style:none;text-align:left;font-size:12px;color:var(--text-secondary)}
 .upgrade-plan-card ul li{padding:2px 0}
 .upgrade-plan-card ul li::before{content:'✓ ';color:var(--gold)}
-@media(max-width:768px){
+@media(max-width:768px){ .features + div .feature-card{margin-bottom:0} div[style*="grid-template-columns:repeat(3"] { grid-template-columns:1fr!important } 
 .navbar{padding:0 16px}.nav-links{display:none}.hero{padding:100px 20px 60px}.hero-ctas{flex-direction:column}
 .demo-content{flex-direction:column;height:auto}.demo-sidebar{width:100%;height:200px;border-right:none;border-bottom:1px solid var(--border)}
 .features-grid{grid-template-columns:1fr}.pricing-grid{grid-template-columns:1fr}.comparison .comp-row{font-size:12px}
@@ -222,6 +222,7 @@ img{max-width:100%}
 <div class="email" id="userEmail"></div>
 <div class="plan-badge plan-free" id="userPlanBadge">Free</div>
 </div>
+<a href="/dashboard.html">My Dashboard</a>
 <a href="/editor.html">Open Editor</a>
 <button onclick="handleUpgradeClick()" id="menuUpgradeBtn">Upgrade Plan</button>
 <button onclick="handleLogout()" style="color:var(--danger)">Sign Out</button>
@@ -279,16 +280,16 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="upgrade-plan-card" onclick="selectUpgradePlan('pro')" id="upgradePro">
 <h3>Pro</h3>
 <div class="plan-price">$9.99<span>/mo</span></div>
-<ul><li>50 AI credits/month</li><li>Contracts, NDAs, proposals</li><li>PDF, Word & HTML export</li><li>Custom logo & branding</li><li>E-signature (5/mo)</li></ul>
+<ul><li>50 AI credits/month</li><li>Contracts, NDAs, proposals</li><li>PDF, Word & HTML export</li><li>Custom logo & branding</li><li>E-signature (5/mo) <span style="font-size:9px;color:var(--gold-dark)">(Soon)</span></li></ul>
 </div>
 <div class="upgrade-plan-card" onclick="selectUpgradePlan('business')" id="upgradeBusiness">
 <h3>Business</h3>
 <div class="plan-price">$24.99<span>/mo</span></div>
-<ul><li>Unlimited AI credits</li><li>ALL templates incl. sensitive</li><li>Unlimited e-signatures</li><li>Team collaboration</li><li>API access</li></ul>
+<ul><li>Unlimited AI credits</li><li>ALL templates incl. sensitive</li><li>Unlimited e-signatures <span style="font-size:9px;color:var(--gold-dark)">(Soon)</span></li><li>Team collaboration <span style="font-size:9px;color:var(--gold-dark)">(Soon)</span></li><li>API access <span style="font-size:9px;color:var(--gold-dark)">(Soon)</span></li></ul>
 </div>
 </div>
-<button class="btn btn-gold btn-lg" style="width:100%" onclick="startStripeCheckout()" id="upgradeCheckoutBtn">Start 14-day Free Trial</button>
-<p style="font-size:11px;color:var(--text-muted);margin-top:12px">Cancel anytime. No commitment required.</p>
+<button class="btn btn-gold btn-lg" style="width:100%" onclick="startStripeCheckout()" id="upgradeCheckoutBtn">Start Free Trial</button>
+<p style="font-size:11px;color:var(--text-muted);margin-top:12px">Cancel anytime. Pro plan includes 3-day free trial.</p>
 </div>
 </div>
 <!-- HERO -->
@@ -367,12 +368,20 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="section-subtitle">A complete document platform that creates, edits, and manages all your professional documents in one place.</div>
 </div>
 <div class="features-grid">
-<div class="feature-card"><div class="feature-icon">📄</div><h3>AI Document Generation</h3><p>Describe your document in plain English. Our AI drafts it instantly — contracts, letters, forms, legal language and all.</p></div>
-<div class="feature-card"><div class="feature-icon">👥</div><h3>Real-time Collaboration</h3><p>Work on documents with your team simultaneously. Live presence indicators, comments, and version history.</p></div>
-<div class="feature-card"><div class="feature-icon">✍️</div><h3>E-Signature Built-in</h3><p>Send for signature directly from DraftMyForms. Legally binding signatures with audit trail.</p></div>
-<div class="feature-card"><div class="feature-icon">🔄</div><h3>Smart Auto-Fill</h3><p>Connect your CRM, tables, or Google Sheets. DraftMyForms pulls client data and auto-populates your documents.</p></div>
-<div class="feature-card"><div class="feature-icon">📊</div><h3>Document Analytics</h3><p>See who viewed your invoices and proposals. Get notified the moment your document is viewed or signed.</p></div>
-<div class="feature-card"><div class="feature-icon">🔗</div><h3>50+ Integrations</h3><p>Works with Salesforce, Stripe, HubSpot, Zapier, and more. DraftMyForms fits into your existing workflow.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-robot" style="color:var(--gold)"></i></div><h3>AI Document Generation</h3><p>Describe your document in plain English. Our AI drafts it instantly — contracts, letters, forms, legal language and all.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-copy" style="color:var(--gold)"></i></div><h3>120+ Professional Templates</h3><p>Choose from over 120 professionally designed templates across invoices, contracts, resumes, letters, proposals, reports, and forms.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-file-export" style="color:var(--gold)"></i></div><h3>PDF &amp; DOCX Export</h3><p>Download your finished documents as PDF or Word files instantly. Print-ready, professionally formatted, and compatible everywhere.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-pen-fancy" style="color:var(--gold)"></i></div><h3>Rich Text Editor</h3><p>Full formatting toolbar with fonts, colors, tables, images, and more. Edit every detail of your documents with precision.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-upload" style="color:var(--gold)"></i></div><h3>Document Upload &amp; Edit</h3><p>Upload existing PDF, DOCX, or TXT files and edit them right in the browser. Transform any document with AI assistance.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-mobile-alt" style="color:var(--gold)"></i></div><h3>Multi-Device Access</h3><p>Create and edit documents on desktop, tablet, or mobile. Your work is always accessible from any device, anywhere.</p></div>
+</div>
+<div style="margin-top:48px;max-width:var(--max-w);margin-left:auto;margin-right:auto">
+<h3 style="text-align:center;font-family:var(--font-heading);font-size:22px;margin-bottom:24px;color:var(--text-muted)">Coming Soon</h3>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:var(--max-w);margin:0 auto">
+<div class="feature-card" style="opacity:.65;position:relative"><span style="position:absolute;top:12px;right:12px;background:var(--gold-bg);color:var(--gold-dark);font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid #f0ddb8">COMING SOON</span><div class="feature-icon"><i class="fas fa-signature" style="color:var(--gold)"></i></div><h3>E-Signature Built-in</h3><p>Send for signature directly from DraftMyForms. Legally binding signatures with audit trail.</p></div>
+<div class="feature-card" style="opacity:.65;position:relative"><span style="position:absolute;top:12px;right:12px;background:var(--gold-bg);color:var(--gold-dark);font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid #f0ddb8">COMING SOON</span><div class="feature-icon"><i class="fas fa-users" style="color:var(--gold)"></i></div><h3>Real-time Collaboration</h3><p>Work on documents with your team simultaneously. Live presence indicators, comments, and version history.</p></div>
+<div class="feature-card" style="opacity:.65;position:relative"><span style="position:absolute;top:12px;right:12px;background:var(--gold-bg);color:var(--gold-dark);font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid #f0ddb8">COMING SOON</span><div class="feature-icon"><i class="fas fa-chart-bar" style="color:var(--gold)"></i></div><h3>Document Analytics</h3><p>See who viewed your invoices and proposals. Get notified the moment your document is viewed or signed.</p></div>
+</div>
 </div>
 </section>
 
@@ -389,10 +398,10 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="comp-header-cell highlight"><div class="comp-brand">✦ DraftMyForms</div><div class="comp-price" style="color:rgba(255,255,255,.8)">From $0/mo</div></div>
 </div>
 <div class="comp-row"><div class="comp-cell feature">AI document generation</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
-<div class="comp-row"><div class="comp-cell feature">E-signature (built-in)</div><div class="comp-cell check"><i class="fas fa-check" style="color:var(--success)"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
-<div class="comp-row"><div class="comp-cell feature">Real-time collaboration</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
-<div class="comp-row"><div class="comp-cell feature">Document open tracking</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
-<div class="comp-row"><div class="comp-cell feature">CRM / direct auto-fill</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
+<div class="comp-row"><div class="comp-cell feature">E-signature (built-in)</div><div class="comp-cell check"><i class="fas fa-check" style="color:var(--success)"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
+<div class="comp-row"><div class="comp-cell feature">Real-time collaboration</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
+<div class="comp-row"><div class="comp-cell feature">Document open tracking</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
+<div class="comp-row"><div class="comp-cell feature">CRM / direct auto-fill</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
 <div class="comp-row"><div class="comp-cell feature">Free templates</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
 <div class="comp-row"><div class="comp-cell feature">Custom branding</div><div class="comp-cell check" style="font-size:12px;color:var(--text-muted)">Business plan only</div><div class="comp-cell check" style="background:var(--gold-bg);font-size:12px;color:var(--gold-dark)">✦ Pro+</div></div>
 <div class="comp-row"><div class="comp-cell feature">Download formats</div><div class="comp-cell check" style="font-size:12px;color:var(--text-muted)">PDF only</div><div class="comp-cell check" style="background:var(--gold-bg);font-size:12px;color:var(--gold-dark)">PDF, Word, HTML</div></div>
@@ -404,7 +413,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="pricing-header">
 <div class="section-label">Simple Pricing</div>
 <div class="section-title">Start free. Upgrade when ready.</div>
-<p style="font-size:15px;color:var(--text-secondary);margin-top:12px">All plans include a 14-day free trial. No credit card required. Cancel any time.</p>
+<p style="font-size:15px;color:var(--text-secondary);margin-top:12px">Pro includes a 3-day free trial. No credit card required. Cancel any time.</p>
 </div>
 <div class="pricing-grid">
 <div class="price-card">
@@ -419,17 +428,17 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="price-tier">Pro</div><div class="price-amount">$9.99</div><div class="price-period">/month · billed monthly</div>
 <div class="price-desc">For freelancers, small businesses, and professionals.</div>
 <ul class="price-features">
-<li><i class="fas fa-check"></i> 50 AI credits per month</li><li><i class="fas fa-check"></i> Unlimited document types</li><li><i class="fas fa-check"></i> Contracts, NDAs, proposals</li><li><i class="fas fa-check"></i> E-signature (5 sends/mo)</li><li><i class="fas fa-check"></i> PDF, Word & HTML export</li><li><i class="fas fa-check"></i> Custom logo & branding</li><li><i class="fas fa-check"></i> Document open tracking</li><li><i class="fas fa-check"></i> Priority support</li>
+<li><i class="fas fa-check"></i> 50 AI credits per month</li><li><i class="fas fa-check"></i> Unlimited document types</li><li><i class="fas fa-check"></i> Contracts, NDAs, proposals</li><li><i class="fas fa-check"></i> E-signature (5 sends/mo) <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> PDF, Word & HTML export</li><li><i class="fas fa-check"></i> Custom logo & branding</li><li><i class="fas fa-check"></i> Document open tracking <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> Priority support</li>
 </ul>
-<a href="javascript:void(0)" class="btn btn-gold btn-lg price-btn" onclick="handlePricingClick('pro')">Start 14-day free trial</a>
+<a href="javascript:void(0)" class="btn btn-gold btn-lg price-btn" onclick="handlePricingClick('pro')">Start 3-day free trial</a>
 </div>
 <div class="price-card">
 <div class="price-tier">Business</div><div class="price-amount">$24.99</div><div class="price-period">/month · billed monthly</div>
 <div class="price-desc">For teams and growing businesses that need scale.</div>
 <ul class="price-features">
-<li><i class="fas fa-check"></i> Unlimited AI credits</li><li><i class="fas fa-check"></i> Everything in Pro</li><li><i class="fas fa-check"></i> Unlimited e-signatures</li><li><i class="fas fa-check"></i> Team collaboration</li><li><i class="fas fa-check"></i> CRM & Sheets auto-fill</li><li><i class="fas fa-check"></i> 50+ integrations</li><li><i class="fas fa-check"></i> API access</li><li><i class="fas fa-check"></i> Dedicated account manager</li>
+<li><i class="fas fa-check"></i> Unlimited AI credits</li><li><i class="fas fa-check"></i> Everything in Pro</li><li><i class="fas fa-check"></i> Unlimited e-signatures <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> Team collaboration <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> CRM & Sheets auto-fill <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> 50+ integrations <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> API access <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> Dedicated account manager</li>
 </ul>
-<a href="javascript:void(0)" class="btn btn-outline btn-lg price-btn" onclick="handlePricingClick('business')">Start 14-day free trial</a>
+<a href="javascript:void(0)" class="btn btn-outline btn-lg price-btn" onclick="handlePricingClick('business')">Get started now</a>
 </div>
 </div>
 </section>
@@ -566,7 +575,7 @@ async function handleAuth(e) {
         updateUIForLoggedIn();
         closeAuthModal();
         if (pendingPlan) { selectedPlan = pendingPlan; pendingPlan = null; openUpgradeModal(selectedPlan); }
-        else { window.location.href = '/editor.html'; }
+        else { window.location.href = '/dashboard.html'; }
       }
     } else {
       var r = await sb.auth.signInWithPassword({ email: email, password: password });
@@ -577,7 +586,7 @@ async function handleAuth(e) {
       closeAuthModal();
       if (currentProfile && currentProfile.role === 'admin') { window.location.href = '/admin.html'; }
       else if (pendingPlan) { selectedPlan = pendingPlan; pendingPlan = null; openUpgradeModal(selectedPlan); }
-      else { window.location.href = '/editor.html'; }
+      else { window.location.href = '/dashboard.html'; }
     }
   } catch(err) {
     errEl.textContent = err.message || 'An error occurred';
@@ -595,14 +604,14 @@ async function handleLogout() {
 }
 
 function handleStartFree() {
-  if (currentUser) { window.location.href = '/editor.html'; }
+  if (currentUser) { window.location.href = '/dashboard.html'; }
   else { openAuthModal('signup'); }
 }
 
 function handlePricingClick(plan) {
   if (currentUser) {
     var userPlan = (currentProfile && currentProfile.plan) || 'free';
-    if (userPlan === plan || (plan === 'pro' && userPlan === 'business')) { window.location.href = '/editor.html'; return; }
+    if (userPlan === plan || (plan === 'pro' && userPlan === 'business')) { window.location.href = '/dashboard.html'; return; }
     selectedPlan = plan;
     openUpgradeModal(plan);
   } else { pendingPlan = plan; openAuthModal('signup'); }
@@ -622,14 +631,14 @@ function openUpgradeModal(plan) {
   document.getElementById('upgradeOverlay').classList.add('active');
   document.getElementById('upgradePro').classList.toggle('selected', selectedPlan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', selectedPlan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro - $9.99/mo (14-day free trial)' : 'Start Business - $24.99/mo (14-day free trial)';
+  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro — 3-Day Free Trial' : 'Start Business — $24.99/mo';
 }
 function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('active'); }
 function selectUpgradePlan(plan) {
   selectedPlan = plan;
   document.getElementById('upgradePro').classList.toggle('selected', plan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', plan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro - $9.99/mo (14-day free trial)' : 'Start Business - $24.99/mo (14-day free trial)';
+  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro — 3-Day Free Trial' : 'Start Business — $24.99/mo';
 }
 
 async function startStripeCheckout() {
@@ -653,16 +662,19 @@ function smoothScroll(id) {
 function showDemo(index) {
   document.querySelectorAll('.demo-sidebar-item').forEach(function(i) { i.classList.remove('active'); });
   document.querySelectorAll('.demo-sidebar-item')[index].classList.add('active');
-}
-
-window.addEventListener('scroll', function() {
-  var navbar = document.querySelector('.navbar');
-  navbar.style.boxShadow = window.scrollY > 10 ? '0 1px 10px rgba(0,0,0,.06)' : 'none';
-});
-
-var observer = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting) { entry.target.style.opacity = '1'; entry.target.style.transform = 'translateY(0)'; }
+  var docs = [
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px"><div><div style="font-family:var(--font-heading);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Apex Creative Studio</div><div style="font-size:9px;color:var(--text-muted)">42 Oak Drive, Suite 204<br>San Francisco, CA 94102</div></div><div style="text-align:right"><div style="font-size:9px;color:var(--text-muted)">Invoice #INV-2024-009</div></div></div><div style="font-family:var(--font-heading);font-size:22px;font-weight:700">INVOICE</div><hr style="border:none;border-top:2px solid var(--gold);margin:8px 0 16px"><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--gold);color:#fff"><th style="padding:6px 10px;text-align:left">Description</th><th style="padding:6px 10px;text-align:center">Qty</th><th style="padding:6px 10px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:6px 10px;border-bottom:1px solid #eee">Brand Identity Design</td><td style="text-align:center;border-bottom:1px solid #eee">1</td><td style="text-align:right;border-bottom:1px solid #eee">$3,500</td></tr><tr><td style="padding:6px 10px">Website Design</td><td style="text-align:center">1</td><td style="text-align:right">$4,200</td></tr></tbody></table><div style="text-align:right;font-size:13px;font-weight:700;margin-top:12px">Total: $7,700.00</div>',
+    '<div style="text-align:center;padding:16px 0;border-bottom:2px solid var(--gold);margin-bottom:16px"><div style="font-size:8px;letter-spacing:3px;color:var(--gold);text-transform:uppercase">Strategic Growth Partners</div><div style="font-family:var(--font-heading);font-size:20px;font-weight:700">SERVICE PROPOSAL</div><div style="font-size:9px;color:var(--text-muted)">Prepared for TechVentures Inc.</div></div><h4 style="font-size:12px;color:var(--gold);margin-bottom:6px">Executive Summary</h4><p style="font-size:10px;line-height:1.5;color:#555;margin-bottom:12px">We propose a comprehensive brand strategy and digital transformation initiative to increase market visibility by 40%.</p><h4 style="font-size:12px;color:var(--gold);margin-bottom:6px">Scope of Work</h4><ul style="font-size:10px;margin-left:16px;color:#555"><li>Market research &amp; competitive analysis</li><li>Brand identity redesign</li><li>Website overhaul</li></ul><div style="text-align:right;font-size:12px;font-weight:700;color:var(--gold);margin-top:16px">Investment: $28,500</div>',
+    '<div style="text-align:center;margin-bottom:16px"><div style="font-family:var(--font-heading);font-size:18px;font-weight:700">PROFESSIONAL SERVICES AGREEMENT</div><hr style="border:none;border-top:2px solid var(--gold);margin:8px auto;width:60px"></div><p style="font-size:10px;margin-bottom:12px">Entered into as of <strong>January 15, 2025</strong></p><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:10px;margin-bottom:12px"><div style="padding:8px;background:#faf7f5;border-radius:6px"><strong>Client:</strong> TechVentures Inc.</div><div style="padding:8px;background:#faf7f5;border-radius:6px"><strong>Provider:</strong> Apex Creative</div></div><h4 style="font-size:11px;color:var(--gold)">1. Scope of Services</h4><p style="font-size:10px;color:#555;margin-bottom:8px">Provider delivers professional design services per Exhibit A.</p><h4 style="font-size:11px;color:var(--gold)">2. Compensation</h4><p style="font-size:10px;color:#555">Total: $15,000 in 3 installments.</p>',
+    '<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">January 20, 2025</div><p style="font-size:10px;margin-bottom:8px">Dear Hiring Manager,</p><p style="font-size:10px;line-height:1.6;color:#555;margin-bottom:10px">I am writing to express my interest in the Senior Product Designer position. With 7+ years in UX/UI design, I am confident I would excel in this role.</p><p style="font-size:10px;line-height:1.6;color:#555;margin-bottom:10px">At DesignLab, I led our flagship redesign resulting in 45% higher engagement and 30% fewer support tickets.</p><p style="font-size:10px;color:var(--gold);font-weight:600">Sarah Mitchell</p>',
+    '<div style="text-align:center;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gold)"><div style="font-family:var(--font-heading);font-size:20px;font-weight:700">JAMES PARKER</div><div style="font-size:9px;color:var(--text-muted)">Senior Software Engineer | james@email.com | San Francisco</div></div><h4 style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Summary</h4><p style="font-size:10px;line-height:1.5;color:#555;margin-bottom:10px">8+ years building scalable web apps. Expert in React, Node.js, cloud. Led teams of 5-12 engineers.</p><h4 style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Experience</h4><div style="font-size:10px;font-weight:600">Senior Engineer — CloudScale Inc. <span style="font-weight:400;color:var(--text-muted)">2021-Present</span></div><p style="font-size:10px;color:#555">Led microservices migration, 60% latency reduction.</p>',
+    '<div style="text-align:center;margin-bottom:16px"><div style="font-family:var(--font-heading);font-size:18px;font-weight:700">NON-DISCLOSURE AGREEMENT</div><div style="font-size:9px;color:var(--text-muted)">(Mutual)</div><hr style="border:none;border-top:2px solid var(--gold);margin:6px auto;width:60px"></div><h4 style="font-size:11px;color:var(--gold)">1. Confidential Information</h4><p style="font-size:10px;color:#555;margin-bottom:10px">Includes any proprietary data, business plans, financial info, customer lists, and trade secrets.</p><h4 style="font-size:11px;color:var(--gold)">2. Obligations</h4><p style="font-size:10px;color:#555">Both parties agree to hold confidential information in strict confidence for 2 years from disclosure.</p>',
+    '<div style="font-family:var(--font-heading);font-size:16px;font-weight:700;margin-bottom:4px">EXPENSE REPORT</div><div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">January 2025 | David Chen</div><hr style="border:none;border-top:2px solid var(--gold);margin-bottom:12px"><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--gold);color:#fff"><th style="padding:5px 8px;text-align:left">Date</th><th style="padding:5px 8px">Category</th><th style="padding:5px 8px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:5px 8px;border-bottom:1px solid #eee">Jan 5</td><td style="border-bottom:1px solid #eee">Flight SFO-NYC</td><td style="text-align:right;border-bottom:1px solid #eee">$425</td></tr><tr><td style="padding:5px 8px;border-bottom:1px solid #eee">Jan 6</td><td style="border-bottom:1px solid #eee">Hotel (2 nights)</td><td style="text-align:right;border-bottom:1px solid #eee">$560</td></tr><tr><td style="padding:5px 8px">Jan 7</td><td>Client dinner</td><td style="text-align:right">$128</td></tr></tbody></table><div style="text-align:right;font-weight:700;margin-top:8px">Total: $1,113.00</div>',
+    '<div style="display:flex;justify-content:space-between;margin-bottom:12px"><div><div style="font-family:var(--font-heading);font-size:16px;font-weight:700;color:var(--gold)">PURCHASE ORDER</div><div style="font-size:9px;color:var(--text-muted)">PO-2025-0042</div></div><div style="text-align:right;font-size:9px;color:var(--text-muted)">Feb 1, 2025</div></div><hr style="border:none;border-top:2px solid var(--gold);margin-bottom:12px"><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--gold);color:#fff"><th style="padding:5px 8px;text-align:left">Item</th><th style="padding:5px 8px;text-align:center">Qty</th><th style="padding:5px 8px;text-align:right">Total</th></tr></thead><tbody><tr><td style="padding:5px 8px;border-bottom:1px solid #eee">Ergonomic Chair</td><td style="text-align:center;border-bottom:1px solid #eee">10</td><td style="text-align:right;border-bottom:1px solid #eee">$2,990</td></tr><tr><td style="padding:5px 8px">Standing Desk</td><td style="text-align:center">5</td><td style="text-align:right">$2,745</td></tr></tbody></table><div style="text-align:right;font-weight:700;margin-top:8px">Order Total: $5,735</div>',
+    '<div style="font-family:var(--font-heading);font-size:16px;font-weight:700;margin-bottom:4px">Q4 BUDGET REPORT</div><div style="font-size:9px;color:var(--text-muted);margin-bottom:12px">FY2024 | Marketing</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px"><div style="padding:8px;background:#f0fdf4;border-radius:6px;text-align:center"><div style="font-size:8px;color:#555">Budget</div><div style="font-size:13px;font-weight:700;color:var(--success)">$125K</div></div><div style="padding:8px;background:#fef3d8;border-radius:6px;text-align:center"><div style="font-size:8px;color:#555">Spent</div><div style="font-size:13px;font-weight:700;color:var(--gold)">$98K</div></div><div style="padding:8px;background:#e8f5e2;border-radius:6px;text-align:center"><div style="font-size:8px;color:#555">Left</div><div style="font-size:13px;font-weight:700;color:var(--success)">$27K</div></div></div><div style="font-size:10px"><div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee"><span>Digital Ads</span><span style="font-weight:600">$42,300</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee"><span>Content</span><span style="font-weight:600">$28,150</span></div><div style="display:flex;justify-content:space-between;padding:4px 0"><span>Events</span><span style="font-weight:600">$28,000</span></div></div>'
+  ];
+  var docEl = document.querySelector('.demo-doc');
+  if (docEl && docs[index]) docEl.innerHTML = docs[index];
   });
 }, { threshold: 0.1 });
 document.querySelectorAll('.feature-card, .price-card').forEach(function(card) {
@@ -673,10 +685,24 @@ document.querySelectorAll('.feature-card, .price-card').forEach(function(card) {
 
 var urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('payment') === 'success') {
-  setTimeout(function() { alert('Payment successful! Your plan has been upgraded.'); window.location.href = '/editor.html'; }, 500);
+  setTimeout(function() { alert('Payment successful! Your plan has been upgraded.'); window.location.href = '/dashboard.html'; }, 500);
 } else if (urlParams.get('payment') === 'cancelled') {
   setTimeout(function() { alert('Payment was cancelled. You can try again anytime.'); }, 500);
 }
+
+
+// Auth state change listener (fixes mobile login 404 - Issue 9)
+sb.auth.onAuthStateChange(function(event, session) {
+if (event === 'SIGNED_IN' && session) {
+currentUser = session.user;
+loadProfile().then(function() { updateUIForLoggedIn(); });
+}
+if (event === 'SIGNED_OUT') {
+currentUser = null;
+currentProfile = null;
+updateUIForLoggedOut();
+}
+});
 
 checkSession();
 </script>
