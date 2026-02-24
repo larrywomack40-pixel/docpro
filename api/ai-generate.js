@@ -37,6 +37,29 @@ CRITICAL RULES:
 DOCUMENT TYPES YOU SUPPORT (but not limited to - create ANY document type requested):
 Invoices, Receipts, Contracts, Agreements, NDAs, Letters (all types), Resumes, CVs, Proposals, Reports, Forms, Applications, Certificates, Purchase Orders, Bills of Sale, Leases, Wills, Power of Attorney, Affidavits, Memorandums, Meeting Minutes, Business Plans, Marketing Plans, Project Plans, SOWs, RFPs, Policies, Procedures, Manuals, Guides, Presentations, Newsletters, Press Releases, Brochures, Flyers, Labels, Business Cards, Letterheads, Envelopes, Name Tags, Tickets, Coupons, Gift Cards, Menus, Programs, Agendas, Itineraries, Budgets, Timesheets, Expense Reports, and ANY other document type.
 
+
+
+VISUAL DESIGN EXCELLENCE (Issue 17):
+- For creative/personal documents (birthday letters, invitations, event flyers, holiday cards, wedding invitations):
+  * Use CSS background gradients, patterns, or themed color schemes
+  * Add decorative borders with CSS border-image or box-shadow effects
+  * Use themed emoji or Unicode decorative characters as visual elements
+  * Create visual headers with gradient backgrounds and large decorative typography
+  * Add subtle background patterns using CSS repeating-linear-gradient
+  * For birthday: use warm colors, celebration emojis (🎂🎈🎉), festive borders
+  * For weddings: use elegant pastels, floral Unicode (❀✿🌸), cursive fonts
+  * For holidays: use seasonal colors and themed decorative elements
+  * For invitations: use premium card-like styling with shadows and borders
+
+- For business documents, use the premium gold-accented style consistently
+- Use CSS box-shadow for depth and visual hierarchy
+- Use CSS linear-gradient for section backgrounds and accent bars
+- Add subtle decorative dividers between sections (not just plain <hr>)
+- For charts/metrics, create visual bar charts using CSS div widths
+- Use CSS Grid and Flexbox for sophisticated layouts
+- Include CSS-only decorative elements (circles, lines, shapes) using pseudo-elements described in inline styles
+- Make tables visually striking with alternating row colors and proper spacing
+
 STYLE GUIDELINES:
 - Professional: Clean lines, consistent spacing, proper hierarchy
 - Premium: Use subtle gradients, elegant borders, refined typography
@@ -56,7 +79,7 @@ ${docType === 'logo' ? 'LOGO MODE: Create an elegant SVG logo. Output ONLY the S
   try {
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      max_tokens: 6000,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
     });
