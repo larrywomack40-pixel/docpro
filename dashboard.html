@@ -127,6 +127,7 @@ a{text-decoration:none;color:inherit}
 <a href="#" id="menuUpgradeLink" style="display:none;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s;color:var(--gold);font-weight:600" onclick="event.preventDefault();openUpgradeModal()" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-crown" style="width:20px"></i> Upgrade Plan</a>
 <a href="/dashboard.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-home" style="width:20px"></i> Dashboard</a>
 <a href="/editor.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-edit" style="width:20px"></i> Open Editor</a>
+<a href="/admin.html" id="menuAdminLink" style="display:none"><i class="fas fa-shield-alt"></i> Admin Dashboard</a>
 <button onclick="handleLogout()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:14px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--danger);font-family:var(--font-body);transition:background .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'"><i class="fas fa-sign-out-alt" style="width:20px"></i> Sign Out</button>
 </div>
 </div>
@@ -261,6 +262,7 @@ var credits=plan==='business'?'\u221E':plan==='pro'?'50':'5';
 document.getElementById('statCredits').textContent=credits;
 if(currentUser.created_at){var d=new Date(currentUser.created_at);document.getElementById('acctSince').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 showUpgradeElements(plan);
+if(currentProfile&&currentProfile.role==='admin'){var al=document.getElementById('menuAdminLink');if(al)al.style.display='block';}
 }
 }
 
