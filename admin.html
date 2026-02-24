@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard | DraftMyForms</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c99532;--gold-light:#e8b94a;--gold-dark:#a67a28;--gold-bg:#fef8ee;--paper:#faf7f5;--white:#ffffff;--text:#1a1a1a;--text-secondary:#555;--text-muted:#888;--border:#e5e0db;--border-light:#f0ebe6;--success:#3a6633;--danger:#c24b3b;--info:#2563eb;--font-heading:'Playfair Display',Georgia,serif;--font-body:'DM Sans',-apple-system,sans-serif}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:#f5f3f0;color:var(--text);min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--font-heading);font-weight:700;font-size:20px;color:var(--text);text-decoration:none}
+.nav-brand .star{color:var(--gold);font-size:22px}
+.nav-badge{background:var(--danger);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;font-family:var(--font-body)}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.nav-actions a{color:var(--text-secondary);text-decoration:none;font-size:14px;padding:8px 12px;border-radius:8px;transition:all .2s}
+.nav-actions a:hover{background:var(--gold-bg);color:var(--gold-dark)}
+
+.container{max-width:1200px;margin:0 auto;padding:88px 24px 40px}
+
+.loading-state{display:flex;justify-content:center;align-items:center;min-height:60vh;font-size:18px;color:var(--text-muted)}
+.access-denied{display:none;text-align:center;padding:120px 24px}
+.access-denied h2{font-family:var(--font-heading);font-size:32px;margin-bottom:12px;color:var(--danger)}
+.access-denied p{color:var(--text-secondary);margin-bottom:24px}
+
+.admin-content{display:none}
+.page-header{margin-bottom:32px}
+.page-header h1{font-family:var(--font-heading);font-size:28px;margin-bottom:4px}
+.page-header p{color:var(--text-muted);font-size:14px}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:#fff;border-radius:12px;padding:20px 24px;border:1px solid var(--border-light)}
+.stat-card .value{font-family:var(--font-heading);font-size:28px;color:var(--gold);font-weight:700}
+.stat-card .label{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+.section{background:#fff;border-radius:12px;border:1px solid var(--border-light);margin-bottom:24px;overflow:hidden}
+.section-header{padding:20px 24px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center}
+.section-header h2{font-family:var(--font-heading);font-size:20px}
+.section-body{padding:0}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:12px 24px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:600;background:#faf9f7;border-bottom:1px solid var(--border-light)}
+td{padding:14px 24px;font-size:14px;border-bottom:1px solid var(--border-light)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf9f7}
+
+.plan-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;text-transform:capitalize}
+.plan-free{background:#f0f0f0;color:#666}
+.plan-pro{background:#e8f4fd;color:#1a73e8}
+.plan-business{background:var(--gold-bg);color:var(--gold-dark)}
+
+.role-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;text-transform:capitalize}
+.role-admin{background:#fce4ec;color:#c62828}
+.role-customer{background:#e8f5e9;color:#2e7d32}
+
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-family:var(--font-body);transition:all .2s}
+.btn-sm:hover{background:var(--gold-bg);border-color:var(--gold)}
+.btn-danger{color:var(--danger);border-color:var(--danger)}
+.btn-danger:hover{background:#fce4ec}
+
+.search-bar{padding:16px 24px;border-bottom:1px solid var(--border-light)}
+.search-bar input{width:100%;padding:10px 16px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;transition:border .2s}
+.search-bar input:focus{border-color:var(--gold)}
+
+.empty-state{padding:40px;text-align:center;color:var(--text-muted)}
+.quick-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+.quick-actions a{display:flex;align-items:center;gap:8px;padding:10px 20px;background:#fff;border:1px solid var(--border-light);border-radius:10px;text-decoration:none;color:var(--text);font-size:14px;transition:all .2s}
+.quick-actions a:hover{border-color:var(--gold);background:var(--gold-bg)}
+.quick-actions a i{color:var(--gold)}
+
+footer{text-align:center;padding:24px;color:var(--text-muted);font-size:13px}
+footer strong{color:var(--gold-dark)}
+
+select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font-body);cursor:pointer;background:#fff}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+<a href="/" class="nav-brand"><span class="star">&#10022;</span> DraftMyForms <span class="nav-badge">ADMIN</span></a>
+<div class="nav-actions">
+<a href="/dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+<a href="/editor.html"><i class="fas fa-edit"></i> Editor</a>
+<a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+</nav>
+
+<div class="container">
+<div id="loadingState" class="loading-state">
+<div><i class="fas fa-shield-alt" style="font-size:24px;color:var(--gold);margin-right:10px"></i> Verifying admin access...</div>
+</div>
+
+<div id="accessDenied" class="access-denied">
+<i class="fas fa-lock" style="font-size:48px;color:var(--danger);margin-bottom:16px"></i>
+<h2>Access Denied</h2>
+<p>You do not have admin privileges to view this page.</p>
+<a href="/dashboard.html" style="color:var(--gold);text-decoration:underline">Return to Dashboard</a>
+</div>
+
+<div id="adminContent" class="admin-content">
+<div class="page-header">
+<h1>&#9881; Admin Dashboard</h1>
+<p>Platform overview and user management for DraftMyForms</p>
+</div>
+
+<div class="quick-actions">
+<a href="/"><i class="fas fa-globe"></i> View Live Site</a>
+<a href="/editor.html"><i class="fas fa-edit"></i> Open Editor</a>
+<a href="/dashboard.html"><i class="fas fa-tachometer-alt"></i> User Dashboard</a>
+<a href="https://supabase.com/dashboard" target="_blank"><i class="fas fa-database"></i> Supabase</a>
+<a href="https://vercel.com" target="_blank"><i class="fas fa-server"></i> Vercel</a>
+<a href="https://dashboard.stripe.com" target="_blank"><i class="fas fa-credit-card"></i> Stripe</a>
+</div>
+
+<div class="stats-grid">
+<div class="stat-card"><div class="value" id="statTotalUsers">-</div><div class="label">Total Users</div></div>
+<div class="stat-card"><div class="value" id="statFreeUsers">-</div><div class="label">Free Plan</div></div>
+<div class="stat-card"><div class="value" id="statProUsers">-</div><div class="label">Pro Plan</div></div>
+<div class="stat-card"><div class="value" id="statBizUsers">-</div><div class="label">Business Plan</div></div>
+<div class="stat-card"><div class="value" id="statEmailLeads">-</div><div class="label">Email Leads</div></div>
+<div class="stat-card"><div class="value" id="statDocs">-</div><div class="label">Saved Documents</div></div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<h2><i class="fas fa-users" style="color:var(--gold);margin-right:8px"></i> User Management</h2>
+<span id="userCount" style="color:var(--text-muted);font-size:13px"></span>
+</div>
+<div class="search-bar">
+<input type="text" id="userSearch" placeholder="Search by email or name..." oninput="filterUsers()">
+</div>
+<div class="section-body">
+<table>
+<thead><tr><th>Email</th><th>Display Name</th><th>Role</th><th>Plan</th><th>Actions</th></tr></thead>
+<tbody id="usersTableBody"><tr><td colspan="5" class="empty-state">Loading users...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<h2><i class="fas fa-envelope" style="color:var(--gold);margin-right:8px"></i> Email Leads</h2>
+<span id="leadCount" style="color:var(--text-muted);font-size:13px"></span>
+</div>
+<div class="section-body">
+<table>
+<thead><tr><th>Email</th><th>Source</th><th>Date</th></tr></thead>
+<tbody id="leadsTableBody"><tr><td colspan="3" class="empty-state">Loading...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+<footer>A product of <strong>WMK Speciality Services L.L.C.</strong></footer>
+
+<script>
+var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
+var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+var allUsers=[];
+
+async function init(){
+try{
+var{data:{session}}=await sb.auth.getSession();
+if(!session){window.location.href='/';return}
+var{data:profile}=await sb.from('profiles').select('role').eq('id',session.user.id).single();
+if(!profile||profile.role!=='admin'){
+document.getElementById('loadingState').style.display='none';
+document.getElementById('accessDenied').style.display='block';
+return;
+}
+document.getElementById('loadingState').style.display='none';
+document.getElementById('adminContent').style.display='block';
+await loadStats();
+await loadUsers();
+await loadLeads();
+}catch(e){
+console.error('Admin init error:',e);
+document.getElementById('loadingState').innerHTML='<div style="color:var(--danger)">Error loading admin dashboard. <a href="/">Go home</a></div>';
+}
+}
+
+async function loadStats(){
+var{data:profiles}=await sb.from('profiles').select('plan');
+var{data:leads}=await sb.from('email_leads').select('id');
+var{data:docs}=await sb.from('saved_documents').select('id');
+var total=profiles?profiles.length:0;
+var free=profiles?profiles.filter(function(p){return p.plan==='free'||!p.plan}).length:0;
+var pro=profiles?profiles.filter(function(p){return p.plan==='pro'}).length:0;
+var biz=profiles?profiles.filter(function(p){return p.plan==='business'}).length:0;
+document.getElementById('statTotalUsers').textContent=total;
+document.getElementById('statFreeUsers').textContent=free;
+document.getElementById('statProUsers').textContent=pro;
+document.getElementById('statBizUsers').textContent=biz;
+document.getElementById('statEmailLeads').textContent=leads?leads.length:0;
+document.getElementById('statDocs').textContent=docs?docs.length:0;
+}
+
+async function loadUsers(){
+var{data:users,error}=await sb.from('profiles').select('*').order('email');
+if(error){document.getElementById('usersTableBody').innerHTML='<tr><td colspan="5" class="empty-state">Error loading users</td></tr>';return}
+allUsers=users||[];
+document.getElementById('userCount').textContent=allUsers.length+' users';
+renderUsers(allUsers);
+}
+
+function renderUsers(users){
+var tbody=document.getElementById('usersTableBody');
+if(!users.length){tbody.innerHTML='<tr><td colspan="5" class="empty-state">No users found</td></tr>';return}
+var html='';
+users.forEach(function(u){
+var planClass='plan-'+(u.plan||'free');
+var roleClass='role-'+(u.role||'customer');
+html+='<tr>';
+html+='<td style="font-weight:500">'+escHtml(u.email)+'</td>';
+html+='<td>'+(u.display_name?escHtml(u.display_name):'<span style="color:var(--text-muted)">Not set</span>')+'</td>';
+html+='<td><span class="role-badge '+roleClass+'">'+(u.role||'customer')+'</span></td>';
+html+='<td><select class="plan-select" onchange="changePlan(this,\''+u.id+'\')" data-current="'+(u.plan||'free')+'">';
+html+='<option value="free"'+(u.plan==='free'||!u.plan?' selected':'')+'>Free</option>';
+html+='<option value="pro"'+(u.plan==='pro'?' selected':'')+'>Pro</option>';
+html+='<option value="business"'+(u.plan==='business'?' selected':'')+'>Business</option>';
+html+='</select></td>';
+html+='<td>';
+if(u.role!=='admin'){html+='<button class="btn-sm" onclick="toggleRole(\''+u.id+'\',\''+u.role+'\')">Toggle Admin</button> '}
+html+='</td>';
+html+='</tr>';
+});
+tbody.innerHTML=html;
+}
+
+function filterUsers(){
+var q=document.getElementById('userSearch').value.toLowerCase();
+if(!q){renderUsers(allUsers);return}
+var filtered=allUsers.filter(function(u){
+return (u.email&&u.email.toLowerCase().indexOf(q)>=0)||(u.display_name&&u.display_name.toLowerCase().indexOf(q)>=0);
+});
+renderUsers(filtered);
+}
+
+async function changePlan(selectEl,userId){
+var newPlan=selectEl.value;
+var oldPlan=selectEl.getAttribute('data-current');
+if(newPlan===oldPlan)return;
+var{error}=await sb.from('profiles').update({plan:newPlan}).eq('id',userId);
+if(error){alert('Error updating plan: '+error.message);selectEl.value=oldPlan;return}
+selectEl.setAttribute('data-current',newPlan);
+await loadStats();
+}
+
+async function toggleRole(userId,currentRole){
+var newRole=currentRole==='admin'?'customer':'admin';
+if(newRole==='admin'&&!confirm('Grant admin access to this user?'))return;
+var{error}=await sb.from('profiles').update({role:newRole}).eq('id',userId);
+if(error){alert('Error updating role: '+error.message);return}
+await loadUsers();
+}
+
+async function loadLeads(){
+var{data:leads,error}=await sb.from('email_leads').select('*').order('created_at',{ascending:false});
+var tbody=document.getElementById('leadsTableBody');
+if(error||!leads){tbody.innerHTML='<tr><td colspan="3" class="empty-state">Error loading leads</td></tr>';return}
+document.getElementById('leadCount').textContent=leads.length+' leads';
+if(!leads.length){tbody.innerHTML='<tr><td colspan="3" class="empty-state">No email leads yet</td></tr>';return}
+var html='';
+leads.forEach(function(l){
+var d=l.created_at?new Date(l.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown';
+html+='<tr><td>'+escHtml(l.email)+'</td><td>'+(l.source||'N/A')+'</td><td>'+d+'</td></tr>';
+});
+tbody.innerHTML=html;
+}
+
+function escHtml(str){
+if(!str)return '';
+var d=document.createElement('div');
+d.textContent=str;
+return d.innerHTML;
+}
+
+function handleLogout(){
+sb.auth.signOut().then(function(){window.location.href='/'});
+}
+
+init();
+</script>
+</body>
+</html>
