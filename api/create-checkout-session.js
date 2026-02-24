@@ -1,4 +1,10 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.SUPABASE_URL || 'https://mupeqeuuwdmkndvtbhzb.supabase.co',
+  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY
+);
 
 // Map plan names to Stripe Price IDs (set these in Vercel environment variables)
 const PLAN_PRICES = {
@@ -23,7 +29,6 @@ module.exports = async (req, res) => {
   }
 
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -41,19 +46,80 @@ module.exports = async (req, res) => {
 
     const trialDays = TRIAL_DAYS[plan] || 0;
 
+    // Check if user already has a Stripe customer ID
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', userId)
+      .single();
+
+    let customerId = profile?.stripe_customer_id;
+
+    // If user already has a customer ID, check if they have an active subscription
+    if (customerId) {
+      try {
+        const subscriptions = await stripe.subscriptions.list({
+          customer: customerId,
+          status: 'active',
+          limit: 1,
+        });
+        if (subscriptions.data.length > 0) {
+          // User already has an active subscription - redirect to portal instead
+          return res.status(409).json({
+            error: 'Active subscription exists',
+            message: 'You already have an active subscription. Use Manage Subscription to change plans.',
+            hasActiveSubscription: true,
+          });
+        }
+
+        // Also check for trialing subscriptions
+        const trialingSubs = await stripe.subscriptions.list({
+          customer: customerId,
+          status: 'trialing',
+          limit: 1,
+        });
+        if (trialingSubs.data.length > 0) {
+          return res.status(409).json({
+            error: 'Active trial exists',
+            message: 'You already have an active trial. Use Manage Subscription to change plans.',
+            hasActiveSubscription: true,
+          });
+        }
+      } catch (e) {
+        // Customer might not exist in Stripe anymore, create new
+        customerId = null;
+      }
+    }
+
+    // Create or reuse Stripe customer
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: userEmail,
+        metadata: { supabase_user_id: userId },
+      });
+      customerId = customer.id;
+
+      // Save the Stripe customer ID to Supabase
+      await supabase
+        .from('profiles')
+        .update({ stripe_customer_id: customerId })
+        .eq('id', userId);
+    }
+
+    // Build checkout session config
     const sessionConfig = {
-      mode: 'subscription',
+      customer: customerId,
       payment_method_types: ['card'],
+      mode: 'subscription',
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      success_url: `${req.headers.origin || 'https://draftmyforms.com'}/dashboard.html?payment=success`,
-      cancel_url: `${req.headers.origin || 'https://draftmyforms.com'}/?payment=cancelled`,
+      success_url: 'https://www.draftmyforms.com/dashboard.html?payment=success&session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://www.draftmyforms.com/dashboard.html?payment=cancelled',
       client_reference_id: userId,
-      customer_email: userEmail || undefined,
       metadata: {
         userId: userId,
         plan: plan,
@@ -71,7 +137,7 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ sessionId: session.id, url: session.url });
   } catch (err) {
-    console.error('Stripe checkout error:', err.message);
+    console.error('Checkout error:', err);
     res.status(500).json({ error: err.message });
   }
 };
