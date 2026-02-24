@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard | DraftMyForms</title>
+<meta name="description" content="Your DraftMyForms dashboard - manage documents, create new ones, and access your account.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23c99532'/%3E%3Cstop offset='100%25' stop-color='%23e8b94a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='24' fill='url(%23g)'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c99532;--gold-light:#e8b94a;--gold-dark:#a67a28;--gold-bg:#fef8ee;--paper:#faf7f5;--white:#ffffff;--text:#1a1a1a;--text-secondary:#555;--text-muted:#888;--border:#e5e0db;--border-light:#f0ebe6;--success:#3a6633;--danger:#c24b3b;--font-heading:'Playfair Display',Georgia,serif;--font-body:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;--max-w:1200px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--text);background:var(--paper);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{text-decoration:none;color:inherit}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--font-heading);font-weight:700;font-size:20px;color:var(--text)}
+.nav-brand .star{color:var(--gold);font-size:22px}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 22px;border-radius:8px;font-family:var(--font-body);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--text);color:var(--white)}.btn-primary:hover{background:#333}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-gold{background:var(--gold);color:var(--white)}.btn-gold:hover{background:var(--gold-dark)}
+.btn-ghost{background:transparent;color:var(--text-secondary);padding:8px 12px}.btn-ghost:hover{color:var(--gold)}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-lg{padding:14px 32px;font-size:16px}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}.btn-danger:hover{background:var(--danger);color:#fff}
+.dashboard{padding:88px 32px 48px;max-width:var(--max-w);margin:0 auto}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+.dash-header h1{font-family:var(--font-heading);font-size:28px;font-weight:700}
+.dash-header h1 .wave{display:inline-block;animation:wave 2s ease-in-out infinite;transform-origin:70% 70%}
+@keyframes wave{0%,100%{transform:rotate(0deg)}15%{transform:rotate(14deg)}30%{transform:rotate(-8deg)}40%{transform:rotate(14deg)}50%{transform:rotate(-4deg)}60%{transform:rotate(10deg)}70%{transform:rotate(0deg)}}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.stat-card{background:#fff;border:1px solid var(--border-light);border-radius:12px;padding:20px;text-align:center}
+.stat-card .stat-number{font-family:var(--font-heading);font-size:28px;font-weight:700;color:var(--gold)}
+.stat-card .stat-label{font-size:12px;color:var(--text-muted);margin-top:4px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-header h2{font-family:var(--font-heading);font-size:20px;font-weight:600}
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:40px}
+.doc-card{background:#fff;border:1px solid var(--border-light);border-radius:12px;overflow:hidden;transition:all .3s;cursor:pointer}
+.doc-card:hover{border-color:var(--gold);box-shadow:0 8px 30px rgba(201,149,50,.1);transform:translateY(-2px)}
+.doc-card .doc-preview{height:160px;background:var(--paper);overflow:hidden;padding:12px;font-size:8px;line-height:1.4;color:var(--text-muted);position:relative}
+.doc-card .doc-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--paper))}
+.doc-card .doc-info{padding:14px 16px;border-top:1px solid var(--border-light)}
+.doc-card .doc-info h4{font-size:14px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-card .doc-info .doc-meta{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.doc-card .doc-actions{padding:8px 16px 14px;display:flex;gap:6px}
+.doc-card .doc-actions button{flex:1}
+.new-doc-card{background:#fff;border:2px dashed var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;cursor:pointer;transition:all .3s;min-height:260px}
+.new-doc-card:hover{border-color:var(--gold);background:var(--gold-bg)}
+.new-doc-card i{font-size:32px;color:var(--gold);margin-bottom:12px}
+.new-doc-card span{font-size:14px;font-weight:600;color:var(--text-secondary)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state i{font-size:48px;color:var(--border);margin-bottom:16px;display:block}
+.empty-state h3{font-family:var(--font-heading);font-size:20px;color:var(--text);margin-bottom:8px}
+.empty-state p{font-size:14px;margin-bottom:24px}
+.account-section{background:#fff;border:1px solid var(--border-light);border-radius:12px;padding:24px;margin-bottom:32px}
+.account-section h3{font-family:var(--font-heading);font-size:18px;margin-bottom:16px}
+.account-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-light)}
+.account-row:last-child{border-bottom:none}
+.account-row .label{font-size:13px;color:var(--text-muted)}
+.account-row .value{font-size:14px;font-weight:500}
+.plan-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600}
+.plan-free{background:#e8f5e2;color:var(--success)}
+.plan-pro{background:#fef3d8;color:var(--gold-dark)}
+.plan-business{background:#e0e7ff;color:#3730a3}
+.loading-spinner{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-muted)}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:768px){.navbar{padding:0 16px}.dashboard{padding:80px 16px 32px}.stats-row{grid-template-columns:1fr 1fr}.docs-grid{grid-template-columns:1fr}.dash-header{flex-direction:column;align-items:flex-start}}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+<a href="/dashboard.html" class="nav-brand"><span class="star">\u2726</span> DraftMyForms</a>
+<div class="nav-actions">
+<a href="/editor.html" class="btn btn-gold btn-sm"><i class="fas fa-plus"></i> New Document</a>
+<div class="user-avatar" id="userAvatar" onclick="toggleMenu()"></div>
+<div id="userDropdown" style="display:none;position:absolute;top:56px;right:32px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1001">
+<div style="padding:10px 14px;border-bottom:1px solid var(--border-light);margin-bottom:4px">
+<div style="font-weight:600;font-size:14px" id="menuName">User</div>
+<div style="font-size:12px;color:var(--text-muted)" id="menuEmail">email</div>
+<div class="plan-badge plan-free" style="margin-top:4px" id="menuPlan">Free</div>
+</div>
+<a href="/dashboard.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-home" style="width:20px"></i> Dashboard</a>
+<a href="/editor.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-edit" style="width:20px"></i> Open Editor</a>
+<button onclick="handleLogout()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:14px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--danger);font-family:var(--font-body);transition:background .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'"><i class="fas fa-sign-out-alt" style="width:20px"></i> Sign Out</button>
+</div>
+</div>
+</nav>
+<div class="dashboard" id="dashboard">
+<div class="loading-spinner" id="loadingState"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Loading your dashboard...</div>
+<div id="dashContent" style="display:none">
+<div class="dash-header">
+<h1><span class="wave">\u{1F44B}</span> Welcome back, <span id="userName">User</span></h1>
+<a href="/editor.html" class="btn btn-gold"><i class="fas fa-plus"></i> Create New Document</a>
+</div>
+<div class="stats-row">
+<div class="stat-card"><div class="stat-number" id="statDocs">0</div><div class="stat-label">Documents</div></div>
+<div class="stat-card"><div class="stat-number" id="statPlan">Free</div><div class="stat-label">Current Plan</div></div>
+<div class="stat-card"><div class="stat-number" id="statCredits">5</div><div class="stat-label">AI Credits</div></div>
+<div class="stat-card"><div class="stat-number" id="statExports">\u221E</div><div class="stat-label">Exports Left</div></div>
+</div>
+<div class="section-header">
+<h2>Your Documents</h2>
+</div>
+<div class="docs-grid" id="docsGrid">
+<div class="new-doc-card" onclick="window.location.href='/editor.html'">
+<i class="fas fa-plus-circle"></i>
+<span>Create New Document</span>
+</div>
+</div>
+<div class="section-header"><h2>Account</h2></div>
+<div class="account-section">
+<div class="account-row"><span class="label">Email</span><span class="value" id="acctEmail">-</span></div>
+<div class="account-row"><span class="label">Name</span><span class="value" id="acctName">-</span></div>
+<div class="account-row"><span class="label">Plan</span><span class="value"><span class="plan-badge plan-free" id="acctPlan">Free</span></span></div>
+<div class="account-row"><span class="label">Member Since</span><span class="value" id="acctSince">-</span></div>
+<div class="account-row"><span class="label">Actions</span><span class="value"><button class="btn btn-danger btn-sm" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button></span></div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
+var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+var currentUser=null;
+var currentProfile=null;
+
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},3000)}
+
+function toggleMenu(){var d=document.getElementById('userDropdown');d.style.display=d.style.display==='none'?'block':'none'}
+document.addEventListener('click',function(e){var d=document.getElementById('userDropdown');var a=document.getElementById('userAvatar');if(!d.contains(e.target)&&e.target!==a)d.style.display='none'});
+
+async function init(){
+try{
+var r=await sb.auth.getSession();
+if(!r.data.session||!r.data.session.user){window.location.href='/';return}
+currentUser=r.data.session.user;
+var p=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+if(p.data)currentProfile=p.data;
+renderDashboard();
+loadSavedDocuments();
+}catch(e){console.error('Init error:',e);window.location.href='/'}
+}
+
+function renderDashboard(){
+document.getElementById('loadingState').style.display='none';
+document.getElementById('dashContent').style.display='block';
+var name=(currentProfile&&currentProfile.display_name)||currentUser.email.split('@')[0];
+document.getElementById('userName').textContent=name;
+document.getElementById('userAvatar').textContent=name.charAt(0).toUpperCase();
+document.getElementById('menuName').textContent=name;
+document.getElementById('menuEmail').textContent=currentUser.email;
+document.getElementById('acctEmail').textContent=currentUser.email;
+document.getElementById('acctName').textContent=name;
+var plan=(currentProfile&&currentProfile.plan)||'free';
+var planLabel=plan.charAt(0).toUpperCase()+plan.slice(1);
+document.getElementById('statPlan').textContent=planLabel;
+document.getElementById('menuPlan').textContent=planLabel;
+document.getElementById('menuPlan').className='plan-badge plan-'+plan;
+document.getElementById('acctPlan').textContent=planLabel;
+document.getElementById('acctPlan').className='plan-badge plan-'+plan;
+var credits=plan==='business'?'\u221E':plan==='pro'?'50':'5';
+document.getElementById('statCredits').textContent=credits;
+if(currentUser.created_at){var d=new Date(currentUser.created_at);document.getElementById('acctSince').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+}
+
+function loadSavedDocuments(){
+var grid=document.getElementById('docsGrid');
+var docs=[];
+for(var i=0;i<localStorage.length;i++){
+var key=localStorage.key(i);
+if(key.startsWith('dmf_doc_')){
+try{var doc=JSON.parse(localStorage.getItem(key));doc._key=key;docs.push(doc)}catch(e){}
+}
+}
+docs.sort(function(a,b){return new Date(b.savedAt)-new Date(a.savedAt)});
+document.getElementById('statDocs').textContent=docs.length;
+var html='<div class="new-doc-card" onclick="window.location.href=\'/editor.html\'"><i class="fas fa-plus-circle"></i><span>Create New Document</span></div>';
+if(docs.length===0){
+html+='<div style="grid-column:1/-1" class="empty-state"><i class="fas fa-folder-open"></i><h3>No documents yet</h3><p>Create your first document to get started.</p><a href="/editor.html" class="btn btn-gold"><i class="fas fa-plus"></i> Create Document</a></div>';
+}else{
+docs.forEach(function(doc){
+var date=doc.savedAt?new Date(doc.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown';
+var preview=doc.content?doc.content.replace(/<[^>]+>/g,'').substring(0,200):'Empty document';
+html+='<div class="doc-card"><div class="doc-preview">'+preview+'</div><div class="doc-info"><h4>'+(doc.title||'Untitled')+'</h4><div class="doc-meta"><span><i class="fas fa-calendar"></i> '+date+'</span></div></div><div class="doc-actions"><button class="btn btn-outline btn-sm" onclick="openDoc(\''+doc._key+'\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-outline btn-sm" onclick="downloadDoc(\''+doc._key+'\')"><i class="fas fa-download"></i> PDF</button><button class="btn btn-ghost btn-sm" onclick="deleteDoc(\''+doc._key+'\',event)" style="color:var(--danger)"><i class="fas fa-trash"></i></button></div></div>';
+});
+}
+grid.innerHTML=html;
+}
+
+function openDoc(key){
+sessionStorage.setItem('dmf_load_doc',key);
+window.location.href='/editor.html';
+}
+
+function downloadDoc(key){
+try{
+var doc=JSON.parse(localStorage.getItem(key));
+if(doc&&doc.content){
+var canvas=document.createElement('div');
+canvas.innerHTML=doc.content;
+showToast('Opening document for download...');
+sessionStorage.setItem('dmf_load_doc',key);
+window.location.href='/editor.html?action=pdf';
+}
+}catch(e){showToast('Error loading document')}
+}
+
+function deleteDoc(key,event){
+event.stopPropagation();
+showToast('To delete documents, please use the editor. Documents are stored locally for your privacy.');
+}
+
+async function handleLogout(){
+await sb.auth.signOut();
+currentUser=null;currentProfile=null;
+window.location.href='/';
+}
+
+init();
+</script>
+<div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services L.L.C.</strong></div>
+</body>
+</html>
