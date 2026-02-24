@@ -186,6 +186,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <button class="btn btn-ghost" onclick="openTemplates()" title="Browse 120+ Templates"><i class="fas fa-th-large"></i></button>
 <button class="btn btn-ghost" onclick="openUploadDoc()" title="Upload PDF, DOCX, or TXT"><i class="fas fa-file-upload"></i></button>
 <button class="btn btn-ghost" onclick="openLogoUpload()" title="Upload or Generate Logo"><i class="fas fa-image"></i></button>
+<button class="btn btn-sm" id="editorUpgradeBtn" style="display:none;background:var(--gold);color:#fff;font-weight:700;gap:6px" onclick="openEditorUpgrade()"><i class="fas fa-crown"></i> Upgrade</button>
 <button class="btn btn-outline btn-sm" onclick="downloadPDF()" title="Export as PDF"><i class="fas fa-file-pdf"></i> PDF</button>
 <button class="btn btn-outline btn-sm" onclick="downloadDocx()" title="Export as Word Document"><i class="fas fa-file-word"></i> DOCX</button>
 <button class="btn btn-gold btn-sm" onclick="saveDocument()" title="Save Document (Ctrl+S)"><i class="fas fa-save"></i> Save</button>
@@ -478,7 +479,35 @@ function clearFormatting() {
 
 function printDoc() {
   const w = window.open('', '_blank');
-  w.document.write('<html><head><title>Print</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>body{font-family:DM Sans,sans-serif;padding:40px;color:#2d2926}h1,h2,h3{font-family:Playfair Display,serif}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}th{background:#c99532;color:#fff}</style></head><body>' + docCanvas.innerHTML + '</body></html>');
+  w.document.write('<html><head><title>Print</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>body{font-family:DM Sans,sans-serif;padding:40px;color:#2d2926}h1,h2,h3{font-family:Playfair Display,serif}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}th{background:#c99532;color:#fff}</style></head><body>' + docCanvas.innerHTML + '
+<div id="editorUpgradeOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)" onclick="if(event.target===this)closeEditorUpgrade()">
+<div style="background:#fff;border-radius:16px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;position:relative">
+<button onclick="closeEditorUpgrade()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#888;z-index:1">&times;</button>
+<div style="padding:24px 28px 16px;border-bottom:1px solid #f0ebe6">
+<h2 style="font-family:'Playfair Display',Georgia,serif;font-size:24px;margin:0 0 4px">Upgrade Your Plan</h2>
+<p style="font-size:14px;color:#888;margin:0">Unlock premium features. Cancel anytime.</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:24px 28px">
+<div style="border:2px solid #c99532;border-radius:12px;padding:24px;position:relative">
+<div style="position:absolute;top:-12px;right:20px;background:#c99532;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:6px">Most Popular</div>
+<div style="font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700">Pro</div>
+<div style="font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:#c99532">$9.99<span style="font-size:14px;font-weight:400;color:#888">/mo</span></div>
+<div style="font-size:12px;color:#a67a28;font-weight:600;margin-bottom:12px">3-day free trial</div>
+<div style="font-size:13px;color:#555;margin-bottom:12px">50 AI credits, unlimited doc types, PDF/Word/HTML export, custom branding, priority support.</div>
+<button id="edBtnPro" onclick="editorCheckout('pro')" style="width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:#c99532;color:#fff;font-family:'DM Sans',sans-serif">Start Free Trial</button>
+</div>
+<div style="border:2px solid #f0ebe6;border-radius:12px;padding:24px">
+<div style="font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700">Business</div>
+<div style="font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:#c99532">$24.99<span style="font-size:14px;font-weight:400;color:#888">/mo</span></div>
+<div style="font-size:12px;color:#a67a28;font-weight:600;margin-bottom:12px">No trial — instant access</div>
+<div style="font-size:13px;color:#555;margin-bottom:12px">Unlimited AI credits, everything in Pro, team features (coming soon), API access, dedicated manager.</div>
+<button id="edBtnBiz" onclick="editorCheckout('business')" style="width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #e5e0db;background:transparent;color:#2d2926;font-family:'DM Sans',sans-serif">Get Started</button>
+</div>
+</div>
+<div style="padding:12px 28px 20px;text-align:center;font-size:12px;color:#888">Secure payment via Stripe. Cancel anytime.</div>
+</div>
+</div>
+</body></html>');
   w.document.close();
   w.print();
 }
@@ -1299,6 +1328,50 @@ document.addEventListener('keydown', (e) => {
   }
   
   updatePreview();
+})();
+
+function openEditorUpgrade() {
+  var overlay = document.getElementById('editorUpgradeOverlay');
+  if (overlay) { overlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function closeEditorUpgrade() {
+  var overlay = document.getElementById('editorUpgradeOverlay');
+  if (overlay) { overlay.style.display = 'none'; document.body.style.overflow = ''; }
+}
+async function editorCheckout(plan) {
+  var btn = document.getElementById(plan === 'pro' ? 'edBtnPro' : 'edBtnBiz');
+  var orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'Redirecting...';
+  try {
+    var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
+    var user = session && session.user ? session.user : null;
+    if (!user) { alert('Please sign in first.'); btn.disabled = false; btn.innerHTML = orig; return; }
+    var resp = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan, userId: user.id, userEmail: user.email })
+    });
+    var data = await resp.json();
+    if (data.url) { window.location.href = data.url; }
+    else { alert('Error: ' + (data.error || 'Could not start checkout')); btn.disabled = false; btn.innerHTML = orig; }
+  } catch (e) { alert('Connection error. Please try again.'); btn.disabled = false; btn.innerHTML = orig; }
+}
+(function checkEditorPlan() {
+  try {
+    var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
+    var user = session && session.user ? session.user : null;
+    if (user) {
+      var sbClient = window.supabase ? window.supabase.createClient('https://mupeqeuuwdmkndvtbhzb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk') : null;
+      if (sbClient) {
+        sbClient.from('profiles').select('plan').eq('id', user.id).single().then(function(r) {
+          var plan = r.data ? r.data.plan : 'free';
+          var btn = document.getElementById('editorUpgradeBtn');
+          if (btn && (!plan || plan === 'free')) { btn.style.display = 'inline-flex'; }
+        });
+      }
+    }
+  } catch(e) {}
 })();
 </script>
 
