@@ -169,6 +169,7 @@ a{text-decoration:none;color:inherit}
 <div class="account-row"><span class="label">Plan</span><span class="value"><span class="plan-badge plan-free" id="acctPlan">Free</span></span></div>
 <div class="account-row"><span class="label">Member Since</span><span class="value" id="acctSince">-</span></div>
 <div class="account-row"><span class="label">Actions</span><span class="value"><button class="btn btn-danger btn-sm" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button></span></div>
+<div class="account-row" id="subscriptionRow" style="display:none"><span class="label">Subscription</span><span class="value"><button class="btn btn-outline btn-sm" onclick="manageSubscription()"><i class="fas fa-credit-card"></i> Manage Subscription</button></span></div>
 </div>
 </div>
 </div>
@@ -221,6 +222,7 @@ a{text-decoration:none;color:inherit}
 var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
 var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+window.__supabase = sb;
 var currentUser=null;
 var currentProfile=null;
 
@@ -342,6 +344,19 @@ async function startCheckout(plan) {
       body: JSON.stringify({ plan: plan, userId: currentUser.id, userEmail: currentUser.email })
     });
     var data = await resp.json();
+    if (resp.status === 409) {
+      showToast(data.message || 'You already have an active subscription.');
+      closeUpgradeModal();
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+      return;
+    }
+    if (!resp.ok) {
+      showToast('Error: ' + (data.error || 'Could not start checkout'));
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+      return;
+    }
     if (data.url) {
       window.location.href = data.url;
     } else {
@@ -364,14 +379,77 @@ function showUpgradeElements(plan) {
   if (banner) banner.style.display = isFree ? 'flex' : 'none';
   if (navBtn) navBtn.style.display = isFree ? 'inline-flex' : 'none';
   if (menuLink) menuLink.style.display = isFree ? 'block' : 'none';
+  var subRow = document.getElementById('subscriptionRow');
+  if (subRow) subRow.style.display = (plan === 'pro' || plan === 'business') ? '' : 'none';
 }
 
 
-// Check for payment success redirect
+// Handle payment success redirect from Stripe
 var urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('payment') === 'success') {
+  var sessionId = urlParams.get('session_id');
   window.history.replaceState({}, '', '/dashboard.html');
-  setTimeout(function() { showToast('Payment successful! Your plan has been upgraded.'); }, 1500);
+  if (sessionId) {
+    (async function() {
+      try {
+        var user = (await sb.auth.getUser()).data.user;
+        if (user) {
+          var resp = await fetch('/api/verify-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: sessionId, userId: user.id })
+          });
+          var data = await resp.json();
+          if (data.plan && data.customerId) {
+            await sb.from('profiles').update({
+              plan: data.plan,
+              stripe_customer_id: data.customerId
+            }).eq('id', user.id);
+            showToast('Welcome to ' + data.plan.charAt(0).toUpperCase() + data.plan.slice(1) + '! Your subscription is active.');
+            setTimeout(function() { location.reload(); }, 1500);
+          } else {
+            showToast('Payment successful! Your plan will update shortly.');
+          }
+        }
+      } catch(e) {
+        console.error('Payment verification error:', e);
+        showToast('Payment received! Plan updating...');
+      }
+    })();
+  } else {
+    showToast('Payment successful! Your plan has been upgraded.');
+  }
+}
+if (urlParams.get('payment') === 'cancelled') {
+  window.history.replaceState({}, '', '/dashboard.html');
+  showToast('Checkout was cancelled. No charges were made.');
+}
+
+// Manage subscription via Stripe Customer Portal
+async function manageSubscription() {
+  var user = (await sb.auth.getUser()).data.user;
+  if (!user) return;
+  var profileResp = await sb.from('profiles').select('stripe_customer_id').eq('id', user.id).single();
+  var customerId = profileResp.data ? profileResp.data.stripe_customer_id : null;
+  if (!customerId) {
+    showToast('No active subscription found.');
+    return;
+  }
+  try {
+    var resp = await fetch('/api/create-portal-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerId: customerId })
+    });
+    var data = await resp.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      showToast('Could not open subscription portal. Please try again.');
+    }
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
 }
 
 init();
