@@ -2,117 +2,102 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
-    process.env.SUPABASE_URL || 'https://mupeqeuuwdmkndvtbhzb.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 // Price ID to plan name mapping
 const PRICE_TO_PLAN = {
-    [process.env.STRIPE_PRO_PRICE_ID]: 'pro',
-    [process.env.STRIPE_BUSINESS_PRICE_ID]: 'business',
-};
-
-// Disable body parsing so we can access the raw body for signature verification
-export const config = {
-    api: {
-          bodyParser: false,
-    },
+  [process.env.STRIPE_PRO_PRICE_ID]: 'pro',
+  [process.env.STRIPE_BUSINESS_PRICE_ID]: 'business',
 };
 
 async function getRawBody(req) {
-    return new Promise((resolve, reject) => {
-          const chunks = [];
-          req.on('data', (chunk) => chunks.push(chunk));
-          req.on('end', () => resolve(Buffer.concat(chunks)));
-          req.on('error', reject);
-    });
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
 }
 
 module.exports = async (req, res) => {
-    if (req.method !== 'POST') {
-          res.setHeader('Allow', 'POST');
-          return res.status(405).json({ error: 'Method not allowed' });
-    }
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    const sig = req.headers['stripe-signature'];
-    const rawBody = await getRawBody(req);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-    let event;
+  const sig = req.headers['stripe-signature'];
+  let rawBody;
+  if (req.body && Buffer.isBuffer(req.body)) {
+    rawBody = req.body;
+  } else if (typeof req.body === 'string') {
+    rawBody = Buffer.from(req.body);
+  } else {
+    rawBody = await getRawBody(req);
+  }
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('Webhook sig failed:', err.message);
+    return res.status(400).json({ error: 'Webhook signature verification failed' });
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const userId = session.client_reference_id || session.metadata?.userId;
+    const customerId = session.customer;
+    const subscriptionId = session.subscription;
+    if (!userId) return res.status(400).json({ error: 'No userId in session' });
+
+    let planName = session.metadata?.plan || 'pro';
     try {
-          event = stripe.webhooks.constructEvent(
-                  rawBody,
-                  sig,
-                  process.env.STRIPE_WEBHOOK_SECRET
-                );
-    } catch (err) {
-          console.error('Webhook signature verification failed:', err.message);
-          return res.status(400).json({ error: 'Webhook signature verification failed' });
-    }
-
-    // Handle the event
-    if (event.type === 'checkout.session.completed') {
-          const session = event.data.object;
-          const userId = session.client_reference_id || session.metadata?.userId;
-          const customerId = session.customer;
-
-      if (!userId) {
-              console.error('No userId found in session');
-              return res.status(400).json({ error: 'No userId in session' });
+      if (subscriptionId) {
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const priceId = sub.items.data[0]?.price?.id;
+        if (priceId && PRICE_TO_PLAN[priceId]) planName = PRICE_TO_PLAN[priceId];
       }
+    } catch (err) { console.error('Sub retrieve error:', err.message); }
 
-      // Get the subscription to find the price ID
-      let planName = 'pro'; // default
+    const { error } = await supabase.from('profiles').update({
+      plan: planName, stripe_customer_id: customerId, updated_at: new Date().toISOString()
+    }).eq('id', userId);
+    if (error) return res.status(500).json({ error: 'Failed to update plan' });
+    console.log('Updated ' + userId + ' to ' + planName);
+  }
+
+  if (event.type === 'invoice.paid') {
+    const inv = event.data.object;
+    if (inv.subscription) {
       try {
-              if (session.subscription) {
-                        const subscription = await stripe.subscriptions.retrieve(session.subscription);
-                        const priceId = subscription.items.data[0]?.price?.id;
-                        if (priceId && PRICE_TO_PLAN[priceId]) {
-                                    planName = PRICE_TO_PLAN[priceId];
-                        }
-              }
-      } catch (err) {
-              console.error('Error retrieving subscription:', err.message);
-      }
-
-      // Update the user's plan in Supabase profiles table
-      const { error } = await supabase
-            .from('profiles')
-            .update({
-                      plan: planName,
-                      stripe_customer_id: customerId,
-                      updated_at: new Date().toISOString(),
-            })
-            .eq('id', userId);
-
-      if (error) {
-              console.error('Supabase update error:', error);
-              return res.status(500).json({ error: 'Failed to update user plan' });
-      }
-
-      console.log(`Updated user ${userId} to plan: ${planName}`);
+        const sub = await stripe.subscriptions.retrieve(inv.subscription);
+        const priceId = sub.items.data[0]?.price?.id;
+        const plan = (priceId && PRICE_TO_PLAN[priceId]) ? PRICE_TO_PLAN[priceId] : 'pro';
+        await supabase.from('profiles').update({ plan, updated_at: new Date().toISOString() })
+          .eq('stripe_customer_id', inv.customer);
+      } catch (err) { console.error('invoice.paid error:', err.message); }
     }
+  }
 
-    // Handle subscription cancellation
-    if (event.type === 'customer.subscription.deleted') {
-          const subscription = event.data.object;
-          const customerId = subscription.customer;
+  if (event.type === 'customer.subscription.deleted') {
+    const sub = event.data.object;
+    const { error } = await supabase.from('profiles').update({
+      plan: 'free', updated_at: new Date().toISOString()
+    }).eq('stripe_customer_id', sub.customer);
+    if (error) return res.status(500).json({ error: 'Failed to downgrade' });
+    console.log('Downgraded customer ' + sub.customer);
+  }
 
-      // Find user by stripe_customer_id and downgrade to free
-      const { error } = await supabase
-            .from('profiles')
-            .update({
-                      plan: 'free',
-                      updated_at: new Date().toISOString(),
-            })
-            .eq('stripe_customer_id', customerId);
+  if (event.type === 'customer.subscription.trial_will_end') {
+    console.log('Trial ending for ' + event.data.object.customer);
+  }
 
-      if (error) {
-              console.error('Supabase downgrade error:', error);
-              return res.status(500).json({ error: 'Failed to downgrade user plan' });
-      }
-
-      console.log(`Downgraded customer ${customerId} to free plan`);
-    }
-
-    res.status(200).json({ received: true });
+  res.status(200).json({ received: true });
 };
