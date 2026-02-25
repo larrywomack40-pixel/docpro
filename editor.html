@@ -204,7 +204,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <body>
 <!-- TOP NAVIGATION -->
 <nav class="top-nav">
-<a href="/dashboard.html" class="brand">â¦ <span>DraftMyForms</span></a>
+<a href="/dashboard.html" class="brand">✦ <span>DraftMyForms</span></a>
 <input class="doc-title-input" id="docTitle" value="Untitled Document" spellcheck="false">
 <div class="nav-actions">
 <button class="btn btn-ghost" onclick="toggleAI()" title="AI Assistant"><i class="fas fa-robot"></i></button>
@@ -226,29 +226,29 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <!-- AI SIDEBAR -->
 <aside class="ai-sidebar" id="aiSidebar">
 <div class="ai-header">
-<h3><span class="star">â¦</span> AI Assistant</h3>
+<h3><span class="star">✦</span> AI Assistant</h3>
 <button class="btn btn-ghost btn-sm" onclick="toggleAI()"><i class="fas fa-times"></i></button>
 </div>
 <div class="ai-messages" id="aiMessages">
 <div class="ai-msg system">
 <strong>Welcome to DraftMyForms AI</strong><br>
 I can help you create, edit, and perfect any document. Try:
-<br>â¢ "Create a professional invoice"
-<br>â¢ "Write a cover letter for a marketing role"
-<br>â¢ "Generate an NDA agreement"
-<br>â¢ "Help me improve this resume"
-<br>â¢ "Create a company logo"
+<br>• "Create a professional invoice"
+<br>• "Write a cover letter for a marketing role"
+<br>• "Generate an NDA agreement"
+<br>• "Help me improve this resume"
+<br>• "Create a company logo"
 </div>
 </div>
 <div class="ai-input-area">
 <div class="ai-quick-actions">
-<button class="ai-quick-btn" onclick="aiQuick('invoice')">ð Invoice</button>
-<button class="ai-quick-btn" onclick="aiQuick('contract')">ð Contract</button>
-<button class="ai-quick-btn" onclick="aiQuick('resume')">ð Resume</button>
-<button class="ai-quick-btn" onclick="aiQuick('letter')">âï¸ Letter</button>
-<button class="ai-quick-btn" onclick="aiQuick('proposal')">ð¼ Proposal</button>
-<button class="ai-quick-btn" onclick="aiQuick('nda')">ð NDA</button>
-<button class="ai-quick-btn" onclick="aiQuick('logo')">ð¨ Logo</button>
+<button class="ai-quick-btn" onclick="aiQuick('invoice')">📄 Invoice</button>
+<button class="ai-quick-btn" onclick="aiQuick('contract')">📋 Contract</button>
+<button class="ai-quick-btn" onclick="aiQuick('resume')">📝 Resume</button>
+<button class="ai-quick-btn" onclick="aiQuick('letter')">✉️ Letter</button>
+<button class="ai-quick-btn" onclick="aiQuick('proposal')">💼 Proposal</button>
+<button class="ai-quick-btn" onclick="aiQuick('nda')">🔒 NDA</button>
+<button class="ai-quick-btn" onclick="aiQuick('logo')">🎨 Logo</button>
 </div>
 <textarea class="ai-prompt-input" id="aiPrompt" placeholder="Describe your document or ask AI to edit..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI()}"></textarea>
 <div style="display:flex;gap:6px">
@@ -363,7 +363,7 @@ I can help you create, edit, and perfect any document. Try:
 <div class="status-bar">
 <span id="wordCount">0 words</span>
 <span id="saveStatus">Ready</span>
-<span id="aiCredits">AI Credits: â</span>
+<span id="aiCredits">AI Credits: ∞</span>
 </div>
 
 <!-- UPLOAD DOCUMENT OVERLAY -->
@@ -393,7 +393,7 @@ I can help you create, edit, and perfect any document. Try:
 <p>Upload logo (PNG, JPG, SVG)</p>
 </div>
 <input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.svg,.webp" style="display:none" onchange="handleLogoUpload(this)">
-<div style="text-align:center;margin-bottom:16px;color:var(--text-muted);font-size:12px">â or â</div>
+<div style="text-align:center;margin-bottom:16px;color:var(--text-muted);font-size:12px">— or —</div>
 <div style="display:flex;gap:8px">
 <input type="text" id="logoCompanyName" placeholder="Company name for AI logo..." style="flex:1;padding:10px;border:1px solid var(--card-border);border-radius:8px;font-size:13px;outline:none">
 <button class="btn btn-gold" onclick="generateLogo()"><i class="fas fa-magic"></i> AI Logo</button>
@@ -421,7 +421,7 @@ I can help you create, edit, and perfect any document. Try:
 <div class="mobile-ai-overlay" id="mobileAiOverlay" onclick="closeMobileAI()"></div>
 <div class="mobile-ai-sheet" id="mobileAiSheet">
 <div class="sheet-header">
-<h3><span style="color:var(--gold)">â¦</span> AI Assistant</h3>
+<h3><span style="color:var(--gold)">✦</span> AI Assistant</h3>
 <button class="btn btn-ghost btn-sm" onclick="closeMobileAI()"><i class="fas fa-times"></i></button>
 </div>
 <div class="sheet-messages" id="mobileAiMessages">
