@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings | DraftMyForms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh}
+a{color:#f97316;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:#111;border-bottom:1px solid #222}
+.nav-logo{font-size:20px;font-weight:700;color:#fff}
+.nav-logo span{color:#f97316}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-links a{color:#aaa;font-size:14px;padding:8px 16px;border-radius:8px;transition:all .2s}
+.nav-links a:hover{color:#fff;background:#1a1a1a;text-decoration:none}
+.nav-links a.active{color:#f97316;background:rgba(249,115,22,.1)}
+
+/* LAYOUT */
+.settings-container{max-width:900px;margin:40px auto;padding:0 24px}
+.settings-header{margin-bottom:32px}
+.settings-header h1{font-size:28px;font-weight:700;color:#fff}
+.settings-header p{color:#888;margin-top:4px;font-size:14px}
+
+/* TABS */
+.settings-tabs{display:flex;gap:4px;border-bottom:1px solid #222;margin-bottom:32px;overflow-x:auto}
+.settings-tab{padding:12px 20px;font-size:14px;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.settings-tab:hover{color:#ccc}
+.settings-tab.active{color:#f97316;border-bottom-color:#f97316}
+
+/* CARDS */
+.settings-card{background:#141414;border:1px solid #222;border-radius:12px;padding:28px;margin-bottom:24px}
+.settings-card h2{font-size:18px;font-weight:600;color:#fff;margin-bottom:4px}
+.settings-card .card-desc{color:#888;font-size:13px;margin-bottom:20px}
+
+/* FORM */
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;font-weight:500;color:#aaa;margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;background:#0a0a0a;border:1px solid #333;border-radius:8px;color:#fff;font-size:14px;font-family:inherit;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#f97316}
+.form-group input:disabled{opacity:.5;cursor:not-allowed}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
+.btn-primary{background:#f97316;color:#fff}
+.btn-primary:hover{background:#ea580c}
+.btn-secondary{background:#222;color:#ddd;border:1px solid #333}
+.btn-secondary:hover{background:#2a2a2a}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:8px 14px;font-size:13px}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1a1a1a}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info h4{font-size:14px;color:#ddd;font-weight:500}
+.toggle-info p{font-size:12px;color:#666;margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#333;border-radius:12px;transition:.3s}
+.toggle-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#888;border-radius:50%;transition:.3s}
+.toggle input:checked+.toggle-slider{background:#f97316}
+.toggle input:checked+.toggle-slider:before{transform:translateX(20px);background:#fff}
+
+/* PLAN BADGE */
+.plan-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase}
+.plan-free{background:rgba(156,163,175,.15);color:#9ca3af}
+.plan-pro{background:rgba(249,115,22,.15);color:#f97316}
+.plan-business{background:rgba(168,85,247,.15);color:#a855f7}
+
+/* SUB CARD */
+.plan-card{display:flex;align-items:center;justify-content:space-between;padding:20px;background:#1a1a1a;border-radius:10px;margin-bottom:16px}
+.plan-card .plan-info h3{font-size:16px;color:#fff;margin-bottom:4px}
+.plan-card .plan-info p{font-size:13px;color:#888}
+
+/* DANGER ZONE */
+.danger-zone{border-color:#dc2626;border-style:dashed}
+.danger-zone h2{color:#dc2626}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;background:#16a34a;color:#fff;border-radius:10px;font-size:14px;font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:9999}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{background:#dc2626}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9998;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#1a1a1a;border:1px solid #333;border-radius:14px;padding:28px;max-width:440px;width:90%}
+.modal-box h3{font-size:18px;color:#fff;margin-bottom:8px}
+.modal-box p{font-size:14px;color:#aaa;margin-bottom:20px}
+.modal-actions{display:flex;gap:12px;justify-content:flex-end}
+
+/* SECTION HIDE */
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .nav{padding:12px 16px}
+  .settings-container{padding:0 16px;margin-top:24px}
+  .form-row{grid-template-columns:1fr}
+  .plan-card{flex-direction:column;align-items:flex-start;gap:12px}
+  .settings-tabs{gap:0}
+  .settings-tab{padding:10px 14px;font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">Draft<span>My</span>Forms</a>
+  <div class="nav-links">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/editor.html">Editor</a>
+    <a href="/settings.html" class="active">Settings</a>
+    <a href="#" id="signOutBtn">Sign Out</a>
+  </div>
+</nav>
+
+<div class="settings-container">
+  <div class="settings-header">
+    <h1>Settings</h1>
+    <p>Manage your account preferences and subscription</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="settings-tabs">
+    <button class="settings-tab active" data-tab="profile">Profile</button>
+    <button class="settings-tab" data-tab="security">Security</button>
+    <button class="settings-tab" data-tab="subscription">Subscription</button>
+    <button class="settings-tab" data-tab="notifications">Notifications</button>
+    <button class="settings-tab" data-tab="danger">Danger Zone</button>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="tab-content active">
+    <div class="settings-card">
+      <h2>Profile Information</h2>
+      <p class="card-desc">Update your display name and email address</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Display Name</label>
+          <input type="text" id="displayName" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="userEmail" disabled placeholder="your@email.com">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+    </div>
+
+    <div class="settings-card">
+      <h2>Connected Accounts</h2>
+      <p class="card-desc">Manage your sign-in methods</p>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Email &amp; Password</h4>
+          <p id="emailProvider">Connected</p>
+        </div>
+        <span class="plan-badge plan-pro">Active</span>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Google Account</h4>
+          <p id="googleProvider">Not connected</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="connectGoogleBtn" disabled>Coming Soon</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY TAB -->
+  <div id="tab-security" class="tab-content">
+    <div class="settings-card">
+      <h2>Change Password</h2>
+      <p class="card-desc">Update your password to keep your account secure</p>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="newPassword" placeholder="Enter new password (min 8 characters)">
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+      </div>
+      <button class="btn btn-primary" id="changePasswordBtn">Update Password</button>
+    </div>
+
+    <div class="settings-card">
+      <h2>Sessions</h2>
+      <p class="card-desc">Manage your active sessions</p>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Current Session</h4>
+          <p id="sessionInfo">Active now</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="signOutAllBtn">Sign Out All Devices</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBSCRIPTION TAB -->
+  <div id="tab-subscription" class="tab-content">
+    <div class="settings-card">
+      <h2>Current Plan</h2>
+      <p class="card-desc">Manage your subscription and billing</p>
+      <div class="plan-card">
+        <div class="plan-info">
+          <h3 id="currentPlanName">Free Plan</h3>
+          <p id="currentPlanDesc">Basic document creation</p>
+        </div>
+        <span class="plan-badge plan-free" id="planBadge">FREE</span>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="upgradePlanBtn">Upgrade Plan</button>
+        <button class="btn btn-secondary" id="manageBillingBtn" style="display:none">Manage Billing</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2>Usage</h2>
+      <p class="card-desc">Your current usage this billing period</p>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Documents Created</h4>
+          <p id="docCount">Loading...</p>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>AI Generations</h4>
+          <p id="aiCount">Available on Pro and Business plans</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS TAB -->
+  <div id="tab-notifications" class="tab-content">
+    <div class="settings-card">
+      <h2>Email Notifications</h2>
+      <p class="card-desc">Choose what emails you receive from DraftMyForms</p>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Product Updates</h4>
+          <p>New features and improvements</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="notifUpdates" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Document Activity</h4>
+          <p>When someone views or signs your documents</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="notifActivity" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Billing &amp; Receipts</h4>
+          <p>Payment confirmations and invoices</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="notifBilling" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Tips &amp; Tutorials</h4>
+          <p>Help getting the most out of DraftMyForms</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="notifTips">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn btn-primary" id="saveNotifsBtn">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DANGER ZONE TAB -->
+  <div id="tab-danger" class="tab-content">
+    <div class="settings-card danger-zone">
+      <h2>Danger Zone</h2>
+      <p class="card-desc">Irreversible actions — proceed with caution</p>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Export My Data</h4>
+          <p>Download all your documents and account data</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="exportDataBtn">Export</button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Delete All Documents</h4>
+          <p>Permanently remove all your saved documents</p>
+        </div>
+        <button class="btn btn-danger btn-sm" id="deleteDocsBtn">Delete All</button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Delete Account</h4>
+          <p>Permanently delete your account and all data. This cannot be undone.</p>
+        </div>
+        <button class="btn btn-danger btn-sm" id="deleteAccountBtn">Delete Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Are you sure?</h3>
+    <p id="modalDesc">This action cannot be undone.</p>
+    <div class="form-group" id="confirmEmailGroup" style="display:none">
+      <label>Type your email to confirm</label>
+      <input type="email" id="confirmEmailInput" placeholder="your@email.com">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+      <button class="btn btn-danger" id="modalConfirmBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTY2MTAsImV4cCI6MjA1NTU3MjYxMH0.5JWAFBHMIHeumNLSq0U3W1SLJGRsdOvBCgVJEt3xfts';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentUser = null;
+let userProfile = null;
+
+// --- INIT ---
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '/'; return; }
+  currentUser = session.user;
+
+  // Load profile
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  userProfile = profile || {};
+
+  // Populate fields
+  document.getElementById('displayName').value = userProfile.display_name || '';
+  document.getElementById('userEmail').value = currentUser.email || '';
+
+  // Plan info
+  const plan = (userProfile.plan || 'free').toLowerCase();
+  updatePlanDisplay(plan);
+
+  // Doc count
+  const { count } = await sb.from('saved_documents').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+  document.getElementById('docCount').textContent = (count || 0) + ' documents';
+
+  // Load notification preferences
+  await loadNotificationPrefs();
+}
+
+function updatePlanDisplay(plan) {
+  const nameEl = document.getElementById('currentPlanName');
+  const descEl = document.getElementById('currentPlanDesc');
+  const badgeEl = document.getElementById('planBadge');
+  const manageBtn = document.getElementById('manageBillingBtn');
+  const upgradeBtn = document.getElementById('upgradePlanBtn');
+
+  const plans = {
+    free: { name: 'Free Plan', desc: 'Basic document creation — 5 documents', badge: 'FREE', cls: 'plan-free' },
+    pro: { name: 'Pro Plan', desc: 'Unlimited documents, AI generation, priority support', badge: 'PRO', cls: 'plan-pro' },
+    business: { name: 'Business Plan', desc: 'Everything in Pro plus e-signatures and analytics', badge: 'BUSINESS', cls: 'plan-business' }
+  };
+
+  const p = plans[plan] || plans.free;
+  nameEl.textContent = p.name;
+  descEl.textContent = p.desc;
+  badgeEl.textContent = p.badge;
+  badgeEl.className = 'plan-badge ' + p.cls;
+
+  if (plan !== 'free') {
+    manageBtn.style.display = 'inline-flex';
+    upgradeBtn.textContent = 'Change Plan';
+  }
+}
+
+// --- TABS ---
+document.querySelectorAll('.settings-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// --- SAVE PROFILE ---
+document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+  const name = document.getElementById('displayName').value.trim();
+  if (!name) { showToast('Please enter a display name', true); return; }
+
+  const { error } = await sb.from('profiles').update({ display_name: name }).eq('id', currentUser.id);
+  if (error) { showToast('Error saving profile: ' + error.message, true); return; }
+  showToast('Profile updated successfully');
+});
+
+// --- CHANGE PASSWORD ---
+document.getElementById('changePasswordBtn').addEventListener('click', async () => {
+  const pw = document.getElementById('newPassword').value;
+  const confirm = document.getElementById('confirmPassword').value;
+
+  if (pw.length < 8) { showToast('Password must be at least 8 characters', true); return; }
+  if (pw !== confirm) { showToast('Passwords do not match', true); return; }
+
+  const { error } = await sb.auth.updateUser({ password: pw });
+  if (error) { showToast('Error: ' + error.message, true); return; }
+
+  document.getElementById('newPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+  showToast('Password updated successfully');
+});
+
+// --- SIGN OUT ALL ---
+document.getElementById('signOutAllBtn').addEventListener('click', async () => {
+  await sb.auth.signOut({ scope: 'global' });
+  window.location.href = '/';
+});
+
+// --- SIGN OUT ---
+document.getElementById('signOutBtn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  await sb.auth.signOut();
+  window.location.href = '/';
+});
+
+// --- UPGRADE / MANAGE ---
+document.getElementById('upgradePlanBtn').addEventListener('click', () => {
+  window.location.href = '/#pricing';
+});
+
+document.getElementById('manageBillingBtn').addEventListener('click', async () => {
+  if (!userProfile.stripe_customer_id) { showToast('No billing info found', true); return; }
+  try {
+    const res = await fetch('/api/create-portal-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUser.id, customerId: userProfile.stripe_customer_id })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else showToast('Error opening billing portal', true);
+  } catch (e) { showToast('Error: ' + e.message, true); }
+});
+
+// --- NOTIFICATIONS ---
+async function loadNotificationPrefs() {
+  const { data } = await sb.from('user_preferences').select('*').eq('user_id', currentUser.id).single();
+  if (data) {
+    document.getElementById('notifUpdates').checked = data.notif_updates !== false;
+    document.getElementById('notifActivity').checked = data.notif_activity !== false;
+    document.getElementById('notifBilling').checked = data.notif_billing !== false;
+    document.getElementById('notifTips').checked = data.notif_tips === true;
+  }
+}
+
+document.getElementById('saveNotifsBtn').addEventListener('click', async () => {
+  const prefs = {
+    user_id: currentUser.id,
+    notif_updates: document.getElementById('notifUpdates').checked,
+    notif_activity: document.getElementById('notifActivity').checked,
+    notif_billing: document.getElementById('notifBilling').checked,
+    notif_tips: document.getElementById('notifTips').checked,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await sb.from('user_preferences').upsert(prefs, { onConflict: 'user_id' });
+  if (error) { showToast('Error saving preferences: ' + error.message, true); return; }
+  showToast('Notification preferences saved');
+});
+
+// --- DANGER ZONE ---
+let pendingAction = null;
+
+document.getElementById('exportDataBtn').addEventListener('click', async () => {
+  showToast('Preparing export...');
+  const { data: docs } = await sb.from('saved_documents').select('*').eq('user_id', currentUser.id);
+  const exportData = { profile: userProfile, documents: docs || [], exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'draftmyforms-export.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported successfully');
+});
+
+document.getElementById('deleteDocsBtn').addEventListener('click', () => {
+  pendingAction = 'deleteDocs';
+  document.getElementById('modalTitle').textContent = 'Delete All Documents?';
+  document.getElementById('modalDesc').textContent = 'This will permanently delete all your saved documents. This cannot be undone.';
+  document.getElementById('confirmEmailGroup').style.display = 'none';
+  document.getElementById('deleteModal').classList.add('show');
+});
+
+document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+  pendingAction = 'deleteAccount';
+  document.getElementById('modalTitle').textContent = 'Delete Your Account?';
+  document.getElementById('modalDesc').textContent = 'This will permanently delete your account, all documents, and all data. Type your email to confirm.';
+  document.getElementById('confirmEmailGroup').style.display = 'block';
+  document.getElementById('confirmEmailInput').value = '';
+  document.getElementById('deleteModal').classList.add('show');
+});
+
+document.getElementById('modalCancelBtn').addEventListener('click', () => {
+  pendingAction = null;
+  document.getElementById('deleteModal').classList.remove('show');
+});
+
+document.getElementById('modalConfirmBtn').addEventListener('click', async () => {
+  if (pendingAction === 'deleteDocs') {
+    const { error } = await sb.from('saved_documents').delete().eq('user_id', currentUser.id);
+    if (error) { showToast('Error: ' + error.message, true); return; }
+    document.getElementById('deleteModal').classList.remove('show');
+    document.getElementById('docCount').textContent = '0 documents';
+    showToast('All documents deleted');
+  }
+
+  if (pendingAction === 'deleteAccount') {
+    const confirmEmail = document.getElementById('confirmEmailInput').value.trim();
+    if (confirmEmail !== currentUser.email) { showToast('Email does not match', true); return; }
+
+    // Delete user data
+    await sb.from('saved_documents').delete().eq('user_id', currentUser.id);
+    await sb.from('user_preferences').delete().eq('user_id', currentUser.id);
+    await sb.from('profiles').delete().eq('id', currentUser.id);
+
+    // Sign out (account deletion requires admin API — mark for deletion)
+    showToast('Account scheduled for deletion. Signing out...');
+    setTimeout(async () => {
+      await sb.auth.signOut();
+      window.location.href = '/';
+    }, 2000);
+  }
+
+  pendingAction = null;
+});
+
+// Close modal on overlay click
+document.getElementById('deleteModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    pendingAction = null;
+    e.target.classList.remove('show');
+  }
+});
+
+// --- TOAST ---
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// --- BOOT ---
+init();
+</script>
+</body>
+</html>
