@@ -176,7 +176,7 @@ img{max-width:100%}
 .upgrade-plan-card .plan-price span{font-size:13px;font-weight:400;color:var(--text-muted)}
 .upgrade-plan-card ul{list-style:none;text-align:left;font-size:12px;color:var(--text-secondary)}
 .upgrade-plan-card ul li{padding:2px 0}
-.upgrade-plan-card ul li::before{content:'â ';color:var(--gold)}
+.upgrade-plan-card ul li::before{content:'✓ ';color:var(--gold)}
 @media(max-width:768px){ .features + div .feature-card{margin-bottom:0} div[style*="grid-template-columns:repeat(3"] { grid-template-columns:1fr!important } 
 .navbar{padding:0 16px}.nav-links{display:none}.hero{padding:100px 20px 60px}.hero-ctas{flex-direction:column}
 .demo-content{flex-direction:column;height:auto}.demo-sidebar{width:100%;height:200px;border-right:none;border-bottom:1px solid var(--border)}
@@ -207,7 +207,7 @@ img{max-width:100%}
 <body>
 <!-- NAVBAR -->
 <nav class="navbar">
-<a href="/" class="nav-brand"><span class="star">â¦</span> DraftMyForms</a>
+<a href="/" class="nav-brand"><span class="star">✦</span> DraftMyForms</a>
 <div class="nav-links">
 <a onclick="smoothScroll('features')">Features</a>
 <a onclick="smoothScroll('demo')">Templates</a>
@@ -229,7 +229,7 @@ img{max-width:100%}
 <button onclick="handleLogout()" style="color:var(--danger)">Sign Out</button>
 </div>
 <a href="javascript:void(0)" class="btn btn-outline btn-sm" id="navSignIn" onclick="openAuthModal('login')">Sign in</a>
-<a href="javascript:void(0)" class="btn btn-primary btn-sm" id="navTryFree" onclick="openAuthModal('signup')">Try Free â</a>
+<a href="javascript:void(0)" class="btn btn-primary btn-sm" id="navTryFree" onclick="openAuthModal('signup')">Try Free →</a>
 </div>
 <button class="mobile-menu-btn" onclick="document.querySelector('.mobile-menu').classList.toggle('active')"><i class="fas fa-bars"></i></button>
 </nav>
@@ -239,7 +239,7 @@ img{max-width:100%}
 <a onclick="smoothScroll('pricing');this.parentElement.classList.remove('active')">Pricing</a>
 <a onclick="smoothScroll('compare');this.parentElement.classList.remove('active')">Compare</a>
 <a href="javascript:void(0)" onclick="openAuthModal('login');this.parentElement.classList.remove('active')">Sign in</a>
-<a href="javascript:void(0)" onclick="openAuthModal('signup');this.parentElement.classList.remove('active')" style="color:var(--gold);font-weight:600">Try Free â</a>
+<a href="javascript:void(0)" onclick="openAuthModal('signup');this.parentElement.classList.remove('active')" style="color:var(--gold);font-weight:600">Try Free →</a>
 </div>
 
 <!-- AUTH MODAL -->
@@ -261,7 +261,7 @@ img{max-width:100%}
 </div>
 <div class="auth-field">
 <label for="authPassword">Password</label>
-<input type="password" id="authPassword" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢" required minlength="6">
+<input type="password" id="authPassword" placeholder="••••••••" required minlength="6">
 </div>
 <button type="submit" class="auth-submit primary" id="authSubmitBtn">Sign In</button>
 </form>
@@ -297,7 +297,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <section class="hero">
 <div class="hero-badge"><span class="dot"></span> AI-POWERED DOCUMENT GENERATOR</div>
 <h1>Professional<br>documents<br>built in <em>seconds</em></h1>
-<p>Create invoices, contracts, proposals, and legal forms with AI. No templates to wrestle with â just describe what you need.</p>
+<p>Create invoices, contracts, proposals, and legal forms with AI. No templates to wrestle with — just describe what you need.</p>
 <div class="hero-ctas">
 <a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free</a>
 <a href="javascript:void(0)" class="btn btn-outline btn-lg" onclick="smoothScroll('demo')">See how it works</a>
@@ -320,7 +320,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="demo-browser-bar">
 <div class="demo-dots"><div class="demo-dot"></div><div class="demo-dot"></div><div class="demo-dot"></div></div>
 <div class="demo-url">draftmyforms.com/editor</div>
-<div style="display:flex;gap:6px"><button class="btn btn-gold btn-sm" onclick="handleStartFree()">â¦ Open Editor</button></div>
+<div style="display:flex;gap:6px"><button class="btn btn-gold btn-sm" onclick="handleStartFree()">✦ Open Editor</button></div>
 </div>
 <div class="demo-content">
 <div class="demo-sidebar">
@@ -369,7 +369,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="section-subtitle">A complete document platform that creates, edits, and manages all your professional documents in one place.</div>
 </div>
 <div class="features-grid">
-<div class="feature-card"><div class="feature-icon"><i class="fas fa-robot" style="color:var(--gold)"></i></div><h3>AI Document Generation</h3><p>Describe your document in plain English. Our AI drafts it instantly â contracts, letters, forms, legal language and all.</p></div>
+<div class="feature-card"><div class="feature-icon"><i class="fas fa-robot" style="color:var(--gold)"></i></div><h3>AI Document Generation</h3><p>Describe your document in plain English. Our AI drafts it instantly — contracts, letters, forms, legal language and all.</p></div>
 <div class="feature-card"><div class="feature-icon"><i class="fas fa-copy" style="color:var(--gold)"></i></div><h3>120+ Professional Templates</h3><p>Choose from over 120 professionally designed templates across invoices, contracts, resumes, letters, proposals, reports, and forms.</p></div>
 <div class="feature-card"><div class="feature-icon"><i class="fas fa-file-export" style="color:var(--gold)"></i></div><h3>PDF &amp; DOCX Export</h3><p>Download your finished documents as PDF or Word files instantly. Print-ready, professionally formatted, and compatible everywhere.</p></div>
 <div class="feature-card"><div class="feature-icon"><i class="fas fa-pen-fancy" style="color:var(--gold)"></i></div><h3>Rich Text Editor</h3><p>Full formatting toolbar with fonts, colors, tables, images, and more. Edit every detail of your documents with precision.</p></div>
@@ -396,7 +396,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="comp-row header">
 <div class="comp-cell feature" style="font-weight:700">Feature</div>
 <div class="comp-header-cell"><div class="comp-brand">Others</div><div class="comp-price">~$15-30/mo</div></div>
-<div class="comp-header-cell highlight"><div class="comp-brand">â¦ DraftMyForms</div><div class="comp-price" style="color:rgba(255,255,255,.8)">From $0/mo</div></div>
+<div class="comp-header-cell highlight"><div class="comp-brand">✦ DraftMyForms</div><div class="comp-price" style="color:rgba(255,255,255,.8)">From $0/mo</div></div>
 </div>
 <div class="comp-row"><div class="comp-cell feature">AI document generation</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
 <div class="comp-row"><div class="comp-cell feature">E-signature (built-in)</div><div class="comp-cell check"><i class="fas fa-check" style="color:var(--success)"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
@@ -404,7 +404,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <div class="comp-row"><div class="comp-cell feature">Document open tracking</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
 <div class="comp-row"><div class="comp-cell feature">CRM / direct auto-fill</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg);font-size:11px;color:var(--gold-dark)">Coming Soon</div></div>
 <div class="comp-row"><div class="comp-cell feature">Free templates</div><div class="comp-cell check"><i class="fas fa-times"></i></div><div class="comp-cell check" style="background:var(--gold-bg)"><i class="fas fa-check" style="color:var(--gold)"></i></div></div>
-<div class="comp-row"><div class="comp-cell feature">Custom branding</div><div class="comp-cell check" style="font-size:12px;color:var(--text-muted)">Business plan only</div><div class="comp-cell check" style="background:var(--gold-bg);font-size:12px;color:var(--gold-dark)">â¦ Pro+</div></div>
+<div class="comp-row"><div class="comp-cell feature">Custom branding</div><div class="comp-cell check" style="font-size:12px;color:var(--text-muted)">Business plan only</div><div class="comp-cell check" style="background:var(--gold-bg);font-size:12px;color:var(--gold-dark)">✦ Pro+</div></div>
 <div class="comp-row"><div class="comp-cell feature">Download formats</div><div class="comp-cell check" style="font-size:12px;color:var(--text-muted)">PDF only</div><div class="comp-cell check" style="background:var(--gold-bg);font-size:12px;color:var(--gold-dark)">PDF, Word, HTML</div></div>
 </div>
 </section>
@@ -426,7 +426,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <a href="javascript:void(0)" class="btn btn-outline btn-lg price-btn" onclick="handleStartFree()">Get started free</a>
 </div>
 <div class="price-card featured">
-<div class="price-tier">Pro</div><div class="price-amount">$9.99</div><div class="price-period">/month Â· billed monthly</div>
+<div class="price-tier">Pro</div><div class="price-amount">$9.99</div><div class="price-period">/month · billed monthly</div>
 <div class="price-desc">For freelancers, small businesses, and professionals.</div>
 <ul class="price-features">
 <li><i class="fas fa-check"></i> 50 AI credits per month</li><li><i class="fas fa-check"></i> Unlimited document types</li><li><i class="fas fa-check"></i> Contracts, NDAs, proposals</li><li><i class="fas fa-check"></i> E-signature (5 sends/mo) <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> PDF, Word & HTML export</li><li><i class="fas fa-check"></i> Custom logo & branding</li><li><i class="fas fa-check"></i> Document open tracking <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> Priority support</li>
@@ -434,7 +434,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <a href="javascript:void(0)" class="btn btn-gold btn-lg price-btn" onclick="handlePricingClick('pro')">Start 3-day free trial</a>
 </div>
 <div class="price-card">
-<div class="price-tier">Business</div><div class="price-amount">$24.99</div><div class="price-period">/month Â· billed monthly</div>
+<div class="price-tier">Business</div><div class="price-amount">$24.99</div><div class="price-period">/month · billed monthly</div>
 <div class="price-desc">For teams and growing businesses that need scale.</div>
 <ul class="price-features">
 <li><i class="fas fa-check"></i> Unlimited AI credits</li><li><i class="fas fa-check"></i> Everything in Pro</li><li><i class="fas fa-check"></i> Unlimited e-signatures <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> Team collaboration <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> CRM & Sheets auto-fill <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> 50+ integrations <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> API access <span style="font-size:10px;color:var(--gold-dark)">(Coming Soon)</span></li><li><i class="fas fa-check"></i> Dedicated account manager</li>
@@ -448,14 +448,14 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <section class="cta-section">
 <h2>Ready to create professional<br>documents in seconds?</h2>
 <p>Join thousands of professionals who trust DraftMyForms for their document needs.</p>
-<a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free â</a>
+<a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free →</a>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
 <div class="footer-grid">
 <div>
-<div class="footer-brand"><span class="star">â¦</span> DraftMyForms</div>
+<div class="footer-brand"><span class="star">✦</span> DraftMyForms</div>
 <p class="footer-desc">Create beautiful documents instantly and free. AI-powered, legally sound, and built for modern businesses.</p>
 <p style="font-size:11px;color:var(--text-muted);margin-top:12px">A product of <strong>WMK SPECIALITY SERVICES LLC</strong></p>
 </div>
@@ -467,7 +467,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 </div>
 <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
 </div>
-<div class="footer-bottom"><p>&copy; 2026 DraftMyForms. All rights reserved. Made with â¦ by <strong>WMK SPECIALITY SERVICES LLC</strong></p></div>
+<div class="footer-bottom"><p>&copy; 2026 DraftMyForms. All rights reserved. Made with ✦ by <strong>WMK SPECIALITY SERVICES LLC</strong></p></div>
 </footer>
 <div style="text-align:center;padding:8px;background:var(--text);color:var(--text-muted);font-size:11px">WMK SPECIALITY SERVICES LLC</div>
 <script>
@@ -633,14 +633,14 @@ function openUpgradeModal(plan) {
   document.getElementById('upgradeOverlay').classList.add('active');
   document.getElementById('upgradePro').classList.toggle('selected', selectedPlan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', selectedPlan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro â 3-Day Free Trial' : 'Start Business â $24.99/mo';
+  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro — 3-Day Free Trial' : 'Start Business — $24.99/mo';
 }
 function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('active'); }
 function selectUpgradePlan(plan) {
   selectedPlan = plan;
   document.getElementById('upgradePro').classList.toggle('selected', plan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', plan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro â 3-Day Free Trial' : 'Start Business â $24.99/mo';
+  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro — 3-Day Free Trial' : 'Start Business — $24.99/mo';
 }
 
 async function startStripeCheckout() {
@@ -669,7 +669,7 @@ function showDemo(index) {
     '<div style="text-align:center;padding:16px 0;border-bottom:2px solid var(--gold);margin-bottom:16px"><div style="font-size:8px;letter-spacing:3px;color:var(--gold);text-transform:uppercase">Strategic Growth Partners</div><div style="font-family:var(--font-heading);font-size:20px;font-weight:700">SERVICE PROPOSAL</div><div style="font-size:9px;color:var(--text-muted)">Prepared for TechVentures Inc.</div></div><h4 style="font-size:12px;color:var(--gold);margin-bottom:6px">Executive Summary</h4><p style="font-size:10px;line-height:1.5;color:#555;margin-bottom:12px">We propose a comprehensive brand strategy and digital transformation initiative to increase market visibility by 40%.</p><h4 style="font-size:12px;color:var(--gold);margin-bottom:6px">Scope of Work</h4><ul style="font-size:10px;margin-left:16px;color:#555"><li>Market research &amp; competitive analysis</li><li>Brand identity redesign</li><li>Website overhaul</li></ul><div style="text-align:right;font-size:12px;font-weight:700;color:var(--gold);margin-top:16px">Investment: $28,500</div>',
     '<div style="text-align:center;margin-bottom:16px"><div style="font-family:var(--font-heading);font-size:18px;font-weight:700">PROFESSIONAL SERVICES AGREEMENT</div><hr style="border:none;border-top:2px solid var(--gold);margin:8px auto;width:60px"></div><p style="font-size:10px;margin-bottom:12px">Entered into as of <strong>January 15, 2025</strong></p><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:10px;margin-bottom:12px"><div style="padding:8px;background:#faf7f5;border-radius:6px"><strong>Client:</strong> TechVentures Inc.</div><div style="padding:8px;background:#faf7f5;border-radius:6px"><strong>Provider:</strong> Apex Creative</div></div><h4 style="font-size:11px;color:var(--gold)">1. Scope of Services</h4><p style="font-size:10px;color:#555;margin-bottom:8px">Provider delivers professional design services per Exhibit A.</p><h4 style="font-size:11px;color:var(--gold)">2. Compensation</h4><p style="font-size:10px;color:#555">Total: $15,000 in 3 installments.</p>',
     '<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">January 20, 2025</div><p style="font-size:10px;margin-bottom:8px">Dear Hiring Manager,</p><p style="font-size:10px;line-height:1.6;color:#555;margin-bottom:10px">I am writing to express my interest in the Senior Product Designer position. With 7+ years in UX/UI design, I am confident I would excel in this role.</p><p style="font-size:10px;line-height:1.6;color:#555;margin-bottom:10px">At DesignLab, I led our flagship redesign resulting in 45% higher engagement and 30% fewer support tickets.</p><p style="font-size:10px;color:var(--gold);font-weight:600">Sarah Mitchell</p>',
-    '<div style="text-align:center;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gold)"><div style="font-family:var(--font-heading);font-size:20px;font-weight:700">JAMES PARKER</div><div style="font-size:9px;color:var(--text-muted)">Senior Software Engineer | james@email.com | San Francisco</div></div><h4 style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Summary</h4><p style="font-size:10px;line-height:1.5;color:#555;margin-bottom:10px">8+ years building scalable web apps. Expert in React, Node.js, cloud. Led teams of 5-12 engineers.</p><h4 style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Experience</h4><div style="font-size:10px;font-weight:600">Senior Engineer â CloudScale Inc. <span style="font-weight:400;color:var(--text-muted)">2021-Present</span></div><p style="font-size:10px;color:#555">Led microservices migration, 60% latency reduction.</p>',
+    '<div style="text-align:center;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gold)"><div style="font-family:var(--font-heading);font-size:20px;font-weight:700">JAMES PARKER</div><div style="font-size:9px;color:var(--text-muted)">Senior Software Engineer | james@email.com | San Francisco</div></div><h4 style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Summary</h4><p style="font-size:10px;line-height:1.5;color:#555;margin-bottom:10px">8+ years building scalable web apps. Expert in React, Node.js, cloud. Led teams of 5-12 engineers.</p><h4 style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Experience</h4><div style="font-size:10px;font-weight:600">Senior Engineer — CloudScale Inc. <span style="font-weight:400;color:var(--text-muted)">2021-Present</span></div><p style="font-size:10px;color:#555">Led microservices migration, 60% latency reduction.</p>',
     '<div style="text-align:center;margin-bottom:16px"><div style="font-family:var(--font-heading);font-size:18px;font-weight:700">NON-DISCLOSURE AGREEMENT</div><div style="font-size:9px;color:var(--text-muted)">(Mutual)</div><hr style="border:none;border-top:2px solid var(--gold);margin:6px auto;width:60px"></div><h4 style="font-size:11px;color:var(--gold)">1. Confidential Information</h4><p style="font-size:10px;color:#555;margin-bottom:10px">Includes any proprietary data, business plans, financial info, customer lists, and trade secrets.</p><h4 style="font-size:11px;color:var(--gold)">2. Obligations</h4><p style="font-size:10px;color:#555">Both parties agree to hold confidential information in strict confidence for 2 years from disclosure.</p>',
     '<div style="font-family:var(--font-heading);font-size:16px;font-weight:700;margin-bottom:4px">EXPENSE REPORT</div><div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">January 2025 | David Chen</div><hr style="border:none;border-top:2px solid var(--gold);margin-bottom:12px"><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--gold);color:#fff"><th style="padding:5px 8px;text-align:left">Date</th><th style="padding:5px 8px">Category</th><th style="padding:5px 8px;text-align:right">Amount</th></tr></thead><tbody><tr><td style="padding:5px 8px;border-bottom:1px solid #eee">Jan 5</td><td style="border-bottom:1px solid #eee">Flight SFO-NYC</td><td style="text-align:right;border-bottom:1px solid #eee">$425</td></tr><tr><td style="padding:5px 8px;border-bottom:1px solid #eee">Jan 6</td><td style="border-bottom:1px solid #eee">Hotel (2 nights)</td><td style="text-align:right;border-bottom:1px solid #eee">$560</td></tr><tr><td style="padding:5px 8px">Jan 7</td><td>Client dinner</td><td style="text-align:right">$128</td></tr></tbody></table><div style="text-align:right;font-weight:700;margin-top:8px">Total: $1,113.00</div>',
     '<div style="display:flex;justify-content:space-between;margin-bottom:12px"><div><div style="font-family:var(--font-heading);font-size:16px;font-weight:700;color:var(--gold)">PURCHASE ORDER</div><div style="font-size:9px;color:var(--text-muted)">PO-2025-0042</div></div><div style="text-align:right;font-size:9px;color:var(--text-muted)">Feb 1, 2025</div></div><hr style="border:none;border-top:2px solid var(--gold);margin-bottom:12px"><table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="background:var(--gold);color:#fff"><th style="padding:5px 8px;text-align:left">Item</th><th style="padding:5px 8px;text-align:center">Qty</th><th style="padding:5px 8px;text-align:right">Total</th></tr></thead><tbody><tr><td style="padding:5px 8px;border-bottom:1px solid #eee">Ergonomic Chair</td><td style="text-align:center;border-bottom:1px solid #eee">10</td><td style="text-align:right;border-bottom:1px solid #eee">$2,990</td></tr><tr><td style="padding:5px 8px">Standing Desk</td><td style="text-align:center">5</td><td style="text-align:right">$2,745</td></tr></tbody></table><div style="text-align:right;font-weight:700;margin-top:8px">Order Total: $5,735</div>',
