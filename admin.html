@@ -158,6 +158,54 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 </div>
 </div>
 
+
+
+<!-- Banner Management -->
+<div class="admin-section" style="background:#fff;border:1px solid #e8ddd4;border-radius:12px;padding:30px;margin:30px 0">
+<h2 style="font-family:Playfair Display,serif;margin-bottom:5px">📢 Site Banner</h2>
+<p style="color:#8a7f76;margin-bottom:20px">Control the global banner shown across all user pages</p>
+<div id="bannerPreview" style="margin-bottom:16px;border-radius:8px;overflow:hidden"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+  <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Banner Message</label>
+  <input type="text" id="bannerMsg" placeholder="e.g. Maintenance tonight at 11 PM EST" style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px"></div>
+  <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Type</label>
+  <select id="bannerType" style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px"><option value="info">Info (Gold)</option><option value="warning">Warning (Orange)</option><option value="success">Success (Green)</option><option value="error">Error (Red)</option></select></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+  <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Link URL (optional)</label>
+  <input type="text" id="bannerLink" placeholder="https://..." style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px"></div>
+  <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Link Text</label>
+  <input type="text" id="bannerLinkText" placeholder="Learn more" style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px"></div>
+  <div style="display:flex;align-items:end;gap:8px">
+    <label style="font-size:13px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="bannerDismissible" checked> Dismissible</label>
+  </div>
+</div>
+<div style="display:flex;gap:10px">
+  <button onclick="publishBanner()" style="background:#c99532;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:600">Publish Banner</button>
+  <button onclick="deactivateBanner()" style="background:#c24b3b;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:600">Remove Banner</button>
+</div>
+</div>
+
+<!-- Admin Messaging -->
+<div class="admin-section" style="background:#fff;border:1px solid #e8ddd4;border-radius:12px;padding:30px;margin:30px 0">
+<h2 style="font-family:Playfair Display,serif;margin-bottom:5px">✉️ Messages</h2>
+<p style="color:#8a7f76;margin-bottom:20px">Send messages to individual users or broadcast to all</p>
+<div style="background:var(--paper,#f9f4f3);border-radius:10px;padding:20px;margin-bottom:20px">
+<h3 style="font-size:16px;margin-bottom:12px">Send New Message</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+  <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">To</label>
+  <select id="msgRecipient" style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px"><option value="broadcast">📣 Broadcast to All Users</option></select></div>
+  <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Subject</label>
+  <input type="text" id="msgSubject" placeholder="Message subject" style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px"></div>
+</div>
+<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Message Body</label>
+<textarea id="msgBody" rows="4" placeholder="Write your message..." style="width:100%;padding:10px;border:1px solid #e8ddd4;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical"></textarea></div>
+<button onclick="sendAdminMessage()" style="background:#c99532;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:600"><i class="fas fa-paper-plane"></i> Send Message</button>
+</div>
+<h3 style="font-size:16px;margin-bottom:12px">Recent Messages</h3>
+<div id="adminMsgList" style="max-height:300px;overflow-y:auto"><p style="color:#8a7f76;text-align:center;padding:20px">Loading...</p></div>
+</div>
+
 <footer>A product of <strong>WMK Speciality Services L.L.C.</strong></footer>
 
 <script>
@@ -288,6 +336,93 @@ sb.auth.signOut().then(function(){window.location.href='/'});
 }
 
 init();
+
+
+// === Phase 5: Banner Management ===
+async function loadBannerAdmin() {
+  const { data } = await sb.from("site_banners").select("*").order("created_at", { ascending: false }).limit(1);
+  const preview = document.getElementById("bannerPreview");
+  if (data && data.length && data[0].is_active) {
+    const b = data[0];
+    const colors = { info: "#c99532", warning: "#e67e22", success: "#3a6633", error: "#c24b3b" };
+    preview.innerHTML = '<div style="background:' + (b.bg_color || colors[b.type] || "#c99532") + ';color:' + (b.text_color || "#fff") + ';padding:12px 20px;border-radius:8px;font-size:14px"><strong>LIVE:</strong> ' + b.message + '</div>';
+    document.getElementById("bannerMsg").value = b.message || "";
+    document.getElementById("bannerType").value = b.type || "info";
+    document.getElementById("bannerLink").value = b.link_url || "";
+    document.getElementById("bannerLinkText").value = b.link_text || "";
+    document.getElementById("bannerDismissible").checked = b.is_dismissible !== false;
+  } else {
+    preview.innerHTML = '<div style="background:#f0f0f0;padding:12px 20px;border-radius:8px;font-size:14px;color:#888;text-align:center">No active banner</div>';
+  }
+}
+
+async function publishBanner() {
+  const msg = document.getElementById("bannerMsg").value.trim();
+  if (!msg) { alert("Enter a banner message"); return; }
+  const type = document.getElementById("bannerType").value;
+  const colors = { info: "#c99532", warning: "#e67e22", success: "#3a6633", error: "#c24b3b" };
+  await sb.from("site_banners").update({ is_active: false }).eq("is_active", true);
+  const { error } = await sb.from("site_banners").insert({ message: msg, type: type, bg_color: colors[type], text_color: "#ffffff", link_url: document.getElementById("bannerLink").value || null, link_text: document.getElementById("bannerLinkText").value || null, is_dismissible: document.getElementById("bannerDismissible").checked, is_active: true, created_by: currentUser.id });
+  if (error) { alert("Error: " + error.message); return; }
+  alert("Banner published!");
+  loadBannerAdmin();
+}
+
+async function deactivateBanner() {
+  await sb.from("site_banners").update({ is_active: false }).eq("is_active", true);
+  alert("Banner removed!");
+  loadBannerAdmin();
+}
+
+// === Phase 5: Admin Messaging ===
+async function loadUserListForMessaging() {
+  const { data } = await sb.from("profiles").select("id, email, display_name").order("email");
+  const select = document.getElementById("msgRecipient");
+  if (data) {
+    data.forEach(u => {
+      const opt = document.createElement("option");
+      opt.value = u.id;
+      opt.textContent = (u.display_name || "No name") + " (" + u.email + ")";
+      select.appendChild(opt);
+    });
+  }
+}
+
+async function sendAdminMessage() {
+  const recipient = document.getElementById("msgRecipient").value;
+  const subject = document.getElementById("msgSubject").value.trim();
+  const body = document.getElementById("msgBody").value.trim();
+  if (!subject || !body) { alert("Subject and body required"); return; }
+  if (recipient === "broadcast") {
+    const { data: users } = await sb.from("profiles").select("id");
+    if (users) {
+      const msgs = users.map(u => ({ sender_id: currentUser.id, recipient_id: u.id, subject, body, is_broadcast: true }));
+      const { error } = await sb.from("messages").insert(msgs);
+      if (error) { alert("Error: " + error.message); return; }
+      alert("Broadcast sent to " + users.length + " users!");
+    }
+  } else {
+    const { error } = await sb.from("messages").insert({ sender_id: currentUser.id, recipient_id: recipient, subject, body });
+    if (error) { alert("Error: " + error.message); return; }
+    alert("Message sent!");
+  }
+  document.getElementById("msgSubject").value = "";
+  document.getElementById("msgBody").value = "";
+  loadAdminMessages();
+}
+
+async function loadAdminMessages() {
+  const { data } = await sb.from("messages").select("*").eq("sender_id", currentUser.id).order("created_at", { ascending: false }).limit(20);
+  const el = document.getElementById("adminMsgList");
+  if (!data || !data.length) { el.innerHTML = '<p style="color:#8a7f76;text-align:center;padding:20px">No messages sent yet</p>'; return; }
+  el.innerHTML = data.map(m => {
+    const date = new Date(m.created_at).toLocaleDateString();
+    return '<div style="padding:10px 12px;border-bottom:1px solid #e8ddd4;font-size:13px"><strong>' + m.subject + '</strong>' + (m.is_broadcast ? ' <span style="background:#c99532;color:#fff;font-size:10px;padding:1px 6px;border-radius:8px">Broadcast</span>' : '') + '<div style="color:#8a7f76;margin-top:2px">' + date + ' - ' + m.body.substring(0, 80) + (m.body.length > 80 ? "..." : "") + '</div></div>';
+  }).join("");
+}
+
+// Call these after admin loads
+setTimeout(function() { if (typeof loadBannerAdmin === "function") { loadBannerAdmin(); loadUserListForMessaging(); loadAdminMessages(); } }, 1000);
 </script>
 </body>
 </html>
