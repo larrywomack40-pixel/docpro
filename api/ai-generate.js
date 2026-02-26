@@ -83,7 +83,18 @@ module.exports = async function handler(req, res) {
   // --- AI GENERATION ---
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  const systemPrompt = `You are a professional document generator for DraftMyForms.com. You create premium, professional-grade HTML documents.
+  let systemPrompt, userMessage;
+
+  if (mode === 'edit' && currentContent) {
+    // ═══════════════ EDIT MODE ═══════════════
+    console.log('[ai-generate] EDIT mode | Content length:', currentContent.length);
+    systemPrompt = 'You are a document editor for DraftMyForms.com. You modify existing HTML documents based on user requests.\n\nABSOLUTE RULES:\n1. Return ONLY the complete modified HTML. No explanations, no markdown code fences, no backticks.\n2. Preserve ALL existing content, styling, structure, inline styles, colors, fonts, images, and layout EXCEPT what the user specifically asks to change.\n3. Do NOT regenerate the document from scratch. Make ONLY the requested modification.\n4. If asked to change a color, change ONLY that color on the relevant elements.\n5. If asked to add something, add it while keeping everything else exactly the same.\n6. If asked to remove something, remove only that, keep everything else.\n7. Return the COMPLETE document HTML, not just the changed portion.\n8. Do NOT wrap the output in markdown code blocks or backticks.';
+
+    userMessage = 'Here is the current document HTML that needs to be edited:\n\n<current_document>\n' + currentContent + '\n</current_document>\n\nUser requested change: "' + prompt + '"\n\nReturn the COMPLETE modified HTML with ONLY the requested change applied. Preserve everything else exactly as-is. Return raw HTML only.';
+  } else {
+    // ═══════════════ GENERATE MODE ═══════════════
+    console.log('[ai-generate] CREATE mode');
+    systemPrompt = `You are a professional document generator for DraftMyForms.com. You create premium, professional-grade HTML documents.
 
 CRITICAL RULES:
 - Output ONLY the HTML content for the document body (no <html>, <head>, <body> tags)
@@ -93,57 +104,22 @@ CRITICAL RULES:
 - Primary accent color: #c99532 (gold) for headers, borders, accents
 - Text color: #2d2926 (dark brown), Muted: #8a7f76
 - Background accents: #f9f4f3 (warm paper), #fffcf9 (card)
-- Success/green: #3a6633, Danger/red: #c24b3b
 - Include proper spacing, padding, margins for a polished look
 - Tables should have styled headers with gold (#c99532) background and white text
-- Use horizontal rules with gold color for section dividers
 - Include realistic placeholder data when creating new documents
-- Signature blocks should have proper lines and spacing
-- For logos: if the user mentions a company name, create an elegant text-based logo header using styled divs
 - Make every document print-ready and professional
-
-DOCUMENT TYPES YOU SUPPORT (but not limited to - create ANY document type requested):
-Invoices, Receipts, Contracts, Agreements, NDAs, Letters (all types), Resumes, CVs, Proposals, Reports, Forms, Applications, Certificates, Purchase Orders, Bills of Sale, Leases, Wills, Power of Attorney, Affidavits, Memorandums, Meeting Minutes, Business Plans, Marketing Plans, Project Plans, SOWs, RFPs, Policies, Procedures, Manuals, Guides, Presentations, Newsletters, Press Releases, Brochures, Flyers, Labels, Business Cards, Letterheads, Envelopes, Name Tags, Tickets, Coupons, Gift Cards, Menus, Programs, Agendas, Itineraries, Budgets, Timesheets, Expense Reports, and ANY other document type.
-
-VISUAL DESIGN EXCELLENCE (Issue 17):
-- For creative/personal documents (birthday letters, invitations, event flyers, holiday cards, wedding invitations):
-  * Use CSS background gradients, patterns, or themed color schemes
-  * Add decorative borders with CSS border-image or box-shadow effects
-  * Use themed emoji or Unicode decorative characters as visual elements
-  * Create visual headers with gradient backgrounds and large decorative typography
-  * Add subtle background patterns using CSS repeating-linear-gradient
-  * For birthday: use warm colors, celebration emojis, festive borders
-  * For weddings: use elegant pastels, floral Unicode, cursive fonts
-  * For holidays: use seasonal colors and themed decorative elements
-  * For invitations: use premium card-like styling with shadows and borders
-- For business documents, use the premium gold-accented style consistently
-- Use CSS box-shadow for depth and visual hierarchy
-- Use CSS linear-gradient for section backgrounds and accent bars
-- Add subtle decorative dividers between sections (not just plain <hr>)
-- For charts/metrics, create visual bar charts using CSS div widths
-- Use CSS Grid and Flexbox for sophisticated layouts
-- Include CSS-only decorative elements (circles, lines, shapes) using pseudo-elements described in inline styles
-- Make tables visually striking with alternating row colors and proper spacing
-
-STYLE GUIDELINES:
-- Professional: Clean lines, consistent spacing, proper hierarchy
-- Premium: Use subtle gradients, elegant borders, refined typography
-- Modern: Balance white space, use clear visual hierarchy
-- Branded: Incorporate gold (#c99532) accents tastefully, not overwhelming
-${mode === 'edit' ? 'EDITING MODE: The user wants to modify an existing document. Apply their requested changes while preserving the overall structure and style. Return the COMPLETE updated document HTML.' : ''}
-${mode === 'create' ? 'CREATION MODE: Generate a complete, ready-to-use document with all necessary sections and realistic sample data.' : ''}
+- For creative documents (birthday, invitations, flyers): use CSS gradients, themed colors, decorative borders, emojis
+- For business documents: use premium gold-accented style consistently
 ${templateStyle ? 'TEMPLATE STYLE: ' + templateStyle : ''}
-${docType === 'logo' ? 'LOGO MODE: Create an elegant SVG logo. Output ONLY the SVG code. Use #c99532 gold as primary color. Make it professional, modern, and suitable for business documents. Size should be around 200x80 pixels.' : ''}`;
+${docType === 'logo' ? 'LOGO MODE: Create an elegant SVG logo. Output ONLY the SVG code. Use #c99532 gold as primary color.' : ''}`;
 
-  let userMessage = prompt;
-  if (currentContent && mode === 'edit') {
-    userMessage = `Here is the current document HTML:\n\n${currentContent}\n\nUser request: ${prompt}\n\nPlease apply the requested changes and return the complete updated HTML.`;
+    userMessage = prompt;
   }
 
   try {
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 6000,
+      max_tokens: 8192,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
     });
