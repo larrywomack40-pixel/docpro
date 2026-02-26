@@ -1669,6 +1669,20 @@ async function editorCheckout(plan) {
 })();
 
 
+    // ===== ACTIVE DAY TRACKING FOR TRIAL ELIGIBILITY =====
+    (function logEditorActivity() {
+        try {
+            var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
+            var token = session.access_token;
+            if (!token) return;
+            fetch('/api/log-activity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ action: 'editor_open' })
+            }).catch(function() {});
+        } catch(e) {}
+    })();
+
   // ===== SITE BANNER LOADER =====
   async function loadSiteBanner() {
     try {
