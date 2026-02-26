@@ -1674,11 +1674,12 @@ async function editorCheckout(plan) {
         try {
             var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
             var token = session.access_token;
-            if (!token) return;
+            var userId = session.user ? session.user.id : null;
+            if (!token || !userId) return;
             fetch('/api/log-activity', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ action: 'editor_open' })
+                body: JSON.stringify({ userId: userId, action: 'editor_open' })
             }).catch(function() {});
         } catch(e) {}
     })();
