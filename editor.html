@@ -667,6 +667,13 @@ function updateWordCount() {
 function toggleAI() {
   const sb = document.getElementById('aiSidebar');
   sb.classList.toggle('collapsed');
+    // Update placeholder based on document content
+    var aiInput = document.getElementById('aiPrompt');
+    if (aiInput) {
+      var canvas = document.getElementById('editor-canvas') || document.querySelector('.doc-canvas');
+      var hasDoc = canvas && canvas.innerHTML.trim().length > 0 && canvas.innerHTML.trim() !== '<br>';
+      aiInput.placeholder = hasDoc ? 'Describe what changes to make to this document...' : 'Describe the document you want to create...';
+    }
 }
 
 function addAIMessage(text, role) {
@@ -709,12 +716,16 @@ async function sendAI() {
   const prompt = document.getElementById('aiPrompt').value.trim();
   if (!prompt) return;
   
-  addAIMessage(prompt, 'user');
+  addAIMessage(prompt, 'user');h
   document.getElementById('aiPrompt').value = '';
   showAILoading();
   
   const currentContent = docCanvas.innerHTML;
   const hasContent = currentContent.trim().length > 0 && currentContent.trim() !== '<br>';
+  // Show edit mode indicator
+  if (hasContent) {
+    addAIMessage('\u270f\ufe0f Editing current document - your changes will be applied to the existing content.', 'system');
+  }
   
   try {
     const res = await fetch('/api/ai-generate', {
