@@ -474,6 +474,7 @@ I can help you create, edit, and perfect any document. Try:
 <script>if(window.pdfjsLib)window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
     // --- AI Credit Tracking: get userId and plan from auth token ---
@@ -556,87 +557,30 @@ function clearFormatting() {
 
 function printDoc() {
     const canvas = document.getElementById('docCanvas');
+    if (!canvas) return;
     const content = canvas.innerHTML;
-    const title = document.getElementById('docTitle').value || 'Untitled Document';
-    
-    // Collect all inline styles from the editor canvas elements
-    const allElements = canvas.querySelectorAll('*');
-    let inlineStyleMap = new Map();
-    allElements.forEach((el, idx) => {
-      el.setAttribute('data-print-idx', idx);
-      const cs = window.getComputedStyle(el);
-      let important = '';
-      // Preserve backgrounds, colors, borders, fonts
-      if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-        important += 'background-color:' + cs.backgroundColor + ' !important;';
-      }
-      if (cs.backgroundImage && cs.backgroundImage !== 'none') {
-        important += 'background-image:' + cs.backgroundImage + ' !important;';
-      }
-      if (cs.color) important += 'color:' + cs.color + ';';
-      if (cs.fontFamily) important += 'font-family:' + cs.fontFamily + ';';
-      if (cs.fontSize) important += 'font-size:' + cs.fontSize + ';';
-      if (cs.fontWeight) important += 'font-weight:' + cs.fontWeight + ';';
-      if (cs.borderTop && cs.borderTop !== 'none') important += 'border-top:' + cs.borderTop + ';';
-      if (cs.borderBottom && cs.borderBottom !== 'none') important += 'border-bottom:' + cs.borderBottom + ';';
-      if (cs.borderLeft && cs.borderLeft !== 'none') important += 'border-left:' + cs.borderLeft + ';';
-      if (cs.borderRight && cs.borderRight !== 'none') important += 'border-right:' + cs.borderRight + ';';
-      if (cs.padding) important += 'padding:' + cs.padding + ';';
-      if (cs.margin) important += 'margin:' + cs.margin + ';';
-      if (cs.textAlign) important += 'text-align:' + cs.textAlign + ';';
-      if (cs.lineHeight) important += 'line-height:' + cs.lineHeight + ';';
-      if (cs.width && el.tagName === 'TABLE') important += 'width:' + cs.width + ';';
-      if (important) {
-        el.style.cssText += important;
-      }
-    });
-    
-    // Also collect stylesheets from current page
-    let editorStyles = '';
-    try {
-      for (const sheet of document.styleSheets) {
-        try {
-          for (const rule of sheet.cssRules) {
-            editorStyles += rule.cssText + ' ';
-          }
-        } catch(e) {} // Skip cross-origin sheets
-      }
-    } catch(e) {}
-    
-    // Re-read content after style inlining
-    const styledContent = canvas.innerHTML;
-    
-    // Clean up data attributes
-    allElements.forEach(el => el.removeAttribute('data-print-idx'));
+    const docTitle = document.getElementById('docTitle') ? document.getElementById('docTitle').value || 'Document' : 'Document';
 
-    const w = window.open('', '_blank');
-    if (!w) { showToast('Pop-up blocked. Please allow pop-ups.'); return; }
-    
-    w.document.write(
-      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + title + '</title>' +
-      '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;700&family=Dancing+Script&family=Great+Vibes&family=Caveat&family=Homemade+Apple&display=swap" rel="stylesheet">' +
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) { showToast('Pop-up blocked. Please allow pop-ups.'); return; }
+
+    printWindow.document.write(
+      '<!DOCTYPE html><html><head><title>' + docTitle + '</title><meta charset="UTF-8">' +
+      '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">' +
       '<style>' +
-      '*, *::before, *::after { box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }' +
-      'body { font-family:DM Sans,sans-serif; padding:40px 60px; color:#2d2926; line-height:1.7; font-size:14px; }' +
-      'h1,h2,h3 { font-family:Playfair Display,Georgia,serif; margin-bottom:10px; }' +
-      'p { margin-bottom:8px; }' +
-      'table { width:100%; border-collapse:collapse; page-break-inside:avoid; }' +
-      'th,td { border:1px solid #ddd; padding:6px 10px; text-align:left; }' +
-      'th { background-color:#c99532 !important; color:#fff !important; font-weight:bold; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
+      '@page { size: letter; margin: 0 !important; }' +
+      'html, body { margin:0; padding:0; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }' +
+      'body { padding: 0.6in 0.75in; font-family: DM Sans, Segoe UI, Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #000; background: #fff; }' +
+      '* { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
+      'h1,h2,h3,h4 { page-break-after:avoid; }' +
+      'table,figure,img { page-break-inside:avoid; }' +
+      'table { border-collapse:collapse; width:100%; }' +
       'img { max-width:100%; height:auto; }' +
-      'ul,ol { margin-left:20px; }' +
-      'li { margin-bottom:4px; }' +
-      'hr { border:none; border-top:1px solid #ddd; margin:15px 0; }' +
-      'div[style*="background"] { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
-      '[style*="background-color"] { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
-      '@page { margin:15mm; size:letter; }' +
-      '@media print { body { padding:0; } * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; } }' +
-      '</style>' +
-      '</head><body>' + styledContent + '</body></html>'
+      '</style></head><body>' + content + '</body></html>'
     );
-    w.document.close();
-    setTimeout(() => { w.focus(); w.print(); }, 500);
-    showToast('\ud83d\udca1 Tip: Uncheck "Headers and footers" in print settings for a cleaner look');
+    printWindow.document.close();
+    printWindow.onload = function() { printWindow.focus(); printWindow.print(); };
+    setTimeout(function() { printWindow.focus(); printWindow.print(); }, 800);
   }
 
 // ==============================
@@ -1373,97 +1317,44 @@ async function loadTemplate(category, index) {
 // DOWNLOADS
 // ==============================
 async function downloadPDF() {
-    const canvas = document.getElementById('docCanvas');
-    const title = document.getElementById('docTitle').value || 'Untitled Document';
-    showToast('Generating PDF...');
-    
-    try {
-      // Force background colors to be visible for html2canvas
-      const allEls = canvas.querySelectorAll('*');
-      const origStyles = [];
-      allEls.forEach((el, i) => {
-        const cs = window.getComputedStyle(el);
-        origStyles[i] = el.getAttribute('style') || '';
-        // Ensure background colors are explicitly inline
-        if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-          el.style.backgroundColor = cs.backgroundColor;
-        }
-        if (cs.color) el.style.color = cs.color;
-        if (cs.fontFamily) el.style.fontFamily = cs.fontFamily;
-        if (cs.fontSize) el.style.fontSize = cs.fontSize;
-        if (cs.fontWeight) el.style.fontWeight = cs.fontWeight;
-      });
+    var canvas = document.getElementById('docCanvas');
+    if (!canvas) return;
+    var docTitle = document.getElementById('docTitle') ? document.getElementById('docTitle').value || 'DraftMyForms_Document' : 'DraftMyForms_Document';
+    var safeName = docTitle.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_');
 
-      const c = await html2canvas(canvas, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: canvas.scrollWidth,
-        height: canvas.scrollHeight,
-        windowWidth: canvas.scrollWidth,
-        windowHeight: canvas.scrollHeight
-      });
-      
-      // Restore original styles
-      allEls.forEach((el, i) => {
-        if (origStyles[i]) el.setAttribute('style', origStyles[i]);
-        else el.removeAttribute('style');
-      });
-
-      const imgData = c.toDataURL('image/png', 1.0);
-      const pdf = new jspdf.jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'letter'
-      });
-      
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
-      const usableWidth = pageWidth - (margin * 2);
-      const imgWidth = usableWidth;
-      const imgHeight = (c.height * imgWidth) / c.width;
-      
-      if (imgHeight <= pageHeight - (margin * 2)) {
-        pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
-      } else {
-        // Multi-page support
-        let remainingHeight = imgHeight;
-        let position = 0;
-        let page = 0;
-        const usableHeight = pageHeight - (margin * 2);
-        
-        while (remainingHeight > 0) {
-          if (page > 0) pdf.addPage();
-          
-          const sliceHeight = Math.min(usableHeight, remainingHeight);
-          const sourceY = position * (c.height / imgHeight);
-          const sourceH = sliceHeight * (c.height / imgHeight);
-          
-          // Create a temporary canvas for this page slice
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = c.width;
-          tempCanvas.height = sourceH;
-          const tempCtx = tempCanvas.getContext('2d');
-          tempCtx.drawImage(c, 0, sourceY, c.width, sourceH, 0, 0, c.width, sourceH);
-          
-          const sliceData = tempCanvas.toDataURL('image/png', 1.0);
-          pdf.addImage(sliceData, 'PNG', margin, margin, imgWidth, sliceHeight);
-          
-          position += sliceHeight;
-          remainingHeight -= sliceHeight;
-          page++;
-        }
-      }
-      
-      pdf.save(title.replace(/[^a-zA-Z0-9 ]/g, '_') + '.pdf');
-      showToast('PDF downloaded!');
-    } catch (err) {
-      console.error('PDF generation error:', err);
-      showToast('Error generating PDF. Please try again.');
+    if (typeof html2pdf === 'undefined') {
+      showToast('PDF library loading... try again in a moment.');
+      return;
     }
+
+    showToast('Generating PDF...');
+
+    var clone = canvas.cloneNode(true);
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.width = '7.5in';
+    clone.style.background = '#fff';
+    clone.style.padding = '0.5in';
+    document.body.appendChild(clone);
+
+    var opt = {
+      margin: [0.5, 0.6, 0.5, 0.6],
+      filename: 'dmyf.' + safeName + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(clone).save().then(function() {
+      document.body.removeChild(clone);
+      showToast('PDF downloaded!');
+    }).catch(function(err) {
+      console.error('PDF generation error:', err);
+      document.body.removeChild(clone);
+      showToast('PDF failed, falling back to print...');
+      printDoc();
+    });
   }
 
 function downloadDocx() {
