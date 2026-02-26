@@ -472,6 +472,23 @@ I can help you create, edit, and perfect any document. Try:
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib)window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
+
+    // --- AI Credit Tracking: get userId and plan from auth token ---
+    (function() {
+      try {
+        var keys = Object.keys(localStorage);
+        for (var i = 0; i < keys.length; i++) {
+          if (keys[i].indexOf('sb-') === 0 && keys[i].indexOf('-auth-token') > 0) {
+            var parsed = JSON.parse(localStorage.getItem(keys[i]));
+            if (parsed && parsed.user && parsed.user.id) {
+              window.__dmfUserId = parsed.user.id;
+            }
+            break;
+          }
+        }
+      } catch(e) {}
+      window.__dmfUserPlan = 'Free'; // Will be updated when profile loads
+    })();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -707,6 +724,8 @@ async function sendAI() {
       body: JSON.stringify({
         prompt: prompt,
         docType: 'custom',
+        userId: window.__dmfUserId || null,
+        plan: window.__dmfUserPlan || 'Free',
         currentContent: hasContent ? currentContent : null,
         mode: hasContent ? 'edit' : 'create'
       })
@@ -716,7 +735,11 @@ async function sendAI() {
     
     if (!res.ok) {
       const err = await res.json();
-      addAIMessage('Error: ' + (err.error || 'Something went wrong'), 'system');
+      if (res.status === 429 && err.creditsRemaining === 0) {
+          addAIMessage('You have used all ' + err.creditLimit + ' AI credits for this month (' + (err.plan || 'Free') + ' plan). Upgrade your plan for more credits or wait until next month.', 'system');
+        } else {
+          addAIMessage('Error: ' + (err.error || 'Something went wrong'), 'system');
+        }
       return;
     }
     
@@ -728,7 +751,12 @@ async function sendAI() {
     updatePreview();
     updateWordCount();
     
-    addAIMessage('Document updated! You can edit it directly in the canvas, or ask me to make more changes.', 'assistant');
+    // Show credit info if available
+      if (data.credits) {
+        var creditMsg = '\u2728 ' + data.credits.remaining + ' AI credits remaining this month (' + data.credits.used + '/' + data.credits.limit + ')';
+        addAIMessage(creditMsg, 'system');
+      }
+      addAIMessage('Document updated! You can edit it directly in the canvas, or ask me to make more changes.', 'assistant');
     
   } catch (e) {
     removeAILoading();
@@ -1728,6 +1756,7 @@ async function editorCheckout(plan) {
       if (sbClient) {
         sbClient.from('profiles').select('plan').eq('id', user.id).single().then(function(r) {
           var plan = r.data ? r.data.plan : 'free';
+      window.__dmfUserPlan = plan;
           var btn = document.getElementById('editorUpgradeBtn');
           if (btn && (!plan || plan === 'free')) { btn.style.display = 'inline-flex'; }
         });
