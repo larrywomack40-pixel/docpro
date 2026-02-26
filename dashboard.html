@@ -549,6 +549,47 @@ function copyReferralLink() {
 
 // Call on load
 setTimeout(() => { loadReferralInfo(); }, 500);
+
+// Process stored referral code on first login
+async function processReferral() {
+  try {
+    const refCode = localStorage.getItem('dmf_referral');
+    if (!refCode) return;
+    
+    const {data:{session}} = await sb.auth.getSession();
+    if (!session) return;
+    const userId = session.user.id;
+    
+    // Check if already processed (user has referred_by set)
+    const {data: profile} = await sb.from('profiles').select('referred_by').eq('id', userId).single();
+    if (profile?.referred_by) {
+      localStorage.removeItem('dmf_referral');
+      localStorage.removeItem('dmf_referral_time');
+      return;
+    }
+    
+    // Find the referrer by code
+    const {data: referrer} = await sb.from('profiles').select('id').eq('referral_code', refCode).single();
+    if (!referrer || referrer.id === userId) {
+      localStorage.removeItem('dmf_referral');
+      return;
+    }
+    
+    // Record the referral
+    await sb.from('profiles').update({referred_by: referrer.id}).eq('id', userId);
+    await sb.from('referrals').insert({
+      referrer_id: referrer.id,
+      referred_id: userId,
+      referral_code: refCode,
+      status: 'completed',
+      completed_at: new Date().toISOString()
+    });
+    
+    localStorage.removeItem('dmf_referral');
+    localStorage.removeItem('dmf_referral_time');
+  } catch(e) { console.error('Referral process error:', e); }
+}
+setTimeout(() => { processReferral(); }, 1000);
 </script>
 <div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services L.L.C.</strong></div>
 </body>
