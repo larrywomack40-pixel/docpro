@@ -288,27 +288,42 @@ if(currentProfile&&currentProfile.role==='admin'){var al=document.getElementById
 }
 
 function loadSavedDocuments(){
-var grid=document.getElementById('docsGrid');
-var docs=[];
-for(var i=0;i<localStorage.length;i++){
-var key=localStorage.key(i);
-if(key.startsWith('dmf_doc_')){
-try{var doc=JSON.parse(localStorage.getItem(key));doc._key=key;docs.push(doc)}catch(e){}
-}
-}
-docs.sort(function(a,b){return new Date(b.savedAt)-new Date(a.savedAt)});
-document.getElementById('statDocs').textContent=docs.length;
-var html='<div class="new-doc-card" onclick="window.location.href=\'/editor.html\'"><i class="fas fa-plus-circle"></i><span>Create New Document</span></div>';
-if(docs.length===0){
-html+='<div style="grid-column:1/-1" class="empty-state"><i class="fas fa-folder-open"></i><h3>No documents yet</h3><p>Create your first document to get started.</p><a href="/editor.html" class="btn btn-gold"><i class="fas fa-plus"></i> Create Document</a></div>';
-}else{
-docs.forEach(function(doc){
-var date=doc.savedAt?new Date(doc.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown';
-var preview=doc.content?doc.content.replace(/<[^>]+>/g,'').substring(0,200):'Empty document';
-html+='<div class="doc-card"><div class="doc-preview">'+preview+'</div><div class="doc-info"><h4>'+(doc.title||'Untitled')+'</h4><div class="doc-meta"><span><i class="fas fa-calendar"></i> '+date+'</span></div></div><div class="doc-actions"><button class="btn btn-outline btn-sm" onclick="openDoc(\''+doc._key+'\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-outline btn-sm" onclick="downloadDoc(\''+doc._key+'\')"><i class="fas fa-download"></i> PDF</button><button class="btn btn-ghost btn-sm" onclick="deleteDoc(\''+doc._key+'\',event)" style="color:var(--danger)"><i class="fas fa-trash"></i></button></div></div>';
-});
-}
-grid.innerHTML=html;
+  const container=document.getElementById('docsGrid');
+  if(!container)return;
+  // Get current user ID for filtering
+  let currentUserId = null;
+  try {
+    const sessionStr = localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token');
+    if(sessionStr){const sData=JSON.parse(sessionStr);currentUserId=sData?.user?.id||sData?.currentSession?.user?.id||null;}
+  } catch(e){}
+  
+  let docs=[];
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key.startsWith('dmf_doc_')){
+      try{
+        const d=JSON.parse(localStorage.getItem(key));
+        // Migration: if doc has no user_id, tag it with current user
+        if(!d.user_id && currentUserId){
+          d.user_id=currentUserId;
+          localStorage.setItem(key,JSON.stringify(d));
+        }
+        // Only show docs belonging to current user (or untagged if no user)
+        if(currentUserId && d.user_id && d.user_id !== currentUserId) continue;
+        docs.push({key:key,data:d});
+      }catch(e){}
+    }
+  }
+  let html='<div class="doc-card new-doc" onclick="window.location.href=\'/editor.html\'"><div class="doc-preview" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-plus" style="font-size:2em;color:var(--primary);"></i></div><div class="doc-info"><h4>Create New Document</h4></div></div>';
+  document.getElementById('statDocs').textContent=docs.length;
+  docs.sort((a,b)=>(b.data.updated_at||b.data.created_at||0)-(a.data.updated_at||a.data.created_at||0));
+  docs.forEach(({key,data:d})=>{
+    const title=d.title||'Untitled Document';
+    const date=d.updated_at?new Date(d.updated_at).toLocaleDateString():'';
+    const preview=(d.html||d.content||'').replace(/<[^>]*>/g,'').substring(0,200);
+    html+='<div class="doc-card"><div class="doc-preview">'+preview+'</div><div class="doc-info"><h4>'+title.substring(0,40)+'</h4><span class="doc-date">'+date+'</span><div class="doc-actions"><button onclick="openDoc(\''+key+'\')">Edit</button><button onclick="downloadDoc(\''+key+'\')">PDF</button><button onclick="deleteDoc(\''+key+'\',event)" class="btn-danger">Delete</button></div></div></div>';
+  });
+  container.innerHTML=html;
 }
 
 function openDoc(key){
