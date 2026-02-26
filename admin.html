@@ -310,7 +310,7 @@ async function loadUsers(){
 }
 
 function renderUsers(users){
-  const container=document.getElementById('userTableBody');
+  const container=document.getElementById('usersTableBody');
   if(!container){return;}
   if(!users||users.length===0){container.innerHTML='<tr><td colspan="6">No users found</td></tr>';return;}
   container.innerHTML=users.map(u=>{
