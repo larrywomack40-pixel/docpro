@@ -98,6 +98,7 @@ ${docType === 'logo' ? 'LOGO MODE: Create an elegant SVG logo. Output ONLY the S
       if (xmlMatch) html = xmlMatch[1];
     }
 
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
     return res.status(200).json({
       html: html.trim(),
       usage: {
