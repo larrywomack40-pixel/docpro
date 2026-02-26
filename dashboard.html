@@ -172,6 +172,19 @@ a{text-decoration:none;color:inherit}
 </div>
 <button class="btn-upgrade" onclick="openUpgradeModal()"><i class="fas fa-crown"></i> Upgrade Now</button>
 </div>
+
+<div class="referral-card" id="aiCreditsCard" style="margin-top:24px;">
+<h3 style="margin:0 0 8px;font-family:var(--font-heading);color:var(--gold);">
+<i class="fas fa-bolt"></i> AI Credits</h3>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+<div style="flex:1;background:var(--card-border);border-radius:8px;height:12px;overflow:hidden;">
+<div id="creditBar" style="height:100%;background:var(--gold);border-radius:8px;width:0%;transition:width 0.5s;"></div>
+</div>
+<span id="creditCount" style="font-weight:600;color:var(--text);font-size:14px;">--</span>
+</div>
+<p id="creditPlan" style="margin:0;font-size:13px;color:var(--text-muted);">Loading plan info...</p>
+<p id="creditReset" style="margin:4px 0 0;font-size:12px;color:var(--text-muted);"></p>
+</div>
 <div class="section-header">
 <h2>Your Documents</h2>
 </div>
@@ -550,6 +563,36 @@ async function loadReferralInfo() {
   } catch(e) { console.error('Referral load error:', e); }
 }
 
+
+    async function loadAICredits() {
+      try {
+        var session = (await sb.auth.getSession()).data.session;
+        if (!session) return;
+        var uid = session.user.id;
+        var { data: p } = await sb.from('profiles').select('plan, plan_override, ai_credits_used, ai_credits_reset_at, ai_credits_limit').eq('id', uid).single();
+        if (!p) return;
+        var effectivePlan = p.plan_override || p.plan || 'Free';
+        var limits = { Free: 5, Starter: 50, Professional: 200, Enterprise: 999999 };
+        var limit = p.ai_credits_limit || limits[effectivePlan] || 5;
+        var used = p.ai_credits_used || 0;
+        var remaining = Math.max(0, limit - used);
+        var pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+        var bar = document.getElementById('creditBar');
+        var count = document.getElementById('creditCount');
+        var planEl = document.getElementById('creditPlan');
+        var resetEl = document.getElementById('creditReset');
+        if (bar) bar.style.width = pct + '%';
+        if (bar) bar.style.background = pct > 80 ? 'var(--danger)' : 'var(--gold)';
+        if (count) count.textContent = remaining + ' / ' + limit;
+        if (planEl) planEl.textContent = effectivePlan + ' Plan' + (effectivePlan === 'Enterprise' ? ' (Unlimited)' : '');
+        if (resetEl && p.ai_credits_reset_at) {
+          var rd = new Date(p.ai_credits_reset_at);
+          rd.setMonth(rd.getMonth() + 1);
+          resetEl.textContent = 'Resets ' + rd.toLocaleDateString();
+        }
+      } catch(e) { console.error('loadAICredits error:', e); }
+    }
+
 function copyReferralLink() {
   const linkEl = document.getElementById('referralLink');
   if (linkEl) {
@@ -563,7 +606,8 @@ function copyReferralLink() {
 }
 
 // Call on load
-setTimeout(() => { loadReferralInfo(); }, 500);
+setTimeout(() => { loadReferralInfo();
+        loadAICredits(); }, 500);
 
 // Process stored referral code on first login
 async function processReferral() {
