@@ -1483,8 +1483,11 @@ function downloadDocx() {
   }
 
 function saveDocument() {
+  let _uid = null; try { const _s = localStorage.getItem("sb-mupeqeuuwdmkndvtbhzb-auth-token"); if(_s){const _d=JSON.parse(_s);_uid=_d?.user?.id||_d?.currentSession?.user?.id||null;} } catch(e){}
+
   const data = {
     title: document.getElementById('docTitle').value,
+    user_id: _uid,
     content: docCanvas.innerHTML,
     savedAt: new Date().toISOString()
   };
@@ -1584,9 +1587,11 @@ function showToast(msg) {
   // AUTO-SAVE (Issue 13)
   var autoSaveTimer = null;
   function autoSave() {
+  let _uid = null; try { const _s = localStorage.getItem("sb-mupeqeuuwdmkndvtbhzb-auth-token"); if(_s){const _d=JSON.parse(_s);_uid=_d?.user?.id||_d?.currentSession?.user?.id||null;} } catch(e){}
+
     var cnt = docCanvas.innerHTML;
     if (!cnt || cnt.trim() === '' || cnt.trim() === '<br>') return;
-    var data = { title: document.getElementById('docTitle').value, content: cnt, savedAt: new Date().toISOString() };
+    var data = { title: document.getElementById('docTitle').value,user_id:_uid, content: cnt, savedAt: new Date().toISOString() };
     localStorage.setItem('dmf_autosave', JSON.stringify(data));
     document.getElementById('saveStatus').textContent = 'Auto-saved ' + new Date().toLocaleTimeString();
   }
