@@ -112,6 +112,7 @@ a{text-decoration:none;color:inherit}
 </style>
 </head>
 <body>
+<div id="siteBanner"></div>
 <nav class="navbar">
 <a href="/dashboard.html" class="nav-brand"><span class="star">✦</span> DraftMyForms</a>
 <div class="nav-actions">
@@ -127,6 +128,7 @@ a{text-decoration:none;color:inherit}
 <a href="#" id="menuUpgradeLink" style="display:none;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s;color:var(--gold);font-weight:600" onclick="event.preventDefault();openUpgradeModal()" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-crown" style="width:20px"></i> Upgrade Plan</a>
 <a href="/dashboard.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-home" style="width:20px"></i> Dashboard</a>
 <a href="/editor.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-edit" style="width:20px"></i> Open Editor</a>
+<a href="/inbox.html" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'" style="display:block;padding:10px 16px;text-decoration:none;color:var(--text);font-size:14px;transition:background .2s"><i class="fas fa-inbox" style="margin-right:8px;color:var(--gold)"></i>Inbox <span id="inboxBadge" style="background:var(--gold);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px;display:none"></span></a>
 <a href="/settings.html" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-cog" style="width:20px"></i> Settings</a>
 <a href="/admin.html" id="menuAdminLink" style="display:none"><i class="fas fa-shield-alt"></i> Admin Dashboard</a>
 <button onclick="handleLogout()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:14px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--danger);font-family:var(--font-body);transition:background .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'"><i class="fas fa-sign-out-alt" style="width:20px"></i> Sign Out</button>
@@ -459,6 +461,33 @@ async function manageSubscription() {
   }
 }
 init();
+
+
+// Load site banner
+async function loadSiteBanner() {
+  try {
+    const { data } = await sb.from("site_banners").select("*").eq("is_active", true).order("created_at", { ascending: false }).limit(1);
+    if (data && data.length) {
+      const b = data[0];
+      if (b.ends_at && new Date(b.ends_at) < new Date()) return;
+      document.getElementById("siteBanner").innerHTML = '<div style="background:' + (b.bg_color || "#c99532") + ';color:' + (b.text_color || "#fff") + ';padding:10px 20px;text-align:center;font-size:14px;font-weight:500">' + b.message + (b.link_url ? ' <a href="' + b.link_url + '" style="color:inherit;text-decoration:underline">' + (b.link_text || "Learn more") + '</a>' : '') + (b.is_dismissible ? ' <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;margin-left:10px;font-size:18px">&times;</button>' : '') + '</div>';
+    }
+  } catch(e) { console.log("Banner load error:", e); }
+}
+
+// Load unread message count
+async function loadUnreadCount() {
+  try {
+    const user = (await sb.auth.getUser()).data.user;
+    if (!user) return;
+    const { count } = await sb.from("messages").select("*", { count: "exact", head: true }).eq("recipient_id", user.id).eq("is_read", false);
+    const badge = document.getElementById("inboxBadge");
+    if (badge && count > 0) { badge.textContent = count; badge.style.display = "inline"; }
+  } catch(e) {}
+}
+
+loadSiteBanner();
+loadUnreadCount();
 </script>
 <div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services L.L.C.</strong></div>
 </body>
