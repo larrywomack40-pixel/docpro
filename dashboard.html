@@ -148,7 +148,6 @@ a{text-decoration:none;color:inherit}
 <div class="stats-row">
 <div class="stat-card"><div class="stat-number" id="statDocs">0</div><div class="stat-label">Documents</div></div>
 <div class="stat-card"><div class="stat-number" id="statPlan">Free</div><div class="stat-label">Current Plan</div></div>
-<div class="stat-card"><div class="stat-number" id="statCredits">5</div><div class="stat-label">AI Credits</div></div>
 <div class="stat-card"><div class="stat-number" id="statExports">∞</div><div class="stat-label">Exports Left</div></div>
 </div>
 <!-- Referral Section -->
@@ -295,8 +294,6 @@ document.getElementById('menuPlan').textContent=planLabel;
 document.getElementById('menuPlan').className='plan-badge plan-'+plan;
 document.getElementById('acctPlan').textContent=planLabel;
 document.getElementById('acctPlan').className='plan-badge plan-'+plan;
-var credits=plan==='business'?'\u221E':plan==='pro'?'50':'5';
-document.getElementById('statCredits').textContent=credits;
 if(currentUser.created_at){var d=new Date(currentUser.created_at);document.getElementById('acctSince').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 showUpgradeElements(plan);
 if(currentProfile&&currentProfile.role==='admin'){var al=document.getElementById('menuAdminLink');if(al)al.style.display='block';}
@@ -576,24 +573,20 @@ async function loadReferralInfo() {
         var { data: p } = await sb.from('profiles').select('plan, plan_override, ai_credits_used, ai_credits_reset_at, ai_credits_limit').eq('id', uid).single();
         if (!p) return;
         var effectivePlan = p.plan_override || p.plan || 'Free';
-        var limits = { Free: 5, Starter: 50, Professional: 200, Enterprise: 999999 };
+    var limits = { free: 5, starter: 50, pro: 50, professional: 50, business: Infinity, enterprise: Infinity, Free: 5, Starter: 50, Professional: 200, Enterprise: Infinity };
         var limit = p.ai_credits_limit || limits[effectivePlan] || 5;
         var used = p.ai_credits_used || 0;
-        var remaining = Math.max(0, limit - used);
-        var pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
-        var bar = document.getElementById('creditBar');
-        var count = document.getElementById('creditCount');
-        var planEl = document.getElementById('creditPlan');
-        var resetEl = document.getElementById('creditReset');
-        if (bar) bar.style.width = pct + '%';
-        if (bar) bar.style.background = pct > 80 ? 'var(--danger)' : 'var(--gold)';
-        if (count) count.textContent = remaining + ' / ' + limit;
-        if (planEl) planEl.textContent = effectivePlan + ' Plan' + (effectivePlan === 'Enterprise' ? ' (Unlimited)' : '');
-        if (resetEl && p.ai_credits_reset_at) {
-          var rd = new Date(p.ai_credits_reset_at);
-          rd.setMonth(rd.getMonth() + 1);
-          resetEl.textContent = 'Resets ' + rd.toLocaleDateString();
-        }
+    var isUnlimited = (limit === Infinity || limit >= 999999);
+    var remaining = isUnlimited ? Infinity : Math.max(0, limit - used);
+    var pct = (!isUnlimited && limit > 0) ? Math.min(100, (used / limit) * 100) : 0;
+    var bar = document.getElementById('creditBar');
+    var count = document.getElementById('creditCount');
+    var planEl = document.getElementById('creditPlan');
+    var resetEl = document.getElementById('creditReset');
+    if (bar) { if (isUnlimited) { bar.parentElement.style.display = 'none'; } else { bar.parentElement.style.display = ''; bar.style.width = pct + '%'; if (pct > 80) bar.style.background = 'var(--danger)'; else bar.style.background = 'var(--gold)'; } }
+    if (count) count.textContent = isUnlimited ? '\u221e' : remaining + ' / ' + limit;
+    if (planEl) planEl.textContent = effectivePlan.toLowerCase() + ' Plan' + (isUnlimited ? ' (Unlimited)' : '');
+    if (resetEl) { if (isUnlimited) { resetEl.style.display = 'none'; } else if (p.ai_credits_reset_at) { resetEl.style.display = ''; var rd = new Date(p.ai_credits_reset_at); rd.setMonth(rd.getMonth() + 1); resetEl.textContent = 'Resets ' + rd.toLocaleDateString(); } }
       } catch(e) { console.error('loadAICredits error:', e); }
     }
 
