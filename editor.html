@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+h<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -440,6 +440,7 @@ I can help you create, edit, and perfect any document. Try:
 <script>if(window.pdfjsLib)window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
 // ==============================
 // GLOBAL STATE
@@ -572,7 +573,7 @@ function toggleAI() {
 function addAIMessage(text, role) {
   const div = document.createElement('div');
   div.className = 'ai-msg ' + role;
-  div.innerHTML = text;
+  div.innerHTML = fixEncoding(text);
   document.getElementById('aiMessages').appendChild(div);
   div.scrollIntoView({ behavior: 'smooth' });
 }
@@ -640,7 +641,7 @@ async function sendAI() {
     lastAIResponse = data.html;
     
     // Auto-apply to canvas
-    docCanvas.innerHTML = data.html;
+    docCanvas.innerHTML = fixEncoding(data.html);
     updatePreview();
     updateWordCount();
     
@@ -672,26 +673,103 @@ function closeUpload() {
   document.getElementById('uploadOverlay').classList.remove('active');
 }
 
-async function handleFileUpload(input) {
+
+    function escapeHTML(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function fixEncoding(str) {
+      // Fix common UTF-8 double-encoding artifacts (Windows-1252 misinterpretation)
+      return str
+        .replace(/\u00e2\u0080\u0099/g, "\u2019") // right single quote
+        .replace(/\u00e2\u0080\u009c/g, "\u201c") // left double quote
+        .replace(/\u00e2\u0080\u009d/g, "\u201d") // right double quote
+        .replace(/\u00e2\u0080\u0093/g, "\u2013") // en dash
+        .replace(/\u00e2\u0080\u0094/g, "\u2014") // em dash
+        .replace(/\u00e2\u0080\u00a2/g, "\u2022") // bullet
+        .replace(/\u00c2\u00b7/g, "\u00b7") // middle dot
+        .replace(/\u00e2\u0080\u00b2/g, "\u2032") // prime
+        .replace(/\u00e2\u0080\u00b3/g, "\u2033") // double prime
+        .replace(/\u00e2\u0080\u0098/g, "\u2018") // left single quote
+        .replace(/\u00c3\u00a9/g, "\u00e9") // e-acute
+        .replace(/\u00e2\u009c\u0093/g, "\u2713") // check mark
+        .replace(/\u00e2\u009c\u0097/g, "\u2717") // cross mark
+        .replace(/\u00e2\u009c\u00a6/g, "\u2726") // four-pointed star
+        .replace(/\u00c2\u00a0/g, " "); // non-breaking space
+    }
+
+
+
+    function buildTableHTML(tableLines, pageWidth) {
+      if (!tableLines.length) return '';
+      // Determine columns by clustering X positions across all rows
+      const allX = [];
+      for (const line of tableLines) {
+        for (const item of line.items) {
+          let found = false;
+          for (const ax of allX) {
+            if (Math.abs(ax - item.x) < 20) { found = true; break; }
+          }
+          if (!found) allX.push(item.x);
+        }
+      }
+      allX.sort((a, b) => a - b);
+      const numCols = Math.max(allX.length, 2);
+      let html = '<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:13px">';
+      for (let r = 0; r < tableLines.length; r++) {
+        const line = tableLines[r];
+        const isHeader = r === 0 && line.items.some(it => it.fontSize > 12);
+        const tag = isHeader ? 'th' : 'td';
+        const bgStyle = isHeader ? 'background:#c99532;color:#fff;font-weight:bold;' : (r % 2 === 0 ? 'background:#faf8f5;' : '');
+        html += '<tr>';
+        // Assign items to columns based on X position
+        const cells = new Array(numCols).fill('');
+        for (const item of line.items) {
+          let colIdx = 0;
+          let minDist = Infinity;
+          for (let c = 0; c < allX.length; c++) {
+            const dist = Math.abs(item.x - allX[c]);
+            if (dist < minDist) { minDist = dist; colIdx = c; }
+          }
+          cells[colIdx] = (cells[colIdx] ? cells[colIdx] + ' ' : '') + item.text;
+        }
+        for (const cell of cells) {
+          html += '<' + tag + ' style="' + bgStyle + 'padding:8px 10px;border:1px solid #e0dcd8;text-align:left">' + escapeHTML(cell.trim()) + '</' + tag + '>';
+        }
+        html += '</tr>';
+      }
+      html += '</table>';
+      return html;
+    }
+
+    async function handleFileUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  
+  window.__uploadedFile = file;
   closeUpload();
   showToast('Processing ' + file.name + '...');
-  
+
   if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-    const text = await file.text();
-    docCanvas.innerHTML = '<div style="white-space:pre-wrap;font-family:var(--font-body);line-height:1.7">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
-    updatePreview();
-    updateWordCount();
-    document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const text = e.target.result;
+      document.getElementById('docCanvas').innerHTML = '<div style="white-space:pre-wrap;font-family:var(--font-body);padding:20px;line-height:1.6">' + text.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+      document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
+      updatePreview();
+      updateWordCount();
+    };
+    reader.readAsText(file);
     showToast('File loaded! You can now edit or ask AI to improve it.');
   } else if (file.type === 'text/html' || file.name.endsWith('.html')) {
-    const text = await file.text();
-    docCanvas.innerHTML = text;
-    updatePreview();
-    updateWordCount();
-    showToast('HTML loaded!');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('docCanvas').innerHTML = e.target.result;
+      document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
+      updatePreview();
+      updateWordCount();
+      showToast('HTML loaded!');
+    };
+    reader.readAsText(file);
   } else if (file.type.startsWith('image/')) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -701,105 +779,165 @@ async function handleFileUpload(input) {
     };
     reader.readAsDataURL(file);
   } else if (file.name.endsWith('.pdf')) {
-    // PDF extraction using pdf.js
-    addAIMessage('Processing PDF: ' + file.name, 'system');
+    // PDF - extract text with structure preservation, NO AI reformatting
+    addAIMessage('Processing PDF: ' + file.name + ' (preserving original format)', 'system');
     showAILoading();
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-      let fullText = '';
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const pages = [];
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        fullText += pageText + '\n\n';
+        const viewport = page.getViewport({ scale: 1 });
+        const pageWidth = viewport.width;
+        // Group text items into lines based on Y position
+        const lines = [];
+        let currentLine = [];
+        let lastY = null;
+        const sortedItems = textContent.items.sort((a, b) => {
+          const yDiff = b.transform[5] - a.transform[5];
+          if (Math.abs(yDiff) > 3) return yDiff;
+          return a.transform[4] - b.transform[4];
+        });
+        for (const item of sortedItems) {
+          const y = Math.round(item.transform[5]);
+          const x = item.transform[4];
+          const fontSize = Math.abs(item.transform[0]) || 12;
+          if (lastY !== null && Math.abs(y - lastY) > 5) {
+            if (currentLine.length) lines.push({ items: [...currentLine], y: lastY });
+            currentLine = [];
+          }
+          currentLine.push({ text: item.str, x, y, fontSize, width: item.width });
+          lastY = y;
+        }
+        if (currentLine.length) lines.push({ items: [...currentLine], y: lastY });
+        pages.push({ lines, pageWidth, pageHeight: viewport.height });
+      }
+      // Build HTML preserving structure
+      let html = '';
+      for (let p = 0; p < pages.length; p++) {
+        const pg = pages[p];
+        if (p > 0) html += '<hr style="border:none;border-top:2px dashed #ccc;margin:30px 0;page-break-before:always">';
+        let prevFontSize = 12;
+        let tableLines = [];
+        let inTable = false;
+        for (const line of pg.lines) {
+          const lineText = line.items.map(it => it.text).join(' ').trim();
+          if (!lineText) { html += '<br>'; continue; }
+          const maxFontSize = Math.max(...line.items.map(it => it.fontSize));
+          // Detect potential table rows (multiple items with significant X gaps)
+          const hasMultipleColumns = line.items.length >= 2 && line.items.some((it, idx) => {
+            if (idx === 0) return false;
+            return (it.x - (line.items[idx-1].x + line.items[idx-1].width)) > 30;
+          });
+          if (hasMultipleColumns) {
+            if (!inTable) { inTable = true; tableLines = []; }
+            tableLines.push(line);
+            continue;
+          }
+          // Flush any pending table
+          if (inTable) {
+            html += buildTableHTML(tableLines, pg.pageWidth);
+            tableLines = [];
+            inTable = false;
+          }
+          // Determine element type by font size
+          if (maxFontSize >= 22) {
+            html += '<h1 style="margin:16px 0 8px;font-size:' + Math.min(maxFontSize * 1.2, 36) + 'px">' + escapeHTML(lineText) + '</h1>';
+          } else if (maxFontSize >= 17) {
+            html += '<h2 style="margin:12px 0 6px;font-size:' + Math.min(maxFontSize * 1.1, 28) + 'px">' + escapeHTML(lineText) + '</h2>';
+          } else if (maxFontSize >= 14) {
+            html += '<h3 style="margin:10px 0 4px;font-size:' + maxFontSize + 'px">' + escapeHTML(lineText) + '</h3>';
+          } else {
+            html += '<p style="margin:4px 0;line-height:1.5;font-size:' + maxFontSize + 'px">' + escapeHTML(lineText) + '</p>';
+          }
+        }
+        // Flush remaining table
+        if (inTable && tableLines.length) {
+          html += buildTableHTML(tableLines, pg.pageWidth);
+        }
       }
       removeAILoading();
-      if (fullText.trim()) {
-        addAIMessage('PDF text extracted (' + pdf.numPages + ' pages). Formatting with AI...', 'system');
-        showAILoading();
-        const res = await fetch('/api/ai-generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: 'Convert this extracted PDF text into a clean, professionally formatted HTML document. Preserve all content and structure. Here is the text:\n\n' + fullText.substring(0, 8000),
-            docType: 'upload',
-            mode: 'create'
-          })
-        });
-        removeAILoading();
-        if (res.ok) {
-          const data = await res.json();
-          docCanvas.innerHTML = data.html;
-          updatePreview(); updateWordCount();
-          addAIMessage('PDF loaded and formatted! You can now edit it.', 'assistant');
-          document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
-        } else {
-          docCanvas.innerHTML = '<div style="white-space:pre-wrap;font-family:var(--font-body);line-height:1.7">' + fullText.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
-          updatePreview(); updateWordCount();
-          addAIMessage('PDF loaded as plain text. AI formatting unavailable.', 'system');
-        }
+      if (html.trim()) {
+        document.getElementById('docCanvas').innerHTML = '<div style="padding:20px;font-family:var(--font-body)">' + html + '</div>';
+        document.getElementById('docTitle').textContent = file.name.replace(/\.pdf$/i, '');
+        updatePreview();
+        updateWordCount();
+        addAIMessage('PDF loaded with original formatting preserved (' + pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + '). You can edit directly in the canvas. Ask me if you need help making changes.', 'assistant');
       } else {
-        removeAILoading();
         addAIMessage('Could not extract text from this PDF. It may be image-based or encrypted.', 'system');
       }
     } catch(err) {
       removeAILoading();
       addAIMessage('Error reading PDF: ' + err.message, 'system');
     }
-    document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
   } else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
-    // DOCX - extract via JSZip-like approach or send text
-    addAIMessage('Processing Word document: ' + file.name, 'system');
+    // DOCX - use mammoth.js for high-fidelity HTML conversion, NO AI reformatting
+    addAIMessage('Processing Word document: ' + file.name + ' (preserving original format)', 'system');
     showAILoading();
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const uint8 = new Uint8Array(arrayBuffer);
-      // Simple DOCX text extraction (DOCX is a ZIP containing XML)
-      let text = '';
-      // Try to decode as text first
-      const decoder = new TextDecoder('utf-8', {fatal: false});
-      const rawText = decoder.decode(uint8);
-      // Extract readable text between XML tags
-      const xmlMatch = rawText.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
-      if (xmlMatch) {
-        text = xmlMatch.map(m => m.replace(/<[^>]+>/g, '')).join(' ');
-      }
-      removeAILoading();
-      if (text.trim()) {
-        addAIMessage('Word document text extracted. Formatting...', 'system');
-        showAILoading();
-        const res = await fetch('/api/ai-generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: 'Format this text from a Word document into clean, professional HTML. Preserve structure:\n\n' + text.substring(0, 8000),
-            docType: 'upload',
-            mode: 'create'
-          })
+      if (typeof mammoth !== 'undefined') {
+        // Use mammoth.js for proper DOCX to HTML conversion
+        const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, {
+          styleMap: [
+            "p[style-name='Heading 1'] => h1:fresh",
+            "p[style-name='Heading 2'] => h2:fresh",
+            "p[style-name='Heading 3'] => h3:fresh",
+            "p[style-name='Title'] => h1.doc-title:fresh",
+            "b => strong",
+            "i => em",
+            "u => u",
+            "strike => s"
+          ]
         });
         removeAILoading();
-        if (res.ok) {
-          const data = await res.json();
-          docCanvas.innerHTML = data.html;
-          addAIMessage('Word document loaded and formatted!', 'assistant');
+        if (result.value && result.value.trim()) {
+          // Add some base styling to the mammoth output
+          let styledHTML = '<div style="padding:20px;font-family:var(--font-body);line-height:1.6;color:#2d2926">';
+          styledHTML += result.value;
+          styledHTML += '</div>';
+          document.getElementById('docCanvas').innerHTML = styledHTML;
+          document.getElementById('docTitle').textContent = file.name.replace(/\.docx?$/i, '');
+          updatePreview();
+          updateWordCount();
+          let msg = 'Word document loaded with formatting preserved!';
+          if (result.messages && result.messages.length) {
+            msg += ' (' + result.messages.length + ' minor conversion note' + (result.messages.length > 1 ? 's' : '') + ')';
+          }
+          msg += ' You can edit directly. Ask me if you need help.';
+          addAIMessage(msg, 'assistant');
         } else {
-          docCanvas.innerHTML = '<div style="white-space:pre-wrap">' + text.replace(/</g,'&lt;') + '</div>';
-          addAIMessage('Document loaded as plain text.', 'system');
+          addAIMessage('Could not extract content from this Word document.', 'system');
         }
       } else {
-        addAIMessage('Could not extract text. Try saving as .txt or .pdf first.', 'system');
+        // Fallback: basic DOCX text extraction without mammoth
+        removeAILoading();
+        const textDecoder = new TextDecoder('utf-8');
+        const text = textDecoder.decode(arrayBuffer);
+        const xmlMatch = text.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+        let extractedText = '';
+        if (xmlMatch) {
+          extractedText = xmlMatch.map(m => m.replace(/<[^>]+>/g, '')).join(' ');
+        }
+        if (extractedText.trim()) {
+          document.getElementById('docCanvas').innerHTML = '<div style="padding:20px;font-family:var(--font-body);line-height:1.6">' + escapeHTML(extractedText) + '</div>';
+          document.getElementById('docTitle').textContent = file.name.replace(/\.docx?$/i, '');
+          updatePreview();
+          updateWordCount();
+          addAIMessage('Word document loaded (basic text extraction). Some formatting may be simplified. Ask me to help improve the layout.', 'assistant');
+        } else {
+          addAIMessage('Could not extract text. Try saving as .pdf or .txt first.', 'system');
+        }
       }
-      updatePreview(); updateWordCount();
     } catch(err) {
       removeAILoading();
       addAIMessage('Error processing Word file: ' + err.message, 'system');
     }
-    document.getElementById('docTitle').value = file.name.replace(/\.[^.]+$/, '');
   } else {
     addAIMessage('Unsupported file format. Please upload PDF, DOCX, TXT, or HTML.', 'system');
   }
-  input.value = '';
 }
 
 // ==============================
