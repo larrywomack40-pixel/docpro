@@ -717,12 +717,13 @@ async function sendAI() {
   const prompt = document.getElementById('aiPrompt').value.trim();
   if (!prompt) return;
   
-  addAIMessage(prompt, 'user');h
+  addAIMessage(prompt, 'user');
   document.getElementById('aiPrompt').value = '';
   showAILoading();
   
   const currentContent = docCanvas.innerHTML;
-  const hasContent = currentContent.trim().length > 0 && currentContent.trim() !== '<br>';
+  const hasContent = currentContent.trim().length > 100 && currentContent.trim() !== '<br>' && currentContent.trim() !== '<p><br></p>';
+  console.log('[AI] Mode:', hasContent ? 'edit' : 'create', '| Content length:', currentContent.length, '| Sending existing:', hasContent);
   // Show edit mode indicator
   if (hasContent) {
     addAIMessage('\u270f\ufe0f Editing current document - your changes will be applied to the existing content.', 'system');
