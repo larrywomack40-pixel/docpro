@@ -7,6 +7,7 @@
 <meta name="description" content="Create, edit, and design professional documents with AI assistance. Free document editor by DraftMyForms.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23c99532'/%3E%3Cstop offset='100%25' stop-color='%23e8b94a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='24' fill='url(%23g)'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Caveat:wght@400;600&family=Homemade+Apple&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -199,6 +200,37 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
   .doc-canvas h1, .doc-canvas h2, .doc-canvas h3 { page-break-after: avoid; }
   @page { margin: 20mm; }
 }
+
+/* E-Signature Modal */
+.sig-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center}
+.sig-overlay.active{display:flex}
+.sig-modal{background:#fff;border-radius:12px;width:560px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.sig-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #e8ddd4}
+.sig-header h3{margin:0;font-family:var(--font-heading);font-size:18px;color:var(--text)}
+.sig-close{background:none;border:none;font-size:20px;cursor:pointer;color:#8a7f76}
+.sig-tabs{display:flex;gap:0;border-bottom:1px solid #e8ddd4}
+.sig-tab{flex:1;padding:10px;text-align:center;background:none;border:none;cursor:pointer;font-size:13px;color:#8a7f76;border-bottom:2px solid transparent;transition:all 0.2s}
+.sig-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+.sig-body{padding:20px}
+.sig-canvas-wrap{border:2px dashed #d4ccc4;border-radius:8px;background:#faf9f7;position:relative;margin-bottom:12px}
+.sig-canvas-wrap canvas{width:100%;height:180px;display:block;cursor:crosshair}
+.sig-type-input{width:100%;padding:16px;font-size:32px;border:2px dashed #d4ccc4;border-radius:8px;background:#faf9f7;text-align:center;outline:none}
+.sig-type-input:focus{border-color:var(--gold)}
+.sig-font-select{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.sig-font-opt{padding:6px 12px;border:1px solid #d4ccc4;border-radius:6px;background:#fff;cursor:pointer;font-size:14px}
+.sig-font-opt.active{border-color:var(--gold);background:#fef8ee}
+.sig-preview{text-align:center;padding:20px;border:2px dashed #d4ccc4;border-radius:8px;margin-top:12px;min-height:80px;display:flex;align-items:center;justify-content:center}
+.sig-preview img{max-width:100%;max-height:100px}
+.sig-actions{display:flex;gap:10px;padding:16px 20px;border-top:1px solid #e8ddd4;justify-content:space-between}
+.sig-btn{padding:8px 20px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500}
+.sig-btn-clear{background:#f5f0eb;color:#8a7f76}
+.sig-btn-insert{background:var(--gold);color:#fff}
+.sig-btn-insert:hover{background:var(--gold-dark)}
+.sig-saved-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.sig-saved-item{border:2px solid #e8ddd4;border-radius:8px;padding:8px 12px;cursor:pointer;background:#fff;text-align:center;min-width:120px}
+.sig-saved-item:hover,.sig-saved-item.selected{border-color:var(--gold);background:#fef8ee}
+.sig-saved-item img{max-width:140px;max-height:50px}
+.sig-saved-item .sig-name{font-size:11px;color:#8a7f76;margin-top:4px}
 </style>
 </head>
 <body>
@@ -326,6 +358,7 @@ I can help you create, edit, and perfect any document. Try:
 <div class="toolbar-group">
 <button class="tool-btn" onclick="clearFormatting()" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
 <button class="tool-btn" onclick="printDoc()" title="Print"><i class="fas fa-print"></i></button>
+      <button class="tool-btn" onclick="openSignatureModal()" title="E-Signature"><i class="fas fa-signature"></i></button>
 </div>
 </div>
 
@@ -1616,10 +1649,224 @@ async function editorCheckout(plan) {
     if (el) el.innerHTML = '';
   }
   loadSiteBanner();
+
+  // ===== E-SIGNATURE FEATURE =====
+  var sigCanvas, sigCtx, sigDrawing = false, sigCurrentTab = 'draw', sigSelectedFont = 'Dancing Script';
+  var sigSelectedSavedId = null;
+
+  function initSigCanvas() {
+    sigCanvas = document.getElementById('sigCanvas');
+    if (!sigCanvas) return;
+    sigCtx = sigCanvas.getContext('2d');
+    sigCanvas.width = sigCanvas.offsetWidth * 2;
+    sigCanvas.height = 360;
+    sigCtx.scale(2, 2);
+    sigCtx.lineCap = 'round';
+    sigCtx.lineJoin = 'round';
+    sigCanvas.addEventListener('mousedown', sigStartDraw);
+    sigCanvas.addEventListener('mousemove', sigDraw);
+    sigCanvas.addEventListener('mouseup', sigStopDraw);
+    sigCanvas.addEventListener('mouseleave', sigStopDraw);
+    sigCanvas.addEventListener('touchstart', function(e) { e.preventDefault(); sigStartDraw(e.touches[0]); }, {passive:false});
+    sigCanvas.addEventListener('touchmove', function(e) { e.preventDefault(); sigDraw(e.touches[0]); }, {passive:false});
+    sigCanvas.addEventListener('touchend', sigStopDraw);
+  }
+
+  function sigStartDraw(e) {
+    sigDrawing = true;
+    var rect = sigCanvas.getBoundingClientRect();
+    sigCtx.beginPath();
+    sigCtx.strokeStyle = document.getElementById('sigColor').value;
+    sigCtx.lineWidth = parseInt(document.getElementById('sigWidth').value);
+    sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }
+
+  function sigDraw(e) {
+    if (!sigDrawing) return;
+    var rect = sigCanvas.getBoundingClientRect();
+    sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    sigCtx.stroke();
+  }
+
+  function sigStopDraw() { sigDrawing = false; }
+
+  function clearSigPad() {
+    if (sigCurrentTab === 'draw' && sigCtx) {
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    } else if (sigCurrentTab === 'type') {
+      document.getElementById('sigTypeInput').value = '';
+    }
+    sigSelectedSavedId = null;
+  }
+
+  function openSignatureModal() {
+    document.getElementById('sigOverlay').classList.add('active');
+    setTimeout(initSigCanvas, 100);
+    loadSavedSignatures();
+  }
+
+  function closeSignatureModal() {
+    document.getElementById('sigOverlay').classList.remove('active');
+  }
+
+  function switchSigTab(tab) {
+    sigCurrentTab = tab;
+    document.querySelectorAll('.sig-tab').forEach(function(t, i) {
+      t.classList.toggle('active', (i === 0 && tab === 'draw') || (i === 1 && tab === 'type') || (i === 2 && tab === 'saved'));
+    });
+    document.getElementById('sigTabDraw').style.display = tab === 'draw' ? '' : 'none';
+    document.getElementById('sigTabType').style.display = tab === 'type' ? '' : 'none';
+    document.getElementById('sigTabSaved').style.display = tab === 'saved' ? '' : 'none';
+    if (tab === 'draw') setTimeout(initSigCanvas, 100);
+    if (tab === 'saved') loadSavedSignatures();
+  }
+
+  function setSigFont(btn, font) {
+    sigSelectedFont = font;
+    document.querySelectorAll('.sig-font-opt').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('sigTypeInput').style.fontFamily = "'" + font + "',cursive";
+  }
+
+  function getSignatureDataURL() {
+    if (sigCurrentTab === 'draw') {
+      if (!sigCanvas) return null;
+      var tempCanvas = document.createElement('canvas');
+      tempCanvas.width = sigCanvas.width;
+      tempCanvas.height = sigCanvas.height;
+      var tCtx = tempCanvas.getContext('2d');
+      tCtx.drawImage(sigCanvas, 0, 0);
+      var imgData = tCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
+      var hasContent = false;
+      for (var i = 3; i < imgData.length; i += 4) { if (imgData[i] > 0) { hasContent = true; break; } }
+      if (!hasContent) return null;
+      return sigCanvas.toDataURL('image/png');
+    } else if (sigCurrentTab === 'type') {
+      var text = document.getElementById('sigTypeInput').value.trim();
+      if (!text) return null;
+      var tc = document.createElement('canvas');
+      tc.width = 600; tc.height = 160;
+      var ctx = tc.getContext('2d');
+      ctx.font = '48px ' + sigSelectedFont + ', cursive';
+      ctx.fillStyle = document.getElementById('sigColor').value || '#000';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 300, 80);
+      return tc.toDataURL('image/png');
+    } else if (sigCurrentTab === 'saved' && sigSelectedSavedId) {
+      var selItem = document.querySelector('.sig-saved-item.selected img');
+      return selItem ? selItem.src : null;
+    }
+    return null;
+  }
+
+  async function insertSignature() {
+    var dataURL = getSignatureDataURL();
+    if (!dataURL) { alert('Please draw, type, or select a signature first.'); return; }
+    var shouldSave = document.getElementById('sigSaveCheck').checked;
+    if (shouldSave && sigCurrentTab !== 'saved') {
+      await saveSignatureToDb(dataURL);
+    }
+    var imgHTML = '<div style="margin:16px 0;"><img src="' + dataURL + '" style="max-width:250px;max-height:80px;" alt="Signature"><div style="border-top:1px solid #333;width:250px;margin-top:4px;padding-top:2px;font-size:11px;color:#666;">Authorized Signature \u2022 ' + new Date().toLocaleDateString() + '</div></div>';
+    var editor = document.getElementById('editor');
+    if (editor) {
+      editor.focus();
+      document.execCommand('insertHTML', false, imgHTML);
+    }
+    closeSignatureModal();
+  }
+
+  async function saveSignatureToDb(dataURL) {
+    try {
+      if (typeof sbClient === 'undefined') return;
+      var session = (await sbClient.auth.getSession()).data.session;
+      if (!session) return;
+      var name = sigCurrentTab === 'type' ? document.getElementById('sigTypeInput').value.trim() : 'Drawn Signature';
+      await sbClient.from('signatures').insert({
+        user_id: session.user.id,
+        name: name || 'My Signature',
+        type: sigCurrentTab,
+        data: dataURL,
+        font_family: sigCurrentTab === 'type' ? sigSelectedFont : null,
+        is_default: false
+      });
+    } catch(e) { console.error('Save signature error:', e); }
+  }
+
+  async function loadSavedSignatures() {
+    var list = document.getElementById('sigSavedList');
+    if (!list) return;
+    try {
+      if (typeof sbClient === 'undefined') { list.innerHTML = '<p style="color:#8a7f76;text-align:center;width:100%">Sign in to save signatures</p>'; return; }
+      var session = (await sbClient.auth.getSession()).data.session;
+      if (!session) { list.innerHTML = '<p style="color:#8a7f76;text-align:center;width:100%">Sign in to save signatures</p>'; return; }
+      var result = await sbClient.from('signatures').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
+      if (!result.data || result.data.length === 0) {
+        list.innerHTML = '<p style="color:#8a7f76;text-align:center;width:100%">No saved signatures yet. Draw or type one and save it.</p>';
+        return;
+      }
+      list.innerHTML = result.data.map(function(s) {
+        return '<div class="sig-saved-item" onclick="selectSavedSig(this,\'' + s.id + '\')" data-id="' + s.id + '"><img src="' + s.data + '"><div class="sig-name">' + (s.name || 'Signature') + '</div></div>';
+      }).join('');
+    } catch(e) { list.innerHTML = '<p style="color:#c24b3b">Error loading signatures</p>'; }
+  }
+
+  function selectSavedSig(el, id) {
+    document.querySelectorAll('.sig-saved-item').forEach(function(item){ item.classList.remove('selected'); });
+    el.classList.add('selected');
+    sigSelectedSavedId = id;
+  }
 </script>
 
 <!-- LLC FOOTER -->
 <div style="position:fixed;bottom:0;left:0;right:0;text-align:center;padding:3px;font-size:10px;color:#8a7f76;background:rgba(255,255,255,.9);border-top:1px solid #e8ddd4;z-index:10;pointer-events:none">A product of <strong>Wmk Speciality Services L.L.C.</strong></div>
 
+
+<!-- E-SIGNATURE MODAL -->
+<div class="sig-overlay" id="sigOverlay">
+  <div class="sig-modal">
+    <div class="sig-header">
+      <h3><i class="fas fa-signature" style="color:var(--gold);margin-right:8px"></i>E-Signature</h3>
+      <button class="sig-close" onclick="closeSignatureModal()">&times;</button>
+    </div>
+    <div class="sig-tabs">
+      <button class="sig-tab active" onclick="switchSigTab('draw')"><i class="fas fa-pen"></i> Draw</button>
+      <button class="sig-tab" onclick="switchSigTab('type')"><i class="fas fa-keyboard"></i> Type</button>
+      <button class="sig-tab" onclick="switchSigTab('saved')"><i class="fas fa-bookmark"></i> Saved</button>
+    </div>
+    <div class="sig-body">
+      <div id="sigTabDraw">
+        <div class="sig-canvas-wrap">
+          <canvas id="sigCanvas" width="520" height="180"></canvas>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="font-size:12px;color:#8a7f76">Color:</label>
+          <input type="color" id="sigColor" value="#000000" style="width:32px;height:28px;border:none;cursor:pointer">
+          <label style="font-size:12px;color:#8a7f76;margin-left:8px">Width:</label>
+          <input type="range" id="sigWidth" min="1" max="6" value="2" style="width:80px">
+        </div>
+      </div>
+      <div id="sigTabType" style="display:none">
+        <input type="text" class="sig-type-input" id="sigTypeInput" placeholder="Type your name" style="font-family:'Dancing Script',cursive">
+        <div class="sig-font-select">
+          <button class="sig-font-opt active" onclick="setSigFont(this,'Dancing Script')" style="font-family:'Dancing Script',cursive">Signature</button>
+          <button class="sig-font-opt" onclick="setSigFont(this,'Great Vibes')" style="font-family:'Great Vibes',cursive">Elegant</button>
+          <button class="sig-font-opt" onclick="setSigFont(this,'Caveat')" style="font-family:'Caveat',cursive">Casual</button>
+          <button class="sig-font-opt" onclick="setSigFont(this,'Homemade Apple')" style="font-family:'Homemade Apple',cursive">Handwritten</button>
+        </div>
+      </div>
+      <div id="sigTabSaved" style="display:none">
+        <div class="sig-saved-list" id="sigSavedList"><p style="color:#8a7f76;text-align:center;width:100%">Loading saved signatures...</p></div>
+      </div>
+    </div>
+    <div class="sig-actions">
+      <div style="display:flex;gap:8px">
+        <button class="sig-btn sig-btn-clear" onclick="clearSigPad()">Clear</button>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:#8a7f76"><input type="checkbox" id="sigSaveCheck" checked> Save for reuse</label>
+      </div>
+      <button class="sig-btn sig-btn-insert" onclick="insertSignature()"><i class="fas fa-check"></i> Insert Signature</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
