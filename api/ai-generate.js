@@ -157,6 +157,23 @@ ${docType === 'logo' ? 'LOGO MODE: Create an elegant SVG logo. Output ONLY the S
         });
 
         creditsRemaining = creditLimit - (creditsUsed + 1);
+
+      // Log active day for trial eligibility
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data: prof } = await supabaseAdmin.from('profiles').select('active_days_log, plan').eq('id', userId).single();
+        if (prof && prof.plan === 'free') {
+          const days = prof.active_days_log || [];
+          if (!days.includes(today)) {
+            const newDays = [...days, today];
+            await supabaseAdmin.from('profiles').update({
+              active_days_log: newDays,
+              active_days_count: newDays.length,
+              trial_eligible: newDays.length < 3
+            }).eq('id', userId);
+          }
+        }
+      } catch (actErr) { /* non-blocking */ }
       } catch (logErr) {
         console.error('Credit logging error (non-blocking):', logErr.message);
       }
