@@ -653,6 +653,20 @@ async function processReferral() {
   } catch(e) { console.error('Referral process error:', e); }
 }
 setTimeout(() => { processReferral(); }, 1000);
+
+// ===== ACTIVE DAY TRACKING FOR TRIAL ELIGIBILITY =====
+(function logDashboardActivity() {
+  try {
+    var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
+    var token = session.access_token;
+    if (!token) return;
+    fetch('/api/log-activity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ action: 'dashboard_visit' })
+    }).catch(function() {});
+  } catch(e) {}
+})();
 </script>
 <div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services L.L.C.</strong></div>
 </body>
