@@ -77,6 +77,35 @@ footer{text-align:center;padding:24px;color:var(--text-muted);font-size:13px}
 footer strong{color:var(--gold-dark)}
 
 select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font-body);cursor:pointer;background:#fff}
+
+/* Plan Change Modal */
+.plan-modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; display:none; align-items:center; justify-content:center; }
+.plan-modal-overlay.active { display:flex; }
+.plan-modal { background:#fff; border-radius:12px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.plan-modal h3 { margin:0 0 20px; font-size:1.3em; }
+.plan-modal label { display:block; margin:10px 0 4px; font-weight:600; font-size:0.9em; color:#555; }
+.plan-modal select, .plan-modal input[type=text] { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:0.95em; }
+.plan-modal .trial-options { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
+.plan-modal .trial-btn { padding:6px 14px; border:1px solid #ddd; border-radius:20px; background:#f9f9f9; cursor:pointer; font-size:0.85em; transition:all 0.2s; }
+.plan-modal .trial-btn:hover, .plan-modal .trial-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.plan-modal .notify-check { display:flex; align-items:center; gap:8px; margin:12px 0; font-size:0.9em; }
+.plan-modal .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+.plan-modal .modal-actions button { padding:10px 24px; border-radius:8px; font-size:0.95em; cursor:pointer; border:none; }
+.plan-modal .btn-cancel { background:#f0f0f0; color:#333; }
+.plan-modal .btn-confirm { background:var(--primary); color:#fff; font-weight:600; }
+.plan-modal .btn-confirm:hover { opacity:0.9; }
+.plan-modal .current-info { background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9em; }
+.plan-modal .current-info strong { color:var(--primary); }
+.plan-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.75em; margin-left:6px; }
+.plan-badge.trial { background:#fff3cd; color:#856404; }
+.plan-badge.override { background:#d4edda; color:#155724; }
+.plan-badge.expired { background:#f8d7da; color:#721c24; }
+/* Referrals Section */
+.referral-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin:15px 0; }
+.ref-stat { background:#f8f9fa; padding:15px; border-radius:10px; text-align:center; }
+.ref-stat .num { font-size:1.8em; font-weight:700; color:var(--primary); }
+.ref-stat .label { font-size:0.85em; color:#666; }
+
 </style>
 </head>
 <body>
@@ -136,7 +165,7 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 </div>
 <div class="section-body">
 <table>
-<thead><tr><th>Email</th><th>Display Name</th><th>Role</th><th>Plan</th><th>Actions</th></tr></thead>
+<thead><tr><th>Email</th><th>Display Name</th><th>Role</th><th>Plan</th><th>Referral Code</th><th>Actions</th></tr></thead>
 <tbody id="usersTableBody"><tr><td colspan="5" class="empty-state">Loading users...</td></tr></tbody>
 </table>
 </div>
@@ -206,6 +235,20 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 <div id="adminMsgList" style="max-height:300px;overflow-y:auto"><p style="color:#8a7f76;text-align:center;padding:20px">Loading...</p></div>
 </div>
 
+
+<!-- Referrals Section -->
+<section class="admin-card" id="referralsSection" style="margin:30px auto;max-width:1200px;padding:30px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h2 style="margin:0;"><span style="margin-right:8px;">&#x1F517;</span> Referral System</h2>
+    <span id="referralCount" style="color:var(--primary);font-weight:600;"></span>
+  </div>
+  <div class="referral-stats" id="referralStats"></div>
+  <div style="margin-top:15px;">
+    <h4 style="margin:0 0 10px;">Recent Referrals</h4>
+    <div id="referralsList" style="max-height:300px;overflow-y:auto;"></div>
+  </div>
+</section>
+
 <footer>A product of <strong>WMK Speciality Services L.L.C.</strong></footer>
 
 <script>
@@ -231,6 +274,8 @@ document.getElementById('adminContent').style.display='block';
 await loadStats();
 await loadUsers();
 await loadLeads();
+    await loadReferrals();
+    await checkExpiredTrials();
     if(typeof loadBannerAdmin === "function") await loadBannerAdmin();
     if(typeof loadUserListForMessaging === "function") loadUserListForMessaging();
     if(typeof loadAdminMessages === "function") await loadAdminMessages();
@@ -257,54 +302,102 @@ document.getElementById('statDocs').textContent=docs?docs.length:0;
 }
 
 async function loadUsers(){
-var{data:users,error}=await sb.from('profiles').select('*').order('email');
-if(error){document.getElementById('usersTableBody').innerHTML='<tr><td colspan="5" class="empty-state">Error loading users</td></tr>';return}
-allUsers=users||[];
-document.getElementById('userCount').textContent=allUsers.length+' users';
-renderUsers(allUsers);
+  const {data,error}=await sb.from('profiles').select('id,email,display_name,role,plan,plan_override,plan_override_expires_at,plan_override_reason,referral_code,ai_credits_used,ai_credits_reset_at').order('created_at',{ascending:true});
+  if(error){console.error(error);return;}
+  window.__allUsers=data||[];
+  document.getElementById('userCount').textContent=data?data.length+' users':'0 users';
+  renderUsers(data||[]);
 }
 
 function renderUsers(users){
-var tbody=document.getElementById('usersTableBody');
-if(!users.length){tbody.innerHTML='<tr><td colspan="5" class="empty-state">No users found</td></tr>';return}
-var html='';
-users.forEach(function(u){
-var planClass='plan-'+(u.plan||'free');
-var roleClass='role-'+(u.role||'customer');
-html+='<tr>';
-html+='<td style="font-weight:500">'+escHtml(u.email)+'</td>';
-html+='<td>'+(u.display_name?escHtml(u.display_name):'<span style="color:var(--text-muted)">Not set</span>')+'</td>';
-html+='<td><span class="role-badge '+roleClass+'">'+(u.role||'customer')+'</span></td>';
-html+='<td><select class="plan-select" onchange="changePlan(this,\''+u.id+'\')" data-current="'+(u.plan||'free')+'">';
-html+='<option value="free"'+(u.plan==='free'||!u.plan?' selected':'')+'>Free</option>';
-html+='<option value="pro"'+(u.plan==='pro'?' selected':'')+'>Pro</option>';
-html+='<option value="business"'+(u.plan==='business'?' selected':'')+'>Business</option>';
-html+='</select></td>';
-html+='<td>';
-if(u.role!=='admin'){html+='<button class="btn-sm" onclick="toggleRole(\''+u.id+'\',\''+u.role+'\')">Toggle Admin</button> '}
-html+='</td>';
-html+='</tr>';
-});
-tbody.innerHTML=html;
+  const container=document.getElementById('userTableBody');
+  if(!container){return;}
+  if(!users||users.length===0){container.innerHTML='<tr><td colspan="6">No users found</td></tr>';return;}
+  container.innerHTML=users.map(u=>{
+    const planDisplay=u.plan_override||u.plan||'free';
+    const isOverride=!!u.plan_override;
+    const isTrial=!!u.plan_override_expires_at;
+    let badge='';
+    if(isTrial){
+      const exp=new Date(u.plan_override_expires_at);
+      const now=new Date();
+      const daysLeft=Math.ceil((exp-now)/(1000*60*60*24));
+      if(daysLeft>0){badge='<span class="plan-badge trial">Trial: '+daysLeft+'d left</span>';}
+      else{badge='<span class="plan-badge expired">Trial expired</span>';}
+    } else if(isOverride){
+      badge='<span class="plan-badge override">Override</span>';
+    }
+    const isAdmin=u.role==='admin';
+    return '<tr>'+
+      '<td style="font-weight:500">'+escHtml(u.email||'')+'</td>'+
+      '<td>'+(u.display_name?escHtml(u.display_name):'<span style="color:var(--text-muted)">Not set</span>')+'</td>'+
+      '<td><span class="role-badge role-'+u.role+'">'+(u.role||'customer')+'</span></td>'+
+      '<td>'+
+        '<span style="font-weight:600;text-transform:capitalize">'+planDisplay+'</span>'+badge+
+        (!isAdmin?' <button onclick="openPlanModal(\''+u.id+'\',\''+escHtml(u.email||'')+'\',\''+planDisplay+'\',\''+(u.plan_override_expires_at||'')+'\',\''+(u.plan_override_reason||'')+'\')" style="margin-left:8px;padding:2px 10px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.8em;">Change</button>':'')+
+      '</td>'+
+      '<td>'+(u.referral_code?'<code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;font-size:0.8em;">'+u.referral_code+'</code>':'<span style="color:#999">None</span>')+'</td>'+
+      '<td>'+(!isAdmin?'<button class="action-btn" onclick="toggleRole(\''+u.id+'\',\''+u.role+'\')">Toggle Admin</button>':'')+'</td>'+
+    '</tr>';
+  }).join('');
 }
-
 function filterUsers(){
-var q=document.getElementById('userSearch').value.toLowerCase();
-if(!q){renderUsers(allUsers);return}
-var filtered=allUsers.filter(function(u){
-return (u.email&&u.email.toLowerCase().indexOf(q)>=0)||(u.display_name&&u.display_name.toLowerCase().indexOf(q)>=0);
-});
-renderUsers(filtered);
+  const q=document.getElementById('userSearch')?.value?.toLowerCase()||'';
+  if(!q){renderUsers(window.__allUsers||[]);return;}
+  const filtered=(window.__allUsers||[]).filter(u=>(u.email||'').toLowerCase().includes(q)||(u.display_name||'').toLowerCase().includes(q));
+  renderUsers(filtered);
 }
-
+function openPlanModal(userId,email,currentPlan,expiresAt,reason){
+  document.getElementById('planModalUserId').value=userId;
+  document.getElementById('planModalUserEmail').value=email;
+  document.getElementById('planModalInfo').innerHTML='<strong>'+escHtml(email)+'</strong><br>Current plan: <strong>'+currentPlan+'</strong>'+(expiresAt?' (expires: '+new Date(expiresAt).toLocaleDateString()+')':'')+(reason?' &mdash; '+escHtml(reason):'');
+  document.getElementById('planModalPlan').value=currentPlan.replace(/Trial.*/i,'').trim()||'free';
+  document.getElementById('planModalDays').value='0';
+  document.getElementById('planModalReason').value='';
+  document.querySelectorAll('.trial-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.trial-btn')?.classList.add('active');
+  document.getElementById('planModalNotify').checked=true;
+  document.getElementById('planModalOverlay').classList.add('active');
+}
+function closePlanModal(){
+  document.getElementById('planModalOverlay').classList.remove('active');
+}
+function setTrialDays(days){
+  document.getElementById('planModalDays').value=days;
+  document.querySelectorAll('.trial-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+async function confirmPlanChange(){
+  const userId=document.getElementById('planModalUserId').value;
+  const userEmail=document.getElementById('planModalUserEmail').value;
+  const newPlan=document.getElementById('planModalPlan').value;
+  const days=parseInt(document.getElementById('planModalDays').value)||0;
+  const reason=document.getElementById('planModalReason').value;
+  const notify=document.getElementById('planModalNotify').checked;
+  const expiresAt=days>0?new Date(Date.now()+days*24*60*60*1000).toISOString():null;
+  const updateData={
+    plan: days>0?newPlan:newPlan,
+    plan_override: days>0?newPlan:null,
+    plan_override_expires_at: expiresAt,
+    plan_override_reason: reason||null,
+    plan_changed_by: currentUser.id,
+    plan_changed_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  const {error}=await sb.from('profiles').update(updateData).eq('id',userId);
+  if(error){alert('Error changing plan: '+error.message);return;}
+  await sb.from('plan_change_log').insert({user_id:userId,old_plan:null,new_plan:newPlan,override_type:days>0?days+' day trial':'permanent',override_expires_at:expiresAt,reason:reason,changed_by:currentUser.id});
+  if(notify){
+    const durText=days>0?days+' day trial':'permanent';
+    const msgBody='Your plan has been updated to '+newPlan.toUpperCase()+(days>0?' for '+days+' days':'')+'. '+(reason?'Reason: '+reason:'')+'\n\nIf you have questions, reply to this message.';
+    await sb.from('messages').insert({sender_id:currentUser.id,recipient_id:userId,subject:'Plan Updated to '+newPlan.charAt(0).toUpperCase()+newPlan.slice(1),body:msgBody,is_broadcast:false,is_read:false});
+  }
+  closePlanModal();
+  alert('Plan updated successfully!'+(notify?' User has been notified via inbox.':''));
+  loadUsers();
+}
 async function changePlan(selectEl,userId){
-var newPlan=selectEl.value;
-var oldPlan=selectEl.getAttribute('data-current');
-if(newPlan===oldPlan)return;
-var{error}=await sb.from('profiles').update({plan:newPlan}).eq('id',userId);
-if(error){alert('Error updating plan: '+error.message);selectEl.value=oldPlan;return}
-selectEl.setAttribute('data-current',newPlan);
-await loadStats();
+  openPlanModal(userId,'','',selectEl.value,'','');
 }
 
 async function toggleRole(userId,currentRole){
@@ -435,6 +528,105 @@ async function sendAdminMessage() {
 
 // Call these after admin loads
 setTimeout(function() { if (typeof loadBannerAdmin === "function") { loadBannerAdmin(); loadUserListForMessaging(); loadAdminMessages(); } }, 1000);
+
+
+// Referral System Functions
+async function loadReferrals() {
+  const statsEl = document.getElementById('referralStats');
+  const listEl = document.getElementById('referralsList');
+  const countEl = document.getElementById('referralCount');
+  if (!statsEl) return;
+  
+  const {data: referrals, error} = await sb.from('referrals').select('*').order('created_at', {ascending: false}).limit(50);
+  if (error) { console.error(error); return; }
+  
+  const total = referrals ? referrals.length : 0;
+  const completed = referrals ? referrals.filter(r => r.status === 'completed' || r.status === 'rewarded').length : 0;
+  const pending = referrals ? referrals.filter(r => r.status === 'pending').length : 0;
+  
+  countEl.textContent = total + ' referrals';
+  statsEl.innerHTML = '<div class="ref-stat"><div class="num">' + total + '</div><div class="label">Total Referrals</div></div>' +
+    '<div class="ref-stat"><div class="num">' + completed + '</div><div class="label">Completed</div></div>' +
+    '<div class="ref-stat"><div class="num">' + pending + '</div><div class="label">Pending</div></div>';
+  
+  if (!referrals || referrals.length === 0) {
+    listEl.innerHTML = '<p style="color:#999;text-align:center;padding:20px;">No referrals yet</p>';
+    return;
+  }
+  
+  const userIds = [...new Set(referrals.map(r => r.referrer_id).concat(referrals.map(r => r.referred_id)))];
+  const {data: profiles} = await sb.from('profiles').select('id,email').in('id', userIds);
+  const emailMap = {};
+  (profiles || []).forEach(p => { emailMap[p.id] = p.email; });
+  
+  listEl.innerHTML = '<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f8f9fa;"><th style="padding:8px;text-align:left;">Referrer</th><th style="padding:8px;text-align:left;">Referred</th><th style="padding:8px;text-align:left;">Code</th><th style="padding:8px;text-align:left;">Status</th><th style="padding:8px;text-align:left;">Date</th></tr></thead><tbody>' +
+    referrals.map(r => '<tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">' + escHtml(emailMap[r.referrer_id] || 'Unknown') + '</td><td style="padding:8px;">' + escHtml(emailMap[r.referred_id] || 'Unknown') + '</td><td style="padding:8px;"><code>' + escHtml(r.referral_code || '') + '</code></td><td style="padding:8px;"><span style="padding:2px 8px;border-radius:10px;font-size:0.8em;background:' + (r.status === 'completed' || r.status === 'rewarded' ? '#d4edda' : r.status === 'pending' ? '#fff3cd' : '#f8d7da') + ';">' + (r.status || 'pending') + '</span></td><td style="padding:8px;">' + new Date(r.created_at).toLocaleDateString() + '</td></tr>').join('') +
+    '</tbody></table>';
+}
+
+// Check and expire overdue trials
+async function checkExpiredTrials() {
+  const {data, error} = await sb.from('profiles').select('id,email,plan,plan_override,plan_override_expires_at').not('plan_override_expires_at', 'is', null);
+  if (error || !data) return;
+  const now = new Date();
+  for (const user of data) {
+    if (user.plan_override_expires_at && new Date(user.plan_override_expires_at) < now) {
+      await sb.from('profiles').update({
+        plan: 'free',
+        plan_override: null,
+        plan_override_expires_at: null,
+        plan_override_reason: null,
+        updated_at: new Date().toISOString()
+      }).eq('id', user.id);
+      await sb.from('plan_change_log').insert({
+        user_id: user.id,
+        old_plan: user.plan_override || user.plan,
+        new_plan: 'free',
+        override_type: 'trial_expired',
+        reason: 'Trial period ended automatically',
+        changed_by: currentUser.id
+      });
+    }
+  }
+}
+
 </script>
+
+<!-- Plan Change Modal -->
+<div class="plan-modal-overlay" id="planModalOverlay">
+  <div class="plan-modal">
+    <h3>&#x2699;&#xFE0F; Change User Plan</h3>
+    <div class="current-info" id="planModalInfo"></div>
+    <input type="hidden" id="planModalUserId">
+    <input type="hidden" id="planModalUserEmail">
+    <label>New Plan</label>
+    <select id="planModalPlan">
+      <option value="free">Free</option>
+      <option value="pro">Pro</option>
+      <option value="business">Business</option>
+    </select>
+    <label>Override Duration (optional trial)</label>
+    <div class="trial-options">
+      <span class="trial-btn" onclick="setTrialDays(0)">Permanent</span>
+      <span class="trial-btn" onclick="setTrialDays(7)">7 Days</span>
+      <span class="trial-btn" onclick="setTrialDays(15)">15 Days</span>
+      <span class="trial-btn" onclick="setTrialDays(30)">30 Days</span>
+      <span class="trial-btn" onclick="setTrialDays(60)">60 Days</span>
+      <span class="trial-btn" onclick="setTrialDays(90)">90 Days</span>
+    </div>
+    <input type="hidden" id="planModalDays" value="0">
+    <label>Reason (optional)</label>
+    <input type="text" id="planModalReason" placeholder="e.g. Beta tester, loyalty reward...">
+    <div class="notify-check">
+      <input type="checkbox" id="planModalNotify" checked>
+      <span>Notify user via inbox message</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePlanModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmPlanChange()">Confirm Change</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
