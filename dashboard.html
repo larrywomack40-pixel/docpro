@@ -148,6 +148,22 @@ a{text-decoration:none;color:inherit}
 <div class="stat-card"><div class="stat-number" id="statCredits">5</div><div class="stat-label">AI Credits</div></div>
 <div class="stat-card"><div class="stat-number" id="statExports">∞</div><div class="stat-label">Exports Left</div></div>
 </div>
+<!-- Referral Section -->
+<div class="referral-card" id="referralCard" style="background:linear-gradient(135deg,#fffdf5,#fff8e1);border:1px solid #e8d5a3;border-radius:12px;padding:20px 25px;margin:20px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+  <div style="flex:1;min-width:200px;">
+    <h3 style="margin:0 0 5px;font-size:1.1em;color:#333;"><span style="margin-right:6px;">🎁</span> Refer a Friend</h3>
+    <p style="margin:0;color:#666;font-size:0.9em;">Share your referral link and earn rewards when friends sign up!</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <input type="text" id="referralLink" readonly style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.85em;width:280px;background:#fff;" value="Loading...">
+    <button onclick="copyReferralLink()" style="padding:8px 16px;background:#C8922A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;">Copy Link</button>
+  </div>
+  <div id="referralStats" style="display:flex;gap:15px;font-size:0.85em;color:#666;">
+    <span><strong id="refCount">0</strong> referrals</span>
+    <span><strong id="refRewards">0</strong> rewards</span>
+  </div>
+</div>
+
 
 <div class="upgrade-banner" id="upgradeBanner" style="display:none">
 <div>
@@ -488,6 +504,51 @@ async function loadUnreadCount() {
 
 loadSiteBanner();
 loadUnreadCount();
+
+// Referral System
+async function loadReferralInfo() {
+  try {
+    const {data:{session}} = await sb.auth.getSession();
+    if (!session) return;
+    const userId = session.user.id;
+    
+    // Check if user has a referral code, generate one if not
+    const {data: profile} = await sb.from('profiles').select('referral_code').eq('id', userId).single();
+    let code = profile?.referral_code;
+    if (!code) {
+      code = 'DMF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      await sb.from('profiles').update({referral_code: code}).eq('id', userId);
+    }
+    
+    const link = 'https://www.draftmyforms.com/?ref=' + code;
+    const linkEl = document.getElementById('referralLink');
+    if (linkEl) linkEl.value = link;
+    
+    // Get referral stats
+    const {data: referrals} = await sb.from('referrals').select('id,status').eq('referrer_id', userId);
+    const total = referrals ? referrals.length : 0;
+    const rewarded = referrals ? referrals.filter(r => r.status === 'rewarded').length : 0;
+    const countEl = document.getElementById('refCount');
+    const rewardsEl = document.getElementById('refRewards');
+    if (countEl) countEl.textContent = total;
+    if (rewardsEl) rewardsEl.textContent = rewarded;
+  } catch(e) { console.error('Referral load error:', e); }
+}
+
+function copyReferralLink() {
+  const linkEl = document.getElementById('referralLink');
+  if (linkEl) {
+    navigator.clipboard.writeText(linkEl.value).then(() => {
+      const btn = event.target;
+      btn.textContent = 'Copied!';
+      btn.style.background = '#4CAF50';
+      setTimeout(() => { btn.textContent = 'Copy Link'; btn.style.background = '#C8922A'; }, 2000);
+    });
+  }
+}
+
+// Call on load
+setTimeout(() => { loadReferralInfo(); }, 500);
 </script>
 <div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services L.L.C.</strong></div>
 </body>
