@@ -527,7 +527,7 @@ async function sendAdminMessage() {
   }
 
 // Call these after admin loads
-setTimeout(function() { if (typeof loadBannerAdmin === "function") { loadBannerAdmin(); loadUserListForMessaging(); loadAdminMessages(); } }, 1000);
+  setTimeout(()=>{ if(currentUser){ loadBannerAdmin(); loadUserListForMessaging(); loadAdminMessages(); loadReferrals(); } },1000);
 
 
 // Referral System Functions
