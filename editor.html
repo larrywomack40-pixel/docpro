@@ -539,38 +539,87 @@ function clearFormatting() {
 }
 
 function printDoc() {
-    const content = docCanvas.innerHTML;
+    const canvas = document.getElementById('docCanvas');
+    const content = canvas.innerHTML;
     const title = document.getElementById('docTitle').value || 'Untitled Document';
+    
+    // Collect all inline styles from the editor canvas elements
+    const allElements = canvas.querySelectorAll('*');
+    let inlineStyleMap = new Map();
+    allElements.forEach((el, idx) => {
+      el.setAttribute('data-print-idx', idx);
+      const cs = window.getComputedStyle(el);
+      let important = '';
+      // Preserve backgrounds, colors, borders, fonts
+      if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+        important += 'background-color:' + cs.backgroundColor + ' !important;';
+      }
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+        important += 'background-image:' + cs.backgroundImage + ' !important;';
+      }
+      if (cs.color) important += 'color:' + cs.color + ';';
+      if (cs.fontFamily) important += 'font-family:' + cs.fontFamily + ';';
+      if (cs.fontSize) important += 'font-size:' + cs.fontSize + ';';
+      if (cs.fontWeight) important += 'font-weight:' + cs.fontWeight + ';';
+      if (cs.borderTop && cs.borderTop !== 'none') important += 'border-top:' + cs.borderTop + ';';
+      if (cs.borderBottom && cs.borderBottom !== 'none') important += 'border-bottom:' + cs.borderBottom + ';';
+      if (cs.borderLeft && cs.borderLeft !== 'none') important += 'border-left:' + cs.borderLeft + ';';
+      if (cs.borderRight && cs.borderRight !== 'none') important += 'border-right:' + cs.borderRight + ';';
+      if (cs.padding) important += 'padding:' + cs.padding + ';';
+      if (cs.margin) important += 'margin:' + cs.margin + ';';
+      if (cs.textAlign) important += 'text-align:' + cs.textAlign + ';';
+      if (cs.lineHeight) important += 'line-height:' + cs.lineHeight + ';';
+      if (cs.width && el.tagName === 'TABLE') important += 'width:' + cs.width + ';';
+      if (important) {
+        el.style.cssText += important;
+      }
+    });
+    
+    // Also collect stylesheets from current page
+    let editorStyles = '';
+    try {
+      for (const sheet of document.styleSheets) {
+        try {
+          for (const rule of sheet.cssRules) {
+            editorStyles += rule.cssText + ' ';
+          }
+        } catch(e) {} // Skip cross-origin sheets
+      }
+    } catch(e) {}
+    
+    // Re-read content after style inlining
+    const styledContent = canvas.innerHTML;
+    
+    // Clean up data attributes
+    allElements.forEach(el => el.removeAttribute('data-print-idx'));
+
     const w = window.open('', '_blank');
     if (!w) { showToast('Pop-up blocked. Please allow pop-ups.'); return; }
-    w.document.write('<!DOCTYPE html>' +
-      '<html><head><meta charset="UTF-8"><title>' + title + '</title>' +
-      '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">' +
+    
+    w.document.write(
+      '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+      '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;700&family=Dancing+Script&family=Great+Vibes&family=Caveat&family=Homemade+Apple&display=swap" rel="stylesheet">' +
       '<style>' +
-      '*{margin:0;padding:0;box-sizing:border-box}' +
-      'body{font-family:DM Sans,sans-serif;padding:40px 60px;color:#2d2926;line-height:1.7;font-size:14px;' +
-      '-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}' +
-      'h1,h2,h3{font-family:Playfair Display,Georgia,serif}' +
-      'h1{font-size:28px;margin-bottom:16px}' +
-      'h2{font-size:22px;margin-bottom:12px}' +
-      'h3{font-size:18px;margin-bottom:8px}' +
-      'p{margin-bottom:10px}' +
-      'table{width:100%;border-collapse:collapse;margin:16px 0;page-break-inside:avoid}' +
-      'th,td{border:1px solid #ddd;padding:8px 12px;text-align:left;font-size:13px}' +
-      'th{background:#c99532;color:#fff;font-weight:600}' +
-      'img{max-width:100%;height:auto;page-break-inside:avoid}' +
-      'ul,ol{margin:8px 0 8px 24px}li{margin-bottom:4px}' +
-      'hr{border:none;border-top:2px solid #c99532;margin:20px 0}' +
-      'div[style*="background"]{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}' +
-      'div[style*="gradient"]{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}' +
-      'div[style*="border-radius"]{overflow:hidden}' +
-      '@page{margin:15mm}' +
-      '@media print{body{padding:0}' +
-      '*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important}' +
-      'table{page-break-inside:avoid}h1,h2,h3{page-break-after:avoid}img{page-break-inside:avoid}}' +
-      '</style></head><body>' + content + '</body></html>');
+      '*, *::before, *::after { box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }' +
+      'body { font-family:DM Sans,sans-serif; padding:40px 60px; color:#2d2926; line-height:1.7; font-size:14px; }' +
+      'h1,h2,h3 { font-family:Playfair Display,Georgia,serif; margin-bottom:10px; }' +
+      'p { margin-bottom:8px; }' +
+      'table { width:100%; border-collapse:collapse; page-break-inside:avoid; }' +
+      'th,td { border:1px solid #ddd; padding:6px 10px; text-align:left; }' +
+      'th { background-color:#c99532 !important; color:#fff !important; font-weight:bold; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
+      'img { max-width:100%; height:auto; }' +
+      'ul,ol { margin-left:20px; }' +
+      'li { margin-bottom:4px; }' +
+      'hr { border:none; border-top:1px solid #ddd; margin:15px 0; }' +
+      'div[style*="background"] { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
+      '[style*="background-color"] { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }' +
+      '@page { margin:15mm; size:letter; }' +
+      '@media print { body { padding:0; } * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; } }' +
+      '</style>' +
+      '</head><body>' + styledContent + '</body></html>'
+    );
     w.document.close();
-    setTimeout(function(){ w.focus(); w.print(); }, 500);
+    setTimeout(() => { w.focus(); w.print(); }, 500);
   }
 
 // ==============================
@@ -1284,78 +1333,150 @@ async function loadTemplate(category, index) {
 // DOWNLOADS
 // ==============================
 async function downloadPDF() {
+    const canvas = document.getElementById('docCanvas');
+    const title = document.getElementById('docTitle').value || 'Untitled Document';
     showToast('Generating PDF...');
+    
     try {
-      // Temporarily expand canvas to full scroll height for complete capture
-      const origHeight = docCanvas.style.height;
-      const origMinHeight = docCanvas.style.minHeight;
-      const origOverflow = docCanvas.style.overflow;
-      docCanvas.style.height = docCanvas.scrollHeight + 'px';
-      docCanvas.style.minHeight = docCanvas.scrollHeight + 'px';
-      docCanvas.style.overflow = 'visible';
-
-      const canvas = await html2canvas(docCanvas, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        scrollY: 0,
-        scrollX: 0,
-        windowWidth: docCanvas.scrollWidth,
-        windowHeight: docCanvas.scrollHeight
+      // Force background colors to be visible for html2canvas
+      const allEls = canvas.querySelectorAll('*');
+      const origStyles = [];
+      allEls.forEach((el, i) => {
+        const cs = window.getComputedStyle(el);
+        origStyles[i] = el.getAttribute('style') || '';
+        // Ensure background colors are explicitly inline
+        if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+          el.style.backgroundColor = cs.backgroundColor;
+        }
+        if (cs.color) el.style.color = cs.color;
+        if (cs.fontFamily) el.style.fontFamily = cs.fontFamily;
+        if (cs.fontSize) el.style.fontSize = cs.fontSize;
+        if (cs.fontWeight) el.style.fontWeight = cs.fontWeight;
       });
 
+      const c = await html2canvas(canvas, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: canvas.scrollWidth,
+        height: canvas.scrollHeight,
+        windowWidth: canvas.scrollWidth,
+        windowHeight: canvas.scrollHeight
+      });
+      
       // Restore original styles
-      docCanvas.style.height = origHeight;
-      docCanvas.style.minHeight = origMinHeight;
-      docCanvas.style.overflow = origOverflow;
+      allEls.forEach((el, i) => {
+        if (origStyles[i]) el.setAttribute('style', origStyles[i]);
+        else el.removeAttribute('style');
+      });
 
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageW = 210;
-      const pageH = 297;
+      const imgData = c.toDataURL('image/png', 1.0);
+      const pdf = new jspdf.jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'letter'
+      });
+      
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 10;
-      const contentW = pageW - (margin * 2);
-      const imgH = (canvas.height * contentW) / canvas.width;
-      const contentH = pageH - (margin * 2);
-      let pos = 0;
-
-      while (pos < imgH) {
-        if (pos > 0) pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin - pos, contentW, imgH);
-        pos += contentH;
+      const usableWidth = pageWidth - (margin * 2);
+      const imgWidth = usableWidth;
+      const imgHeight = (c.height * imgWidth) / c.width;
+      
+      if (imgHeight <= pageHeight - (margin * 2)) {
+        pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+      } else {
+        // Multi-page support
+        let remainingHeight = imgHeight;
+        let position = 0;
+        let page = 0;
+        const usableHeight = pageHeight - (margin * 2);
+        
+        while (remainingHeight > 0) {
+          if (page > 0) pdf.addPage();
+          
+          const sliceHeight = Math.min(usableHeight, remainingHeight);
+          const sourceY = position * (c.height / imgHeight);
+          const sourceH = sliceHeight * (c.height / imgHeight);
+          
+          // Create a temporary canvas for this page slice
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = c.width;
+          tempCanvas.height = sourceH;
+          const tempCtx = tempCanvas.getContext('2d');
+          tempCtx.drawImage(c, 0, sourceY, c.width, sourceH, 0, 0, c.width, sourceH);
+          
+          const sliceData = tempCanvas.toDataURL('image/png', 1.0);
+          pdf.addImage(sliceData, 'PNG', margin, margin, imgWidth, sliceHeight);
+          
+          position += sliceHeight;
+          remainingHeight -= sliceHeight;
+          page++;
+        }
       }
-
-      const title = document.getElementById('docTitle').value || 'document';
-      pdf.save(title.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf');
+      
+      pdf.save(title.replace(/[^a-zA-Z0-9 ]/g, '_') + '.pdf');
       showToast('PDF downloaded!');
-    } catch (e) {
-      console.error('PDF generation error:', e);
-      showToast('Error generating PDF');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      showToast('Error generating PDF. Please try again.');
     }
   }
 
 function downloadDocx() {
-    const html = docCanvas.innerHTML;
-    const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>' +
-      'body{font-family:Calibri,sans-serif;font-size:12pt;color:#2d2926;line-height:1.6}' +
-      'h1,h2,h3{font-family:Georgia,serif}' +
-      'h1{font-size:24pt;margin-bottom:12pt}' +
-      'h2{font-size:18pt;margin-bottom:10pt}' +
-      'h3{font-size:14pt;margin-bottom:8pt}' +
-      'table{width:100%;border-collapse:collapse;margin:12pt 0}' +
-      'th,td{border:1px solid #ccc;padding:6px 8px;font-size:11pt}' +
-      'th{background:#c99532;color:#fff;font-weight:bold}' +
-      'img{max-width:100%}' +
-      'ul,ol{margin:6pt 0 6pt 24pt}' +
-      'hr{border:none;border-top:2px solid #c99532;margin:12pt 0}' +
-      '</style></head><body>';
-    const footer = '</body></html>';
-    const blob = new Blob([header + html + footer], { type: 'application/msword' });
+    const canvas = document.getElementById('docCanvas');
+    const title = document.getElementById('docTitle').value || 'Untitled Document';
+    
+    // Inline computed styles before extracting HTML
+    const allEls = canvas.querySelectorAll('*');
+    const origStyles = [];
+    allEls.forEach((el, i) => {
+      origStyles[i] = el.getAttribute('style') || '';
+      const cs = window.getComputedStyle(el);
+      let s = el.style.cssText || '';
+      if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+        s += 'background-color:' + cs.backgroundColor + ';';
+      }
+      if (cs.color) s += 'color:' + cs.color + ';';
+      if (cs.fontFamily) s += 'font-family:' + cs.fontFamily + ';';
+      if (cs.fontSize) s += 'font-size:' + cs.fontSize + ';';
+      if (cs.fontWeight && cs.fontWeight !== '400' && cs.fontWeight !== 'normal') s += 'font-weight:' + cs.fontWeight + ';';
+      if (cs.textAlign && cs.textAlign !== 'start') s += 'text-align:' + cs.textAlign + ';';
+      if (el.tagName === 'TABLE') s += 'width:100%;border-collapse:collapse;';
+      if (el.tagName === 'TH' || el.tagName === 'TD') {
+        s += 'border:1px solid #999;padding:4px 8px;';
+      }
+      el.style.cssText = s;
+    });
+    
+    const styledHTML = canvas.innerHTML;
+    
+    // Restore original styles
+    allEls.forEach((el, i) => {
+      if (origStyles[i]) el.setAttribute('style', origStyles[i]);
+      else el.removeAttribute('style');
+    });
+    
+    const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+      '<head><meta charset="utf-8"><style>' +
+      'body { font-family:Calibri,sans-serif; font-size:11pt; color:#2d2926; line-height:1.6; }' +
+      'h1,h2,h3 { font-family:Georgia,serif; margin-bottom:8px; }' +
+      'table { width:100%; border-collapse:collapse; }' +
+      'th,td { border:1px solid #999; padding:4px 8px; }' +
+      'th { background-color:#c99532; color:#fff; font-weight:bold; }' +
+      'img { max-width:100%; }' +
+      'ul,ol { margin-left:20px; }' +
+      'hr { border:none; border-top:1px solid #ccc; margin:10px 0; }' +
+      '</style></head><body>' + styledHTML + '</body></html>';
+    
+    const blob = new Blob([header], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const title = document.getElementById('docTitle').value || 'document';
-    a.download = title.replace(/[^a-zA-Z0-9]/g, '_') + '.doc';
+    a.download = title.replace(/[^a-zA-Z0-9 ]/g, '_') + '.doc';
     a.click();
     URL.revokeObjectURL(url);
     showToast('Document downloaded!');
