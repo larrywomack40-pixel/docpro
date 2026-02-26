@@ -416,15 +416,22 @@ async function sendAdminMessage() {
   loadAdminMessages();
 }
 
-async function loadAdminMessages() {
-  const { data } = await sb.from("messages").select("*").eq("sender_id", currentUser.id).order("created_at", { ascending: false }).limit(20);
-  const el = document.getElementById("adminMsgList");
-  if (!data || !data.length) { el.innerHTML = '<p style="color:#8a7f76;text-align:center;padding:20px">No messages sent yet</p>'; return; }
-  el.innerHTML = data.map(m => {
-    const date = new Date(m.created_at).toLocaleDateString();
-    return '<div style="padding:10px 12px;border-bottom:1px solid #e8ddd4;font-size:13px"><strong>' + m.subject + '</strong>' + (m.is_broadcast ? ' <span style="background:#c99532;color:#fff;font-size:10px;padding:1px 6px;border-radius:8px">Broadcast</span>' : '') + '<div style="color:#8a7f76;margin-top:2px">' + date + ' - ' + m.body.substring(0, 80) + (m.body.length > 80 ? "..." : "") + '</div></div>';
-  }).join("");
-}
+  async function loadAdminMessages() {
+    const { data } = await sb.from('messages').select('*').eq('sender_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
+    const el = document.getElementById('adminMsgList');
+    if (!data || !data.length) { el.innerHTML = '<p style="color:#8a7f76;text-align:center;padding:16px">No messages sent yet</p>'; return; }
+    var recipientIds = [...new Set(data.filter(function(m){ return m.recipient_id; }).map(function(m){ return m.recipient_id; }))];
+    var profileMap = {};
+    if (recipientIds.length > 0) {
+      var pResult = await sb.from('profiles').select('id,email,display_name').in('id', recipientIds);
+      if (pResult.data) { pResult.data.forEach(function(p){ profileMap[p.id] = p.display_name || p.email || 'Unknown'; }); }
+    }
+    el.innerHTML = data.map(function(m) {
+      var date = new Date(m.created_at).toLocaleDateString();
+      var toLabel = m.is_broadcast ? '<span style="background:#c99532;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px">Broadcast</span>' : '<span style="color:#8a7f76;font-size:12px">To: ' + (profileMap[m.recipient_id] || 'Unknown user') + '</span>';
+      return '<div style="padding:10px 0;border-bottom:1px solid #e8ddd4;font-size:14px"><strong>' + m.subject + '</strong> ' + toLabel + '<div style="color:#8a7f76;margin-top:4px;font-size:12px">' + date + ' \u2013 ' + (m.body || '').substring(0, 80) + (m.body && m.body.length > 80 ? '...' : '') + '</div></div>';
+    }).join('');
+  }
 
 // Call these after admin loads
 setTimeout(function() { if (typeof loadBannerAdmin === "function") { loadBannerAdmin(); loadUserListForMessaging(); loadAdminMessages(); } }, 1000);
