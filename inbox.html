@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inbox | DraftMyForms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c99532;--gold-light:#e8b94a;--paper:#f9f4f3;--card:#fffcf9;--text:#2d2926;--text-muted:#8a7f76;--border:#e8ddd4;--danger:#c24b3b;--success:#3a6633}
+body{font-family:"DM Sans",sans-serif;background:var(--paper);color:var(--text);min-height:100vh}
+nav{background:#fff;border-bottom:3px solid var(--gold);padding:12px 30px;display:flex;align-items:center;justify-content:space-between}
+.brand{text-decoration:none;color:var(--text);font-family:"Playfair Display",serif;font-size:22px;font-weight:700;display:flex;align-items:center;gap:8px}
+.brand .star{color:var(--gold)}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{text-decoration:none;color:var(--text-muted);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.container{max-width:900px;margin:30px auto;padding:0 20px}
+h1{font-family:"Playfair Display",serif;font-size:28px;margin-bottom:5px}
+.subtitle{color:var(--text-muted);margin-bottom:25px}
+.inbox-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.msg-list{display:flex;flex-direction:column;gap:8px}
+.msg-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;gap:16px;cursor:pointer;transition:all .2s;position:relative}
+.msg-item:hover{border-color:var(--gold);box-shadow:0 2px 12px rgba(201,149,50,.12)}
+.msg-item.unread{border-left:4px solid var(--gold);background:var(--card)}
+.msg-item.unread .msg-subject{font-weight:700}
+.msg-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;font-size:14px}
+.msg-body-preview{flex:1;min-width:0}
+.msg-subject{font-weight:600;font-size:15px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-snippet{color:var(--text-muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-meta{text-align:right;flex-shrink:0;font-size:12px;color:var(--text-muted);min-width:80px}
+.msg-badge{background:var(--gold);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state i{font-size:48px;color:var(--border);margin-bottom:16px;display:block}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:14px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:30px}
+.modal-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:20px}
+.modal-header h2{font-family:"Playfair Display",serif;font-size:22px}
+.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-muted);padding:4px}
+.modal-from{color:var(--text-muted);font-size:13px;margin-bottom:16px}
+.modal-body{line-height:1.7;font-size:14px}
+.modal-body p{margin-bottom:12px}
+.reply-box{margin-top:20px;border-top:1px solid var(--border);padding-top:16px}
+.reply-box textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:inherit;font-size:14px;resize:vertical;min-height:80px}
+.reply-box button{margin-top:10px;background:var(--gold);color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px}
+.reply-box button:hover{background:var(--gold-light)}
+.tab-bar{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border)}
+.tab-btn{padding:10px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+@media(max-width:600px){.msg-meta{display:none}.modal{margin:10px;padding:20px}}
+</style>
+</head>
+<body>
+<div id="siteBanner"></div>
+<nav>
+  <a href="/dashboard.html" class="brand"><span class="star">✦</span> <span>DraftMyForms</span></a>
+  <div class="nav-links">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/editor.html">Editor</a>
+    <a href="/inbox.html" class="active">Inbox</a>
+    <a href="/settings.html">Settings</a>
+    <a href="#" onclick="signOut()">Sign Out</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="inbox-header">
+    <div>
+      <h1>📬 Inbox</h1>
+      <p class="subtitle">Messages from DraftMyForms</p>
+    </div>
+    <div><span id="unreadCount" style="background:var(--gold);color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600"></span></div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="filterMessages('all')">All</button>
+    <button class="tab-btn" onclick="filterMessages('unread')">Unread</button>
+    <button class="tab-btn" onclick="filterMessages('read')">Read</button>
+  </div>
+
+  <div id="messageList" class="msg-list">
+    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading messages...</p></div>
+  </div>
+</div>
+
+<div id="msgModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalSubject"></h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-from" id="modalFrom"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="reply-box">
+      <textarea id="replyText" placeholder="Write a reply..."></textarea>
+      <button onclick="sendReply()"><i class="fas fa-paper-plane"></i> Send Reply</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://mupeqeuuwdmkndvtbhzb.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5MTYzOTksImV4cCI6MjA1NTQ5MjM5OX0.V6MlVFDa5Zs-2XRwt0gaA30ORk";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let currentUser = null;
+let allMessages = [];
+let currentMsgId = null;
+let currentFilter = "all";
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = "/"; return; }
+  currentUser = session.user;
+  await loadBanner();
+  await loadMessages();
+}
+
+async function loadBanner() {
+  const { data } = await sb.from("site_banners").select("*").eq("is_active", true).order("created_at", { ascending: false }).limit(1);
+  if (data && data.length) {
+    const b = data[0];
+    if (b.ends_at && new Date(b.ends_at) < new Date()) return;
+    const el = document.getElementById("siteBanner");
+    el.innerHTML = '<div style="background:' + (b.bg_color || "#c99532") + ';color:' + (b.text_color || "#fff") + ';padding:10px 20px;text-align:center;font-size:14px;font-weight:500">' + b.message + (b.link_url ? ' <a href="' + b.link_url + '" style="color:inherit;text-decoration:underline">' + (b.link_text || "Learn more") + '</a>' : '') + (b.is_dismissible ? ' <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;margin-left:10px;font-size:18px">&times;</button>' : '') + '</div>';
+  }
+}
+
+async function loadMessages() {
+  const { data, error } = await sb.from("messages").select("*").or("recipient_id.eq." + currentUser.id + ",is_broadcast.eq.true").order("created_at", { ascending: false });
+  if (error) { console.error(error); }
+  allMessages = data || [];
+  const unread = allMessages.filter(m => !m.is_read && m.recipient_id === currentUser.id).length;
+  document.getElementById("unreadCount").textContent = unread > 0 ? unread + " unread" : "";
+  renderMessages();
+}
+
+function renderMessages() {
+  let msgs = allMessages;
+  if (currentFilter === "unread") msgs = msgs.filter(m => !m.is_read);
+  if (currentFilter === "read") msgs = msgs.filter(m => m.is_read);
+  const list = document.getElementById("messageList");
+  if (!msgs.length) {
+    list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No messages yet</p></div>';
+    return;
+  }
+  list.innerHTML = msgs.map(m => {
+    const date = new Date(m.created_at);
+    const ago = timeAgo(date);
+    const unread = !m.is_read ? " unread" : "";
+    const snippet = m.body.length > 100 ? m.body.substring(0, 100) + "..." : m.body;
+    return '<div class="msg-item' + unread + '" onclick="openMessage(\x27' + m.id + '\x27)"><div class="msg-avatar">' + (m.is_broadcast ? '<i class="fas fa-bullhorn"></i>' : "DM") + '</div><div class="msg-body-preview"><div class="msg-subject">' + escapeHtml(m.subject) + '</div><div class="msg-snippet">' + escapeHtml(snippet) + '</div></div><div class="msg-meta">' + ago + (m.is_broadcast ? '<div class="msg-badge">Broadcast</div>' : "") + '</div></div>';
+  }).join("");
+}
+
+async function openMessage(id) {
+  const msg = allMessages.find(m => m.id === id);
+  if (!msg) return;
+  currentMsgId = id;
+  document.getElementById("modalSubject").textContent = msg.subject;
+  document.getElementById("modalFrom").textContent = "From: DraftMyForms Team \u2022 " + new Date(msg.created_at).toLocaleDateString();
+  document.getElementById("modalBody").innerHTML = msg.body.replace(/\n/g, "<br>");
+  document.getElementById("replyText").value = "";
+  document.getElementById("msgModal").classList.add("active");
+  if (!msg.is_read && msg.recipient_id === currentUser.id) {
+    await sb.from("messages").update({ is_read: true }).eq("id", id);
+    msg.is_read = true;
+    const unread = allMessages.filter(m => !m.is_read && m.recipient_id === currentUser.id).length;
+    document.getElementById("unreadCount").textContent = unread > 0 ? unread + " unread" : "";
+    renderMessages();
+  }
+}
+
+function closeModal() { document.getElementById("msgModal").classList.remove("active"); }
+
+async function sendReply() {
+  const text = document.getElementById("replyText").value.trim();
+  if (!text) return;
+  const parentMsg = allMessages.find(m => m.id === currentMsgId);
+  const recipientId = parentMsg ? parentMsg.sender_id : null;
+  if (!recipientId) { alert("Cannot reply to this message."); return; }
+  const { error } = await sb.from("messages").insert({ sender_id: currentUser.id, recipient_id: recipientId, subject: "Re: " + parentMsg.subject, body: text, parent_id: currentMsgId });
+  if (error) { alert("Failed to send: " + error.message); return; }
+  document.getElementById("replyText").value = "";
+  alert("Reply sent!");
+  closeModal();
+}
+
+function filterMessages(filter) {
+  currentFilter = filter;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  renderMessages();
+}
+
+function timeAgo(date) {
+  const s = Math.floor((Date.now() - date) / 1000);
+  if (s < 60) return "Just now";
+  if (s < 3600) return Math.floor(s/60) + "m ago";
+  if (s < 86400) return Math.floor(s/3600) + "h ago";
+  if (s < 604800) return Math.floor(s/86400) + "d ago";
+  return date.toLocaleDateString();
+}
+
+function escapeHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+async function signOut() { await sb.auth.signOut(); window.location.href = "/"; }
+
+init();
+</script>
+</body>
+</html>
