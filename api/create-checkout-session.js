@@ -44,16 +44,23 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Invalid plan: ' + plan });
     }
 
-    const trialDays = TRIAL_DAYS[plan] || 0;
+    let trialDays = 0; // Will be set based on trial_eligible
 
     // Check if user already has a Stripe customer ID
     const { data: profile } = await supabase
       .from('profiles')
-      .select('stripe_customer_id')
+      .select('stripe_customer_id, trial_eligible')
       .eq('id', userId)
       .single();
 
     let customerId = profile?.stripe_customer_id;
+
+    // Check trial eligibility: only grant trial if user is eligible (fewer than 3 active days)
+    const isTrialEligible = profile?.trial_eligible !== false; // Default to true if column not set
+    if (plan === 'pro' && isTrialEligible) {
+        trialDays = TRIAL_DAYS[plan] || 3;
+    }
+    console.log('[Checkout] Plan:', plan, '| Trial eligible:', isTrialEligible, '| Trial days:', trialDays);
 
     // If user already has a customer ID, check if they have an active subscription
     if (customerId) {
