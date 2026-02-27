@@ -335,7 +335,7 @@ window.renderTemplateGrid = function(category) {
 
     html += '<div class="template-card' + lockedClass + '" ';
     if (isLocked) {
-      html += 'onclick="showTemplateUpgradePrompt(\'' + t.name.replace(/'/g, "\\'") + '\', '" + templateTier + "')"';
+      html += 'onclick="showTemplateUpgradePrompt(\'' + t.name.replace(/'/g, "\\'") + '\',\'' + templateTier + '\')" ';
     } else {
       html += 'onclick="loadTemplate(\'' + category + '\', ' + i + ')"';
     }
