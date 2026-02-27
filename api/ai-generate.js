@@ -395,6 +395,25 @@ module.exports = async function handler(req, res) {
           });
         } catch (histErr) { /* non-blocking */ }
 
+            // Suspicious activity: rapid generation check (>10 in 5 min)
+            try {
+              const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+              const { data: recentDocs, count } = await supabaseAdmin
+                .from('document_history')
+                .select('id', { count: 'exact', head: true })
+                .eq('user_id', userId)
+                .gte('created_at', fiveMinAgo);
+              if (count && count > 10) {
+                await supabaseAdmin.from('activity_flags').insert({
+                  user_id: userId,
+                  email: userEmail || null,
+                  flag_type: 'rapid_generation',
+                  severity: 'high',
+                  details: { count: count, window: '5min' }
+                });
+              }
+            } catch (flagErr) { /* non-blocking */ }
+
         // Log active day for trial eligibility
         try {
           const today = new Date().toISOString().split('T')[0];
