@@ -6,12 +6,6 @@
     "api/ai-generate.js": {
       "maxDuration": 60
     },
-    "api/extract-style.js": {
-      "maxDuration": 30
-    },
-    "api/generate-templates.js": {
-      "maxDuration": 300
-    },
     "api/templates-list.js": {
       "maxDuration": 10
     },
