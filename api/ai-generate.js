@@ -7,7 +7,7 @@ const PLAN_LIMITS = {
   starter: 50,
   pro: 50,
   business: 999999,
-  enterprise: 999999
+  enterprise: 999999h
 };
 
 // ═══════════════ RESPONSE CLEANUP ═══════════════
@@ -241,17 +241,19 @@ module.exports = async function handler(req, res) {
   let creditLimit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   let creditsRemaining = creditLimit;
   let supabaseAdmin = null;
+  let userEmail = '';
 
   if (userId && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
       const { data: profile, error: profileErr } = await supabaseAdmin
         .from('profiles')
-        .select('ai_credits_used, ai_credits_reset_at, ai_credits_limit, plan, plan_override')
+        .select('ai_credits_used, ai_credits_reset_at, ai_credits_limit, plan, plan_override, email')
         .eq('id', userId)
         .single();
 
       if (profile) {
+        userEmail = profile.email || '';
         const effectivePlan = (profile.plan_override || profile.plan || 'free').toLowerCase();
         creditLimit = profile.ai_credits_limit || PLAN_LIMITS[effectivePlan] || PLAN_LIMITS.free;
 
@@ -418,6 +420,35 @@ module.exports = async function handler(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, html, documentType })
           }).catch(() => {});
+
+          // Fire-and-forget email notifications
+          if (userEmail && process.env.VERCEL_URL) {
+            const emailUrl = 'https://' + process.env.VERCEL_URL + '/api/send-email';
+            // Document ready notification
+            fetch(emailUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: userId,
+                email: userEmail,
+                type: 'document_ready',
+                data: { docType: docType || 'Document' }
+              })
+            }).catch(() => {});
+            // Credits low warning (2 or fewer remaining)
+            if (creditsRemaining <= 2 && creditsRemaining >= 0) {
+              fetch(emailUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: userId,
+                  email: userEmail,
+                  type: 'credits_low',
+                  data: { creditsRemaining: creditsRemaining, planName: plan || 'Free' }
+                })
+              }).catch(() => {});
+            }
+          }
         }
 
       } catch (logErr) {
