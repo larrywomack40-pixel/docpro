@@ -16,16 +16,15 @@
       background: #fff;
       border: 1px solid #e8ddd4;
       border-radius: 6px;
-      height: 160px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
+      height: 140px;
+      display: block !important;
+      padding: 0 !important;
     }
     .preview-inner {
-      width: 400px;
+      width: 680px;
       min-height: 500px;
-      transform: scale(0.38);
-      transform-origin: top center;
+      transform: scale(0.32);
+      transform-origin: top left;
       pointer-events: none;
       font-family: 'DM Sans', sans-serif;
       padding: 20px;
