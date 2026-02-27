@@ -189,6 +189,36 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 
 
 
+
+
+    <!-- Live Activity Feed -->
+    <div class="section">
+      <div class="section-header">
+        <h2><i class="fas fa-stream" style="color:var(--gold);margin-right:8px"></i> Live Activity Feed</h2>
+        <span id="feedStatus" style="color:var(--text-muted);font-size:13px">Loading...</span>
+      </div>
+      <div class="section-body" style="max-height:400px;overflow-y:auto">
+        <table>
+          <thead><tr><th>User</th><th>Action</th><th>Details</th><th>Time</th></tr></thead>
+          <tbody id="liveFeedBody"><tr><td colspan="4" class="empty-state">Loading activity...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Activity Flags -->
+    <div class="section">
+      <div class="section-header">
+        <h2><i class="fas fa-flag" style="color:var(--danger);margin-right:8px"></i> Activity Flags</h2>
+        <span id="flagCount" style="color:var(--text-muted);font-size:13px"></span>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th>User</th><th>Flag</th><th>Severity</th><th>Details</th><th>Time</th><th>Actions</th></tr></thead>
+          <tbody id="flagsBody"><tr><td colspan="6" class="empty-state">No flags</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
 <!-- Banner Management -->
 <div class="admin-section" style="background:#fff;border:1px solid #e8ddd4;border-radius:12px;padding:30px;margin:30px 0">
 <h2 style="font-family:Playfair Display,serif;margin-bottom:5px">📢 Site Banner</h2>
@@ -274,6 +304,7 @@ document.getElementById('adminContent').style.display='block';
 await loadStats();
 await loadUsers();
 await loadLeads();
+    startFeedRefresh();
     await loadReferrals();
     await checkExpiredTrials();
     if(typeof loadBannerAdmin === "function") await loadBannerAdmin();
@@ -432,6 +463,92 @@ return d.innerHTML;
 function handleLogout(){
 sb.auth.signOut().then(function(){window.location.href='/'});
 }
+
+
+    // === Live Feed & Activity Flags (via admin-api) ===
+    async function getAdminToken() {
+      var session = await sb.auth.getSession();
+      return session.data.session ? session.data.session.access_token : '';
+    }
+
+    async function loadLiveFeed() {
+      try {
+        var token = await getAdminToken();
+        var res = await fetch('/api/admin-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ action: 'live-feed' })
+        });
+        var data = await res.json();
+        if (data.error) { console.error('Feed error:', data.error); return; }
+        var tbody = document.getElementById('liveFeedBody');
+        var statusEl = document.getElementById('feedStatus');
+        if (!data.feed || data.feed.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No recent activity</td></tr>';
+          statusEl.textContent = '0 events';
+          return;
+        }
+        statusEl.textContent = data.feed.length + ' recent events';
+        tbody.innerHTML = data.feed.map(function(e) {
+          var time = new Date(e.created_at || e.logged_in_at).toLocaleString('en-US', { hour:'numeric', minute:'2-digit', month:'short', day:'numeric' });
+          return '<tr><td>' + escHtml(e.email || e.user_id || 'Unknown') + '</td>' +
+            '<td>' + escHtml(e.action || e.document_type || 'Session') + '</td>' +
+            '<td>' + escHtml((e.prompt || e.user_agent || '').substring(0, 60)) + '</td>' +
+            '<td style="color:var(--text-muted);font-size:12px">' + time + '</td></tr>';
+        }).join('');
+      } catch (err) { console.error('Live feed error:', err); }
+    }
+
+    async function loadFlags() {
+      try {
+        var token = await getAdminToken();
+        var res = await fetch('/api/admin-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ action: 'flags' })
+        });
+        var data = await res.json();
+        if (data.error) { console.error('Flags error:', data.error); return; }
+        var tbody = document.getElementById('flagsBody');
+        var countEl = document.getElementById('flagCount');
+        if (!data.flags || data.flags.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No activity flags - all clear!</td></tr>';
+          countEl.textContent = '0 flags';
+          return;
+        }
+        countEl.textContent = data.flags.length + ' flag(s)';
+        tbody.innerHTML = data.flags.map(function(f) {
+          var time = new Date(f.created_at).toLocaleString('en-US', { hour:'numeric', minute:'2-digit', month:'short', day:'numeric' });
+          var sevColor = f.severity === 'high' ? 'var(--danger)' : f.severity === 'medium' ? '#D97706' : 'var(--text-muted)';
+          return '<tr><td>' + escHtml(f.email || f.user_id || 'Unknown') + '</td>' +
+            '<td>' + escHtml(f.flag_type || '') + '</td>' +
+            '<td style="color:' + sevColor + ';font-weight:600">' + escHtml(f.severity || 'low') + '</td>' +
+            '<td style="font-size:12px">' + escHtml(typeof f.details === 'object' ? JSON.stringify(f.details) : (f.details || '')) + '</td>' +
+            '<td style="color:var(--text-muted);font-size:12px">' + time + '</td>' +
+            '<td>' + (f.resolved ? '<span style="color:var(--success)">Resolved</span>' : '<button class="btn-sm" onclick="resolveFlag(\'' + f.id + '\')">Resolve</button>') + '</td></tr>';
+        }).join('');
+      } catch (err) { console.error('Flags error:', err); }
+    }
+
+    async function resolveFlag(flagId) {
+      try {
+        var token = await getAdminToken();
+        await fetch('/api/admin-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ action: 'resolve-flag', flagId: flagId })
+        });
+        loadFlags();
+      } catch (err) { alert('Error resolving flag'); }
+    }
+
+    // Auto-refresh live feed every 30 seconds
+    var feedInterval = null;
+    function startFeedRefresh() {
+      loadLiveFeed();
+      loadFlags();
+      feedInterval = setInterval(function() { loadLiveFeed(); loadFlags(); }, 30000);
+    }
 
 init();
 
