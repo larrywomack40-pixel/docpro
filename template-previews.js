@@ -245,31 +245,45 @@ function _tpGeneratePreview(template, category) {
 }
 
 // ============================================
-// ADMIN & PRO ACCESS HELPERS
+// ADMIN & PRO ACCESS HELPERS + PRICING CONFIG
 // ============================================
 var ADMIN_EMAILS = ['larrywomack40@gmail.com'];
+
+var PLANS = {
+  free:     { name: 'Free',     price: 'Free',      color: '#9ca3af' },
+  pro:      { name: 'Pro',      price: '$9.99/mo',  color: '#D97706' },
+  business: { name: 'Business', price: '$24.99/mo', color: '#7C3AED' }
+};
+
+var TIER_LEVEL = { free: 0, pro: 1, business: 2 };
 
 function hasProAccess(email, plan) {
   if (ADMIN_EMAILS.indexOf(email) !== -1) return true;
   return plan === 'pro' || plan === 'business';
 }
+
+function canAccessTemplate(userEmail, userPlan, templateTier) {
+  if (ADMIN_EMAILS.indexOf(userEmail) !== -1) return true;
+  return (TIER_LEVEL[userPlan] || 0) >= (TIER_LEVEL[templateTier] || 0);
+}
 // ============================================
 // UPGRADE MODAL
 // ============================================
-function showTemplateUpgradePrompt(templateName) {
+function showTemplateUpgradePrompt(templateName, templateTier) {
   // Admin bypass - never show upgrade modal to admin
-  if (ADMIN_EMAILS.indexOf(window.__userEmail) !== -1) {
-    return; // Admin has access to all templates
-  }
+  if (ADMIN_EMAILS.indexOf(window.__userEmail) !== -1) return;
 
+  var tier = templateTier || 'pro';
+  var plan = PLANS[tier] || PLANS.pro;
   var existing = document.querySelector('.upgrade-modal-overlay');
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.className = 'upgrade-modal-overlay';
   overlay.innerHTML = '<div class="upgrade-modal-box">' +
-    '<h3>\u2728 Pro Template</h3>' +
-    '<p><strong>' + templateName + '</strong> is available on the Pro plan. Upgrade to unlock all premium templates.</p>' +
-    '<button class="upgrade-btn" onclick="window.location.href=\'pricing.html\'">Upgrade to Pro \u2014 $12/mo</button>' +
+    '<h3>\u2728 ' + plan.name + ' Template</h3>' +
+    '<p><strong>' + templateName + '</strong> is available on the ' + plan.name + ' plan. Upgrade to unlock ' + (tier === 'business' ? 'all' : 'premium') + ' templates.</p>' +
+    '<button class="upgrade-btn" onclick="window.location.href=\'pricing.html?plan=' + tier + '\'">' +
+    'Upgrade to ' + plan.name + ' \u2014 ' + plan.price + '</button>' +
     '<span class="cancel-link" onclick="this.closest(\'.upgrade-modal-overlay\').remove()">Maybe later</span>' +
     '</div>';
   overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
@@ -314,21 +328,21 @@ window.renderTemplateGrid = function(category) {
 
   var html = '';
   tpl.forEach(function(t, i) {
-    var isPro = t.tier === 'pro';
-    var isLocked = isPro && !hasProAccess(window.__userEmail, userPlan);
+    var templateTier = t.tier || 'free';
+    var isLocked = !canAccessTemplate(window.__userEmail, userPlan, templateTier);
     var previewHTML = _tpGeneratePreview(t, category);
     var lockedClass = isLocked ? ' locked' : '';
 
     html += '<div class="template-card' + lockedClass + '" ';
     if (isLocked) {
-      html += 'onclick="showTemplateUpgradePrompt(\'' + t.name.replace(/'/g, "\\'") + '\')"';
+      html += 'onclick="showTemplateUpgradePrompt(\'' + t.name.replace(/'/g, "\\'") + '\', '" + templateTier + "')"';
     } else {
       html += 'onclick="loadTemplate(\'' + category + '\', ' + i + ')"';
     }
     html += '>';
     html += '<div class="preview"><div class="preview-inner">' + previewHTML + '</div></div>';
     html += '<div class="info"><h4>' + t.name + '</h4>';
-    html += '<span class="' + (isPro ? 'pro' : 'free') + '">' + (isPro ? 'Pro' : 'Free') + '</span>';
+    html += '<span class="' + (templateTier !== 'free' ? templateTier : 'free') + '">' + (PLANS[templateTier] ? PLANS[templateTier].name : 'Free') + '</span>';
     html += '</div></div>';
   });
 
