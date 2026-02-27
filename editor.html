@@ -1864,6 +1864,7 @@ async function editorCheckout(plan) {
         sbClient.from('profiles').select('plan').eq('id', user.id).single().then(function(r) {
           var plan = r.data ? r.data.plan : 'free';
       window.__dmfUserPlan = plan;
+        window.__dmfUserEmail = session.user.email || "";
           var btn = document.getElementById('editorUpgradeBtn');
           if (btn && (!plan || plan === 'free')) { btn.style.display = 'inline-flex'; }
         });
@@ -2204,5 +2205,7 @@ async function editorCheckout(plan) {
   }
 })();
 </script>
+
+<script src="/template-system.js"></script>
 </body>
 </html>
