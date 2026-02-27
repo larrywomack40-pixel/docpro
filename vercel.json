@@ -9,6 +9,12 @@
     "api/extract-style.js": {
       "maxDuration": 30
     },
+    "api/generate-templates.js": {
+      "maxDuration": 300
+    },
+    "api/templates-list.js": {
+      "maxDuration": 10
+    },
     "api/cron/nightly-training.js": {
       "maxDuration": 300
     },
@@ -19,7 +25,9 @@
   "routes": [
     {
       "src": "/api/webhook",
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "dest": "/api/webhook.js"
     }
   ],
