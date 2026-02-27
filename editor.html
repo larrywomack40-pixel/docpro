@@ -368,6 +368,20 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
                     font-size: 12px !important;
         }
 }
+
+/* === TASK 1: Toolbar Button Polish === */
+.nav-actions .btn.btn-outline.btn-sm { background: #fff; border: 1.5px solid #E5E5E5; color: #555; border-radius: 6px; padding: 7px 14px; font-weight: 600; font-size: 13px; transition: all 0.15s ease; gap: 6px; }
+.nav-actions .btn.btn-outline.btn-sm:hover { background: #F5F5F5; border-color: #CCC; color: #1B3A5C; }
+.nav-actions .btn.btn-outline.btn-sm .fa-file-pdf { color: #D32F2F; }
+.nav-actions .btn.btn-outline.btn-sm[onclick*="PDF"] { border-color: #D32F2F; color: #D32F2F; }
+.nav-actions .btn.btn-outline.btn-sm[onclick*="PDF"]:hover { background: #FFF5F5; border-color: #B71C1C; }
+.nav-actions .btn.btn-outline.btn-sm .fa-file-word { color: #1565C0; }
+.nav-actions .btn.btn-outline.btn-sm[onclick*="Docx"] { border-color: #1565C0; color: #1565C0; }
+.nav-actions .btn.btn-outline.btn-sm[onclick*="Docx"]:hover { background: #F5F8FF; border-color: #0D47A1; }
+.nav-actions .btn.btn-gold.btn-sm { background: #1B3A5C; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; font-size: 13px; transition: all 0.15s ease; gap: 6px; }
+.nav-actions .btn.btn-gold.btn-sm:hover { background: #152D49; }
+.nav-actions .tool-icon-btn { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: #F5F5F5; border: 1px solid #E5E5E5; border-radius: 6px; color: #555; cursor: pointer; transition: all 0.15s ease; font-size: 14px; }
+.nav-actions .tool-icon-btn:hover { background: #EBEBEB; color: #1B3A5C; }
 </style>
 </head>
 <body>
@@ -1713,7 +1727,19 @@ function showToast(msg) {
   }
 
   // LOAD FROM DASHBOARD / AUTOSAVE
-  (function loadSavedContent() {
+  (
+// === TASK 2: Default Editor Content by Plan ===
+function getDefaultEditorContent() {
+  var plan = window.__dmfUserPlan || "free";
+  if (plan === "business") {
+    return '<div style="text-align:center;padding:60px 20px;"><h1 style="font-size:24px;color:#1B3A5C;margin-bottom:8px;font-family:Playfair Display,serif;">Untitled Document</h1><p style="color:#7C3AED;font-size:13px;font-weight:500;">\ud83d\udcbc Business Plan \u2014 Unlimited AI credits</p><p style="color:#999;font-size:14px;margin-top:12px;">Start typing or use AI to create a document</p></div>';
+  }
+  if (plan === "pro") {
+    return '<div style="text-align:center;padding:60px 20px;"><h1 style="font-size:24px;color:#1B3A5C;margin-bottom:8px;font-family:Playfair Display,serif;">Untitled Document</h1><p style="color:#D97706;font-size:13px;font-weight:500;">\u2728 Pro Plan \u2014 50 AI credits/month</p><p style="color:#999;font-size:14px;margin-top:12px;">Start typing or use AI to create a document</p></div>';
+  }
+  return '<div style="text-align:center;padding:60px 20px;"><h1 style="font-size:24px;color:#1B3A5C;margin-bottom:8px;font-family:Playfair Display,serif;">Untitled Document</h1><p style="color:#999;font-size:14px;">Start typing or choose a template from the sidebar</p></div>';
+}
+function loadSavedContent() {
     var loadKey = sessionStorage.getItem('dmf_load_doc');
     if (loadKey) {
       sessionStorage.removeItem('dmf_load_doc');
@@ -1723,7 +1749,12 @@ function showToast(msg) {
     if (auto) {
       try { var doc = JSON.parse(auto); if (doc.content && doc.content.trim() !== '' && doc.content.trim() !== '<br>') { docCanvas.innerHTML = doc.content; document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); } } catch(e) {}
     }
-  })();
+  
+  // Default content if no saved document
+  if (docCanvas && !docCanvas.innerHTML.trim()) {
+    docCanvas.innerHTML = getDefaultEditorContent();
+  }
+})();
 
 // ==============================
 // KEYBOARD SHORTCUTS
