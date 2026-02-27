@@ -311,6 +311,16 @@ var p=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
 if(p.data)currentProfile=p.data;
 renderDashboard();
 loadSavedDocuments();
+// Fire auth-callback for session logging + welcome email
+fetch("/api/auth-callback", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    userId: currentUser.id,
+    email: currentUser.email,
+    name: (currentProfile && currentProfile.display_name) || currentUser.email
+  })
+}).catch(function() {});
 }catch(e){console.error('Init error:',e);window.location.href='/'}
 }
 
