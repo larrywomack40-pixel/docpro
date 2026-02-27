@@ -292,6 +292,53 @@ module.exports = async function handler(req, res) {
   let systemPrompt = (mode === 'edit' && currentContent) ? EDIT_SYSTEM_PROMPT : CREATE_SYSTEM_PROMPT;
   const documentType = docType || null;
 
+  // --- TASK 5: STYLE PREFERENCE INJECTION FOR CREATE MODE ---
+  if (mode !== 'edit' && documentType && userId && supabaseAdmin) {
+    try {
+      const { data: styleData } = await supabaseAdmin
+        .from('document_styles')
+        .select('style_fingerprint')
+        .eq('user_id', userId)
+        .eq('document_type', documentType)
+        .single();
+
+      if (styleData && styleData.style_fingerprint) {
+        const fp = styleData.style_fingerprint;
+        systemPrompt += '\n\nUSER PREFERRED STYLE FOR ' + documentType.toUpperCase() + ':\n';
+        systemPrompt += '- Primary color: ' + (fp.primary_color || '#1B3A5C') + '\n';
+        systemPrompt += '- Font: ' + (fp.font_family || 'Arial') + '\n';
+        systemPrompt += '- Header style: ' + (fp.header_style || 'navy_bar') + '\n';
+        systemPrompt += '- Table borders: ' + (fp.table_style || 'full_grid') + '\n';
+        systemPrompt += '- Body text size: ' + (fp.body_font_size || '8pt') + '\n';
+        systemPrompt += '- Spacing: ' + (fp.section_spacing || 'compact') + '\n';
+        if (fp.company_name) systemPrompt += '- Company name: ' + fp.company_name + '\n';
+        if (fp.company_address) systemPrompt += '- Company address: ' + fp.company_address + '\n';
+        if (fp.company_phone) systemPrompt += '- Company phone: ' + fp.company_phone + '\n';
+        systemPrompt += 'Use these preferences unless the user explicitly requests a different style.';
+      }
+    } catch (styleErr) { /* no stored style yet, use defaults */ }
+  }
+
+  // --- TASK 7: GOLDEN SAMPLE FEW-SHOT EXAMPLES ---
+  if (mode !== 'edit' && documentType && supabaseAdmin) {
+    try {
+      const { data: samples } = await supabaseAdmin
+        .from('golden_samples')
+        .select('prompt, html')
+        .eq('document_type', documentType)
+        .eq('active', true)
+        .gte('quality_score', 8)
+        .order('quality_score', { ascending: false })
+        .limit(1);
+
+      if (samples && samples.length > 0) {
+        systemPrompt += '\n\nREFERENCE EXAMPLE (match this quality level):\n';
+        systemPrompt += 'Prompt: "' + samples[0].prompt + '"\n';
+        systemPrompt += samples[0].html.substring(0, 2000) + '\n...\n';
+      }
+    } catch (sampleErr) { /* no golden samples yet */ }
+  }
+
   // Build user message
   let userMessage = '';
   if (mode === 'edit' && currentContent) {
