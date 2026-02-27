@@ -2,6 +2,18 @@
   "functions": {
     "api/webhook.js": {
       "maxDuration": 30
+    },
+    "api/ai-generate.js": {
+      "maxDuration": 60
+    },
+    "api/extract-style.js": {
+      "maxDuration": 30
+    },
+    "api/cron/nightly-training.js": {
+      "maxDuration": 300
+    },
+    "api/cron/weekly-report.js": {
+      "maxDuration": 60
     }
   },
   "routes": [
@@ -9,6 +21,16 @@
       "src": "/api/webhook",
       "methods": ["POST"],
       "dest": "/api/webhook.js"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/nightly-training",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-report",
+      "schedule": "0 9 * * 1"
     }
   ]
 }
