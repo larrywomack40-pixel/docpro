@@ -382,7 +382,43 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 .nav-actions .btn.btn-gold.btn-sm:hover { background: #152D49; }
 .nav-actions .tool-icon-btn { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: #F5F5F5; border: 1px solid #E5E5E5; border-radius: 6px; color: #555; cursor: pointer; transition: all 0.15s ease; font-size: 14px; }
 .nav-actions .tool-icon-btn:hover { background: #EBEBEB; color: #1B3A5C; }
+</style><style>
+/* === TOOLBAR POLISH (Task 1) === */
+.nav-actions { gap: 6px !important; }
+.nav-actions .btn-ghost {
+  background: #F5F5F5; border: 1px solid #E5E5E5; border-radius: 6px;
+  width: 36px; height: 36px; display: inline-flex; align-items: center;
+  justify-content: center; padding: 0 !important; color: #555;
+  transition: all 0.15s ease;
+}
+.nav-actions .btn-ghost:hover { background: #EBEBEB; color: #1B3A5C; }
+.nav-actions .btn-ghost i { font-size: 14px; }
+/* PDF button */
+.nav-actions .btn-outline.btn-sm[title*="PDF"] {
+  background: #fff; border: 1.5px solid #D32F2F !important;
+  color: #D32F2F; font-weight: 600; font-size: 13px; padding: 6px 14px !important;
+  border-radius: 6px; transition: all 0.15s ease;
+}
+.nav-actions .btn-outline.btn-sm[title*="PDF"]:hover { background: #FFF5F5; border-color: #B71C1C !important; }
+/* DOCX button */
+.nav-actions .btn-outline.btn-sm[title*="Word"] {
+  background: #fff; border: 1.5px solid #1565C0 !important;
+  color: #1565C0; font-weight: 600; font-size: 13px; padding: 6px 14px !important;
+  border-radius: 6px; transition: all 0.15s ease;
+}
+.nav-actions .btn-outline.btn-sm[title*="Word"]:hover { background: #F5F8FF; border-color: #0D47A1 !important; }
+/* Save button */
+.nav-actions .btn-gold.btn-sm {
+  background: #1B3A5C !important; color: #fff; font-weight: 600;
+  font-size: 13px; padding: 6px 14px !important; border-radius: 6px;
+  border: none; transition: all 0.15s ease;
+}
+.nav-actions .btn-gold.btn-sm:hover { background: #152D49 !important; }
+/* Settings & Home links */
+.nav-actions a.btn-ghost { background: transparent; border: none; }
+.nav-actions a.btn-ghost:hover { background: #F0F0F0; }
 </style>
+
 </head>
 <body>
 <div id="siteBanner"></div>
@@ -2124,5 +2160,49 @@ async function editorCheckout(plan) {
   </div>
 </div>
 <script src="template-previews.js"></script>
+<script>
+// === DEFAULT DOCUMENT PER TIER (Task 2) ===
+(function setDefaultDoc() {
+  // Only set default if no document was loaded from storage
+  var loadKey = sessionStorage.getItem("dmf_load_doc");
+  if (loadKey) return; // User is loading a saved doc
+  
+  var canvas = document.getElementById("docCanvas");
+  if (!canvas) return;
+  
+  // Check if canvas has meaningful content (not just default template)
+  var text = (canvas.textContent || "").trim();
+  var hasUserContent = text.length > 200 && !text.includes("WMK Industries");
+  if (hasUserContent) return;
+  
+  // Get user plan
+  var plan = "free";
+  try {
+    var sess = JSON.parse(localStorage.getItem("sb-mupeqeuuwdmkndvtbhzb-auth-token") || "{}");
+    var uid = sess.user ? sess.user.id : null;
+    if (uid && window.__supabase) {
+      window.__supabase.from("profiles").select("plan").eq("id", uid).single()
+        .then(function(r) {
+          if (r.data && r.data.plan) setBlank(r.data.plan);
+          else setBlank("free");
+        })
+        .catch(function() { setBlank("free"); });
+    } else { setBlank("free"); }
+  } catch(e) { setBlank("free"); }
+  
+  function setBlank(p) {
+    var c = document.getElementById("docCanvas");
+    if (!c) return;
+    var badge = "";
+    if (p === "business") badge = "<p style=\"color:#7C3AED;font-size:13px;font-weight:500\">Business Plan</p>";
+    else if (p === "pro") badge = "<p style=\"color:#D97706;font-size:13px;font-weight:500\">Pro Plan</p>";
+    c.innerHTML = "<div style=\"text-align:center;padding:40px 20px;\">" +
+      "<h1 style=\"font-size:24px;color:#1B3A5C;margin-bottom:8px;\">Untitled Document</h1>" +
+      badge +
+      "<p style=\"color:#999;font-size:14px;margin-top:12px;\">Start typing or choose a template from the sidebar</p>" +
+      "</div>";
+  }
+})();
+</script>
 </body>
 </html>
