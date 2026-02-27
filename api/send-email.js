@@ -3,7 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-const FROM_EMAIL = 'DraftMyForms <noreply@draftmyforms.com>';
+const FROM_EMAIL = 'DraftMyForms <support@draftmyforms.com>';
 
 // Cooldowns in minutes per email type
 const COOLDOWNS = {
