@@ -245,9 +245,23 @@ function _tpGeneratePreview(template, category) {
 }
 
 // ============================================
+// ADMIN & PRO ACCESS HELPERS
+// ============================================
+var ADMIN_EMAILS = ['larrywomack40@gmail.com'];
+
+function hasProAccess(email, plan) {
+  if (ADMIN_EMAILS.indexOf(email) !== -1) return true;
+  return plan === 'pro' || plan === 'business';
+}
+// ============================================
 // UPGRADE MODAL
 // ============================================
 function showTemplateUpgradePrompt(templateName) {
+  // Admin bypass - never show upgrade modal to admin
+  if (ADMIN_EMAILS.indexOf(window.__userEmail) !== -1) {
+    return; // Admin has access to all templates
+  }
+
   var existing = document.querySelector('.upgrade-modal-overlay');
   if (existing) existing.remove();
   var overlay = document.createElement('div');
@@ -281,12 +295,17 @@ window.renderTemplateGrid = function(category) {
 
   // Determine user plan
   var userPlan = window.__userPlan || 'free';
+  var userEmail = window.__userEmail || '';
   try {
     if (typeof sbClient !== 'undefined' && sbClient && sbClient.auth) {
       sbClient.auth.getUser().then(function(res) {
         if (res.data && res.data.user) {
+            window.__userEmail = res.data.user.email;
           sbClient.from('profiles').select('plan').eq('id', res.data.user.id).single().then(function(p) {
             if (p.data && p.data.plan) window.__userPlan = p.data.plan;
+              window.__userEmail = res.data.user.email;
+              // Re-render the grid now that plan is loaded
+              if (typeof window.renderTemplateGrid === 'function') window.renderTemplateGrid(category);
           });
         }
       });
@@ -296,7 +315,7 @@ window.renderTemplateGrid = function(category) {
   var html = '';
   tpl.forEach(function(t, i) {
     var isPro = t.tier === 'pro';
-    var isLocked = isPro && (userPlan === 'free');
+    var isLocked = isPro && !hasProAccess(window.__userEmail, userPlan);
     var previewHTML = _tpGeneratePreview(t, category);
     var lockedClass = isLocked ? ' locked' : '';
 
