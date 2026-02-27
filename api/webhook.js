@@ -71,6 +71,26 @@ module.exports = async (req, res) => {
     }).eq('id', userId);
     if (error) return res.status(500).json({ error: 'Failed to update plan' });
     console.log('Updated ' + userId + ' to ' + planName);
+
+    // Fire-and-forget payment receipt email
+    try {
+      const customerEmail = session.customer_details && session.customer_details.email
+        || session.customer_email || null;
+      if (customerEmail && process.env.VERCEL_URL) {
+        const emailUrl = 'https://' + process.env.VERCEL_URL + '/api/send-email';
+        const amount = session.amount_total ? (session.amount_total / 100).toFixed(2) : '9.99';
+        fetch(emailUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: userId,
+            email: customerEmail,
+            type: 'payment_receipt',
+            data: { planName: planName, amount: amount }
+          })
+        }).catch(() => {});
+      }
+    } catch (emailErr) { /* non-blocking */ }
   }
 
   if (event.type === 'invoice.paid') {
