@@ -2167,7 +2167,7 @@ async function editorCheckout(plan) {
       await saveSignatureToDb(dataURL);
     }
     var imgHTML = '<div style="margin:16px 0;"><img src="' + dataURL + '" style="max-width:250px;max-height:80px;" alt="Signature"><div style="border-top:1px solid #333;width:250px;margin-top:4px;padding-top:2px;font-size:11px;color:#666;">Authorized Signature \u2022 ' + new Date().toLocaleDateString() + '</div></div>';
-    var editor = document.getElementById('editor');
+    var editor = document.getElementById('docCanvas');
     if (editor) {
       editor.focus();
       document.execCommand('insertHTML', false, imgHTML);
