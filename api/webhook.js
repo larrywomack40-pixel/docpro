@@ -72,13 +72,13 @@ module.exports = async (req, res) => {
     if (error) return res.status(500).json({ error: 'Failed to update plan' });
     console.log('Updated ' + userId + ' to ' + planName);
 
-    // Fire-and-forget payment receipt email
+    // Send payment receipt email
     try {
-      const customerEmail = session.customer_details && session.customer_details.email
-        || session.customer_email || null;
-      if (customerEmail && process.env.VERCEL_URL) {
-        const emailUrl = 'https://' + process.env.VERCEL_URL + '/api/send-email';
-        const amount = session.amount_total ? (session.amount_total / 100).toFixed(2) : '9.99';
+      var customerEmail = session.customer_details && session.customer_details.email || session.customer_email || null;
+      if (customerEmail) {
+        var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
+        var emailUrl = siteUrl + '/api/send-email';
+        var amount = session.amount_total ? (session.amount_total / 100).toFixed(2) : '9.99';
         fetch(emailUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -88,9 +88,9 @@ module.exports = async (req, res) => {
             type: 'payment_receipt',
             data: { planName: planName, amount: amount }
           })
-        }).catch(() => {});
+        }).catch(function(e) { console.error('Payment email failed:', e.message); });
       }
-    } catch (emailErr) { /* non-blocking */ }
+    } catch (emailErr) { console.error('Email block error:', emailErr.message); }
   }
 
   if (event.type === 'invoice.paid') {
@@ -108,15 +108,39 @@ module.exports = async (req, res) => {
 
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object;
+    const { data: profile } = await supabase.from('profiles').select('id, email')
+      .eq('stripe_customer_id', sub.customer).single();
     const { error } = await supabase.from('profiles').update({
-      plan: 'free', updated_at: new Date().toISOString()
+      plan: 'free',
+      updated_at: new Date().toISOString()
     }).eq('stripe_customer_id', sub.customer);
     if (error) return res.status(500).json({ error: 'Failed to downgrade' });
     console.log('Downgraded customer ' + sub.customer);
+    // Send cancellation email
+    if (profile && profile.email) {
+      var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
+      fetch(siteUrl + '/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: profile.id, email: profile.email, type: 'subscription_cancelled', data: {} })
+      }).catch(function(e) { console.error('Cancel email failed:', e.message); });
+    }
   }
 
   if (event.type === 'customer.subscription.trial_will_end') {
-    console.log('Trial ending for ' + event.data.object.customer);
+    const trialSub = event.data.object;
+    console.log('Trial ending for ' + trialSub.customer);
+    const { data: trialProfile } = await supabase.from('profiles').select('id, email')
+      .eq('stripe_customer_id', trialSub.customer).single();
+    if (trialProfile && trialProfile.email) {
+      var trialEnd = trialSub.trial_end ? Math.ceil((trialSub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24)) : 3;
+      var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
+      fetch(siteUrl + '/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: trialProfile.id, email: trialProfile.email, type: 'trial_ending', data: { daysLeft: trialEnd } })
+      }).catch(function(e) { console.error('Trial email failed:', e.message); });
+    }
   }
 
   res.status(200).json({ received: true });
