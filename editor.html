@@ -1790,8 +1790,8 @@ function loadSavedContent() {
   if (docCanvas && !docCanvas.innerHTML.trim()) {
     docCanvas.innerHTML = getDefaultEditorContent();
   }
-
-
+    }
+    loadSavedContent();
 // ==============================
 // KEYBOARD SHORTCUTS
 // ==============================
