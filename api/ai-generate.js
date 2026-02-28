@@ -7,7 +7,7 @@ const PLAN_LIMITS = {
   starter: 50,
   pro: 50,
   business: 999999,
-  enterprise: 999999h
+  enterprise: 999999
 };
 
 // ═══════════════ RESPONSE CLEANUP ═══════════════
