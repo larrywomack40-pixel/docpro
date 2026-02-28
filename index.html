@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>(function(){var t=localStorage.getItem('draftmyforms-theme')||'system';var r=t;if(t==='system'){r=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',r)})()</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DraftMyForms - Professional Documents Built in Seconds</title>
@@ -36,6 +37,23 @@
 --font-mono:'DM Mono',monospace;
 --max-w:1200px;
 }
+/* Dark Theme */
+[data-theme="dark"]{--gold:#F59E0B;--gold-light:#FBBF24;--gold-dark:#D97706;--gold-bg:#1a1608;--paper:#0F0F13;--white:#1A1A22;--text:#E8E6E3;--text-secondary:#A0A0A8;--text-muted:#666670;--border:#2A2A36;--border-light:#333340;--success:#4ADE80;--danger:#EF5350}
+[data-theme="dark"] body{background:#0F0F13;color:#E8E6E3}
+[data-theme="dark"] .navbar{background:rgba(15,15,19,0.95);border-color:#2A2A36}
+[data-theme="dark"] .hero{background:linear-gradient(135deg,#0F0F13 0%,#1A1A22 100%)}
+[data-theme="dark"] .section{background:#0F0F13}
+[data-theme="dark"] .section:nth-child(even){background:#131318}
+[data-theme="dark"] .card,.demo-card,.pricing-card,.feature-card{background:#1A1A22;border-color:#2A2A36;color:#E8E6E3}
+[data-theme="dark"] .pricing-card.popular{border-color:#F59E0B}
+[data-theme="dark"] footer{background:#0A0A0E;border-color:#2A2A36}
+[data-theme="dark"] input,[data-theme="dark"] select{background:#242430;color:#E8E6E3;border-color:#333340}
+[data-theme="dark"] .user-menu{background:#1E1E28;border-color:#2A2A36}
+[data-theme="dark"] .nav-links a{color:#A0A0A8}
+[data-theme="dark"] .nav-links a:hover{color:#F59E0B}
+.theme-toggle-home{display:inline-flex;gap:2px;background:rgba(255,255,255,0.1);border-radius:6px;padding:2px;margin-right:8px}
+.theme-toggle-home button{padding:3px 7px;border-radius:4px;border:none;cursor:pointer;font-size:12px;background:transparent;color:var(--text-muted);transition:all 0.2s}
+.theme-toggle-home button.active{background:var(--gold);color:#fff}
 html{scroll-behavior:smooth}
 body{font-family:var(--font-body);color:var(--text);background:var(--white);-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
@@ -214,6 +232,11 @@ img{max-width:100%}
 <a onclick="smoothScroll('demo')">Templates</a>
 <a onclick="smoothScroll('pricing')">Pricing</a>
 <a onclick="smoothScroll('compare')">Compare</a>
+</div>
+<div class="theme-toggle-home" id="themeToggle">
+<button onclick="setTheme('light')" title="Light">&#9728;</button>
+<button onclick="setTheme('dark')" title="Dark">&#9790;</button>
+<button onclick="setTheme('system')" title="System">&#128187;</button>
 </div>
 <div class="nav-actions">
 <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
@@ -770,6 +793,13 @@ checkSession();
     localStorage.setItem('dmf_referral_time', Date.now().toString());
   }
 })();
+</script>
+
+<script>
+function setTheme(t){localStorage.setItem('draftmyforms-theme',t);var r=t;if(t==='system'){r=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',r);updateThemeButtons(t)}
+function updateThemeButtons(t){var btns=document.querySelectorAll('#themeToggle button');btns.forEach(function(b,i){var vals=['light','dark','system'];b.classList.toggle('active',vals[i]===t)})}
+function initTheme(){var saved=localStorage.getItem('draftmyforms-theme')||'system';updateThemeButtons(saved);window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if((localStorage.getItem('draftmyforms-theme')||'system')==='system'){setTheme('system')}})}
+initTheme();
 </script>
 </body>
 </html>
