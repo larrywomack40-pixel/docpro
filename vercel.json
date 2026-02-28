@@ -51,15 +51,6 @@
       ]
     }
   ],
-  "routes": [
-    {
-      "src": "/api/webhook",
-      "methods": [
-        "POST"
-      ],
-      "dest": "/api/webhook.js"
-    }
-  ],
   "crons": [
     {
       "path": "/api/cron/nightly-training",
