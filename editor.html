@@ -788,9 +788,64 @@ function insertLink() {
 }
 
 function insertImage() {
-  const url = prompt('Enter image URL:');
-  if (url) document.execCommand('insertImage', false, url);
-  updatePreview();
+    var imgModal = document.createElement('div');
+      imgModal.className = 'upload-overlay active';
+        imgModal.innerHTML = '<div class="upload-modal">' +
+            '<h2>Insert Image</h2>' +
+                '<p>Upload an image or paste a URL to add to your document</p>' +
+                    '<div class="upload-zone" id="imgUploadZone" style="margin-bottom:16px">' +
+                          '<i class="fas fa-image"></i>' +
+                                '<p>Click to upload (PNG, JPG, GIF, SVG)</p>' +
+                                      '<input type="file" id="imgFileInput" accept="image/*" style="display:none">' +
+                                          '</div>' +
+                                              '<div style="text-align:center;color:var(--text-muted);margin:12px 0">— or —</div>' +
+                                                  '<div style="display:flex;gap:8px">' +
+                                                        '<input type="text" id="imgUrlInput" placeholder="Paste image URL..." style="flex:1;padding:10px 14px;border:1px solid var(--card-border);border-radius:8px;font-size:14px">' +
+                                                              '<button class="btn btn-gold" onclick="insertImageFromUrl()">Insert</button>' +
+                                                                  '</div>' +
+                                                                      '<div id="imgPreviewArea" style="margin-top:16px;display:none">' +
+                                                                            '<img id="imgPreviewImg" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--card-border)">' +
+                                                                                  '<div style="margin-top:8px"><button class="btn btn-gold" onclick="confirmImageInsert()">Add to Document</button></div>' +
+                                                                                      '</div>' +
+                                                                                          '<button class="btn" style="margin-top:16px" onclick="this.closest(\'.upload-overlay\').remove()">Cancel</button>' +
+                                                                                            '</div>';
+                                                                                              document.body.appendChild(imgModal);
+                                                                                                var zone = imgModal.querySelector('#imgUploadZone');
+                                                                                                  var fileIn = imgModal.querySelector('#imgFileInput');
+                                                                                                    zone.onclick = function() { fileIn.click(); };
+                                                                                                      fileIn.onchange = function() {
+                                                                                                          var file = this.files[0];
+                                                                                                              if (!file || !file.type.startsWith('image/')) return;
+                                                                                                                  var reader = new FileReader();
+                                                                                                                      reader.onload = function(e) {
+                                                                                                                            window.__pendingImageData = e.target.result;
+                                                                                                                                  var prev = imgModal.querySelector('#imgPreviewArea');
+                                                                                                                                        var prevImg = imgModal.querySelector('#imgPreviewImg');
+                                                                                                                                              prevImg.src = e.target.result;
+                                                                                                                                                    prev.style.display = 'block';
+                                                                                                                                                        };
+                                                                                                                                                            reader.readAsDataURL(file);
+                                                                                                                                                              };
+                                                                                                                                                              }
+                                                                                                                                                              function insertImageFromUrl() {
+                                                                                                                                                                var url = document.getElementById('imgUrlInput').value.trim();
+                                                                                                                                                                  if (!url) return;
+                                                                                                                                                                    window.__pendingImageData = url;
+                                                                                                                                                                      var prev = document.getElementById('imgPreviewArea');
+                                                                                                                                                                        var prevImg = document.getElementById('imgPreviewImg');
+                                                                                                                                                                          prevImg.src = url;
+                                                                                                                                                                            prev.style.display = 'block';
+                                                                                                                                                                            }
+                                                                                                                                                                            function confirmImageInsert() {
+                                                                                                                                                                              if (!window.__pendingImageData) return;
+                                                                                                                                                                                docCanvas.focus();
+                                                                                                                                                                                  document.execCommand('insertImage', false, window.__pendingImageData);
+                                                                                                                                                                                    updatePreview();
+                                                                                                                                                                                      var overlay = document.querySelector('.upload-overlay.active');
+                                                                                                                                                                                        if (overlay && overlay.querySelector('#imgUploadZone')) overlay.remove();
+                                                                                                                                                                                          window.__pendingImageData = null;
+                                                                                                                                                                                            showToast('Image inserted!');
+                                                                                                                                                                                            }
 }
 
 function clearFormatting() {
@@ -911,6 +966,12 @@ async function sendAI() {
   const currentContent = docCanvas.innerHTML;
   const hasContent = currentContent.trim().length > 100 && currentContent.trim() !== '<br>' && currentContent.trim() !== '<p><br></p>';
   console.log('[AI] Mode:', hasContent ? 'edit' : 'create', '| Content length:', currentContent.length, '| Sending existing:', hasContent);
+      // Truncate very large documents to avoid API timeouts
+          var contentToSend = currentContent;
+              if (hasContent && currentContent.length > 50000) {
+                    contentToSend = currentContent.substring(0, 50000) + '\n<!-- ... document truncated for AI processing (' + currentContent.length + ' total chars) ... -->';
+                          console.log('[AI] Content truncated from', currentContent.length, 'to ~50000 chars');
+                              }
   // Show edit mode indicator
   if (hasContent) {
     addAIMessage('\u270f\ufe0f Editing current document - your changes will be applied to the existing content.', 'system');
@@ -925,7 +986,7 @@ async function sendAI() {
         docType: 'custom',
         userId: window.__dmfUserId || null,
         plan: window.__dmfUserPlan || 'Free',
-        currentContent: hasContent ? currentContent : null,
+        currentContent: hasContent ? contentToSend : null,
         mode: hasContent ? 'edit' : 'create'
       })
     });
@@ -959,7 +1020,13 @@ async function sendAI() {
     
   } catch (e) {
     removeAILoading();
-    addAIMessage('Connection error. Please try again.', 'system');
+        console.error('[AI] Error:', e);
+            var errMsg = 'Connection error. ';
+                if (e.message && e.message.includes('Failed to fetch')) errMsg += 'Could not reach the AI server. Check your internet connection.';
+                    else if (e.message && e.message.includes('timeout')) errMsg += 'The request timed out. Try a shorter prompt or smaller document.';
+                        else if (e.message) errMsg += e.message;
+                            else errMsg += 'Please try again.';
+                                addAIMessage(errMsg, 'system');
   }
 }
 
