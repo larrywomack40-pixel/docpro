@@ -12,7 +12,9 @@ const COOLDOWNS = {
   welcome: 999999,
   document_ready: 1,
   credits_low: 1440,
-  payment_receipt: 5
+  payment_receipt: 5,
+  subscription_cancelled: 999999,
+  trial_ending: 1440
 };
 
 // ═══════════════ BRANDED EMAIL WRAPPER ═══════════════
@@ -109,18 +111,39 @@ function getEmailHTML(type, data) {
     return emailWrapper(content, 'This is your payment receipt. Save it for your records.');
   }
 
+
+  if (type === 'subscription_cancelled') {
+    var content = '<h1 style="font-size:20px;color:#1A1A1A;margin:0 0 8px;font-weight:700;">Subscription Cancelled</h1>'
+      + '<p style="font-size:15px;color:#555;line-height:1.6;margin:16px 0;">Hey ' + firstName + ', your subscription has been cancelled. You can still use DraftMyForms on the free plan.</p>'
+      + '<p style="font-size:15px;color:#555;line-height:1.6;">If this was a mistake, you can resubscribe anytime.</p>'
+      + emailButton('Resubscribe', 'https://draftmyforms.com/settings.html');
+    return emailWrapper(content, 'Your documents are still safe and accessible on the free plan.');
+  }
+
+  if (type === 'trial_ending') {
+    var daysLeft = data.daysLeft || 3;
+    var content = '<h1 style="font-size:20px;color:#D97706;margin:0 0 8px;font-weight:700;">Trial Ending Soon</h1>'
+      + '<p style="font-size:15px;color:#555;line-height:1.6;margin:16px 0;">Hey ' + firstName + ', your free trial ends in <strong style="color:#D97706;">' + daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + '</strong>.</p>'
+      + '<p style="font-size:15px;color:#555;line-height:1.6;">Subscribe now to keep your Pro features.</p>'
+      + emailButton('Subscribe Now', 'https://draftmyforms.com/settings.html', '#D97706');
+    return emailWrapper(content, 'Your trial features will be downgraded when the trial expires.');
+  }
+
   return '';
 }
 
 // ═══════════════ THROTTLE CHECK ═══════════════
 async function canSendEmail(userId, emailType) {
-  var cooldown = COOLDOWNS[emailType] || 60;
-  var { data } = await supabase.from('email_log').select('sent_at')
-    .eq('user_id', userId).eq('email_type', emailType)
-    .order('sent_at', { ascending: false }).limit(1).single();
-  if (!data) return true;
-  var diff = (new Date() - new Date(data.sent_at)) / (1000 * 60);
-  return diff >= cooldown;
+  try {
+    var cooldown = COOLDOWNS[emailType] || 60;
+    var { data, error } = await supabase.from('email_log').select('sent_at')
+      .eq('user_id', userId).eq('email_type', emailType)
+      .order('sent_at', { ascending: false }).limit(1);
+    if (error) { console.error('email_log query error:', error.message); return true; }
+    if (!data || data.length === 0) return true;
+    var diff = (new Date() - new Date(data[0].sent_at)) / (1000 * 60);
+    return diff >= cooldown;
+  } catch (e) { console.error('canSendEmail error:', e.message); return true; }
 }
 
 // ═══════════════ INPUT SANITIZATION ═══════════════
@@ -166,7 +189,9 @@ module.exports = async (req, res) => {
       welcome: 'Welcome to DraftMyForms!',
       document_ready: 'Your ' + (data && data.docType || 'Document') + ' is Ready',
       credits_low: 'You have ' + (data && data.creditsRemaining || 0) + ' credit(s) left',
-      payment_receipt: 'Payment Confirmed - ' + (data && data.planName || 'Pro') + ' Plan'
+      payment_receipt: 'Payment Confirmed - ' + (data && data.planName || 'Pro') + ' Plan',
+      subscription_cancelled: 'Your DraftMyForms Subscription Has Been Cancelled',
+      trial_ending: 'Your Trial Ends in ' + (data && data.daysLeft || 3) + ' Days'
     };
 
     var { data: emailResult, error } = await resend.emails.send({
@@ -182,12 +207,14 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Email send failed' });
     }
 
-    // Log the email
-    await supabase.from('email_log').insert({
-      user_id: userId,
-      email_type: type,
-      resend_id: emailResult && emailResult.id || null
-    });
+    // Log the email (non-blocking - don't fail if table missing)
+    try {
+      await supabase.from('email_log').insert({
+        user_id: userId,
+        email_type: type,
+        resend_id: emailResult && emailResult.id || null
+      });
+    } catch (logErr) { console.error('email_log insert error:', logErr.message); }
 
     return res.status(200).json({ success: true, id: emailResult && emailResult.id });
   } catch (err) {
