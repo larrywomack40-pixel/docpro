@@ -792,7 +792,6 @@ document.addEventListener("selectionchange", function() {
   var el = document.getElementById("docCanvas");
   if (el && (el === document.activeElement || el.contains(document.getSelection().anchorNode))) { updateToolbarState(); }
 });
-});
 
 function insertHeading(tag) {
   document.execCommand('formatBlock', false, tag);
