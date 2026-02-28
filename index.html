@@ -499,18 +499,18 @@ async function loadProfile() {
 }
 
 function updateUIForLoggedIn() {
-  document.getElementById('navSignIn').style.display = 'none';
-  document.getElementById('navTryFree').style.display = 'none';
+  var _navSI=document.getElementById('navSignIn');if(_navSI)_navSI.style.display='none';
+  var _navTF=document.getElementById('navTryFree');if(_navTF)_navTF.style.display='none';
   var avatar = document.getElementById('userAvatar');
-  avatar.classList.add('show');
+  if(avatar)avatar.classList.add('show');
   var nm = (currentProfile && currentProfile.display_name) || (currentUser && currentUser.email) || 'User';
-  avatar.textContent = (nm || 'U').charAt(0).toUpperCase();
+  if(avatar)avatar.textContent = (nm || 'U').charAt(0).toUpperCase();
   document.getElementById('userDisplayName').textContent = (currentProfile && currentProfile.display_name) || 'User';
   document.getElementById('userEmail').textContent = currentUser.email;
   var badge = document.getElementById('userPlanBadge');
   var plan = (currentProfile && currentProfile.plan) || 'free';
-  badge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
-  badge.className = 'plan-badge plan-' + plan;
+  if(badge)badge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
+  if(badge)badge.className = 'plan-badge plan-' + plan;
 var muBtn=document.getElementById('menuUpgradeBtn');if(muBtn)muBtn.style.display=(!plan||plan==='free')?'block':'none';
   var upBtn = document.getElementById('menuUpgradeBtn');
   if (plan === 'business') upBtn.style.display = 'none';
