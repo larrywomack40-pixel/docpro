@@ -232,7 +232,35 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+
+  // ═══════════════ INPUT SANITIZATION ═══════════════
+  function sanitizeInput(input, maxLen) {
+    if (typeof input !== 'string') return '';
+    return input.replace(/javascript:/gi, '').replace(/on\w+\s*=/gi, '').trim().slice(0, maxLen || 5000);
+  }
+
+  // ═══════════════ RATE LIMITING (IP-based) ═══════════════
+  const clientIP = (req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown').split(',')[0].trim();
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const rlClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const oneMinAgo = new Date(Date.now() - 60 * 1000).toISOString();
+      const { count } = await rlClient
+        .from('ai_usage')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', oneMinAgo);
+      // Global: max 60 AI requests per minute across all users
+      if (count && count > 60) {
+        return res.status(429).json({ error: 'Service is busy. Please wait a moment and try again.' });
+      }
+    } catch (rlErr) { /* rate limit check non-blocking */ }
+  }
+
   const { prompt, docType, plan, userId, currentContent, mode, templateStyle, fileData, fileName } = req.body;
+  // Sanitize user inputs
+  var sanitizedPrompt = sanitizeInput(prompt, 10000);
+  if (!sanitizedPrompt) return res.status(400).json({ error: 'Prompt is required' });
+
   if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'AI service not configured' });
 
