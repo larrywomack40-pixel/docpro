@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>(function(){var t=localStorage.getItem('draftmyforms-theme')||'system';var r=t;if(t==='system'){r=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',r)})()</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Document Editor | DraftMyForms</title>
@@ -22,6 +23,35 @@
 --font-body:'DM Sans',-apple-system,sans-serif;
 --font-mono:'DM Mono',monospace;
 }
+/* Dark Theme */
+[data-theme="dark"]{
+--gold:#F59E0B;--gold-light:#FBBF24;--gold-dark:#D97706;
+--paper:#0F0F13;--paper-dark:#1A1A22;
+--card:#1A1A22;--card-border:#2A2A36;
+--text:#E8E6E3;--text-muted:#A0A0A8;
+--success:#4ADE80;--danger:#EF5350;
+}
+[data-theme="dark"] body{background:#0F0F13;color:#E8E6E3}
+[data-theme="dark"] .top-nav{background:#131318;border-color:#2A2A36}
+[data-theme="dark"] .sidebar{background:#131318;border-color:#2A2A36}
+[data-theme="dark"] .toolbar{background:#1A1A22;border-color:#2A2A36}
+[data-theme="dark"] .editor-container{background:#161620}
+[data-theme="dark"] .doc-title-input{background:transparent;color:#E8E6E3}
+[data-theme="dark"] .btn-ghost{color:#A0A0A8}
+[data-theme="dark"] .btn-ghost:hover{background:#2A2A36;color:#E8E6E3}
+[data-theme="dark"] .ai-panel{background:#1A1A22;border-color:#2A2A36}
+[data-theme="dark"] .template-panel{background:#1A1A22;border-color:#2A2A36}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:#242430;color:#E8E6E3;border-color:#333340}
+[data-theme="dark"] .modal-overlay .modal{background:#1E1E28;color:#E8E6E3}
+[data-theme="dark"] .brand span{color:#E8E6E3}
+[data-theme="dark"] .chat-input{background:#242430;color:#E8E6E3;border-color:#333340}
+[data-theme="dark"] .chat-message{background:#242430}
+[data-theme="dark"] .chat-message.assistant{background:#1A2A3A}
+/* Theme toggle */
+.theme-toggle{display:inline-flex;gap:2px;background:var(--card);border-radius:6px;padding:2px;border:1px solid var(--card-border)}
+.theme-toggle button{padding:4px 8px;border-radius:4px;border:none;cursor:pointer;font-size:13px;background:transparent;color:var(--text-muted);transition:all 0.2s}
+.theme-toggle button.active{background:var(--gold);color:#fff}
+
 body{font-family:var(--font-body);background:var(--paper);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
 /* TOP NAV */
 .top-nav{display:flex;align-items:center;gap:12px;padding:8px 16px;background:#fff;border-bottom:1px solid var(--card-border);z-index:100;min-height:52px}
@@ -435,6 +465,11 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <button class="btn btn-outline btn-sm" onclick="downloadPDF()" title="Export as PDF"><i class="fas fa-file-pdf"></i> PDF</button>
 <button class="btn btn-outline btn-sm" onclick="downloadDocx()" title="Export as Word Document"><i class="fas fa-file-word"></i> DOCX</button>
 <button class="btn btn-gold btn-sm" onclick="saveDocument()" title="Save Document (Ctrl+S)"><i class="fas fa-save"></i> Save</button>
+<div class="theme-toggle" id="themeToggle">
+<button onclick="setTheme('light')" title="Light">&#9728;</button>
+<button onclick="setTheme('dark')" title="Dark">&#9790;</button>
+<button onclick="setTheme('system')" title="System">&#128187;</button>
+</div>
 <a href="/settings.html" class="btn btn-ghost btn-sm" title="Settings"><i class="fas fa-cog"></i></a>
 <a href="/dashboard.html" class="btn btn-ghost btn-sm" title="Back to Dashboard"><i class="fas fa-home"></i></a>
 </div>
@@ -2207,5 +2242,35 @@ async function editorCheckout(plan) {
 </script>
 
 <script src="/template-system.js"></script>
+
+<script>
+// Theme Switcher
+function setTheme(t){
+localStorage.setItem('draftmyforms-theme',t);
+var r=t;
+if(t==='system'){r=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}
+document.documentElement.setAttribute('data-theme',r);
+updateThemeButtons(t);
+// Save to Supabase if logged in
+if(window._supabase&&window._userId){
+window._supabase.from('profiles').update({theme:t}).eq('id',window._userId).then(function(){}).catch(function(){});
+}
+}
+function updateThemeButtons(t){
+var btns=document.querySelectorAll('#themeToggle button');
+btns.forEach(function(b,i){
+var vals=['light','dark','system'];
+b.classList.toggle('active',vals[i]===t);
+});
+}
+function initTheme(){
+var saved=localStorage.getItem('draftmyforms-theme')||'system';
+updateThemeButtons(saved);
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){
+if((localStorage.getItem('draftmyforms-theme')||'system')==='system'){setTheme('system')}
+});
+}
+initTheme();
+</script>
 </body>
 </html>
