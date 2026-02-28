@@ -551,7 +551,7 @@ function toggleUserMenu() { document.getElementById('userMenu').classList.toggle
 document.addEventListener('click', function(e) {
   var menu = document.getElementById('userMenu');
   var avatar = document.getElementById('userAvatar');
-  if (!menu.contains(e.target) && e.target !== avatar) menu.classList.remove('show');
+  if (!menu && menu.contains(e.target) && e.target !== avatar) menu.classList.remove('show');
 });
 
 function openAuthModal(mode) {
