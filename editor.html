@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Caveat:wght@400;600&family=Homemade+Apple&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -447,6 +448,26 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 /* Settings & Home links */
 .nav-actions a.btn-ghost { background: transparent; border: none; }
 .nav-actions a.btn-ghost:hover { background: #F0F0F0; }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .top-nav { flex-wrap: wrap; height: auto; min-height: var(--toolbar-h); padding: 4px 8px; }
+    .doc-title-input { font-size: 12px; max-width: 120px; }
+      .nav-actions { gap: 2px; flex-wrap: wrap; justify-content: flex-end; }
+        .nav-actions .btn { padding: 4px 6px; font-size: 11px; }
+          .nav-actions .btn-sm { padding: 3px 8px; font-size: 11px; }
+            .nav-actions .btn i { font-size: 13px; }
+              .toolbar { flex-wrap: wrap; height: auto; min-height: var(--toolbar-h); padding: 2px 4px; gap: 1px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                .toolbar button, .toolbar select { min-width: 28px; height: 28px; font-size: 11px; padding: 2px 4px; }
+                  .toolbar .separator { margin: 0 2px; }
+                    .editor-container { flex-direction: column; }
+                      #docCanvas { padding: 20px 15px; min-height: 60vh; font-size: 11px; }
+                        .ai-panel { position: fixed; bottom: 0; left: 0; right: 0; width: 100% !important; max-height: 50vh; z-index: 8000; border-top: 2px solid var(--gold); border-right: none; }
+                          .preview-panel { display: none; }
+                            .brand { font-size: 14px; }
+                              .theme-toggle { gap: 2px; }
+                                .theme-toggle button { width: 26px; height: 26px; font-size: 12px; }
+                                }
 </style>
 
 </head>
@@ -1894,12 +1915,14 @@ async function editorCheckout(plan) {
     var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
     var user = session && session.user ? session.user : null;
     if (user) {
-      var sbClient = window.supabase ? window.supabase.createClient('https://mupeqeuuwdmkndvtbhzb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk') : null;
+      window.sbClient = window.supabase ? window.supabase.createClient('https://mupeqeuuwdmkndvtbhzb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk') : null;
       if (sbClient) {
         sbClient.from('profiles').select('plan').eq('id', user.id).single().then(function(r) {
           var plan = r.data ? r.data.plan : 'free';
       window.__dmfUserPlan = plan;
         window.__dmfUserEmail = session.user.email || "";
+                      window.__userEmail = session.user.email || "";
+                                    window.__userPlan = plan;
           var btn = document.getElementById('editorUpgradeBtn');
           if (btn && (!plan || plan === 'free')) { btn.style.display = 'inline-flex'; }
         });
