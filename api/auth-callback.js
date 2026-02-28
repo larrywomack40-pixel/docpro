@@ -31,21 +31,23 @@ module.exports = async (req, res) => {
               });
       } catch (sessErr) { console.error('Session log error:', sessErr.message); }
 
-      // 2. Welcome email for new users (check email_log to avoid duplicates)
-      if (isNewUser && process.env.VERCEL_URL) {
-              try {
-                        const emailUrl = 'https://' + process.env.VERCEL_URL + '/api/send-email';
-                        fetch(emailUrl, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                                  userId: userId,
-                                                  email: email,
-                                                  type: 'welcome',
-                                                  data: { userName: email.split('@')[0] }
-                                    })
-                        }).catch(() => {});
-              } catch (e) { /* non-blocking */ }
+      // 2. Welcome email for new users
+      if (isNewUser) {
+        try {
+          var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
+          var emailUrl = siteUrl + '/api/send-email';
+          fetch(emailUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: userId,
+              email: email,
+              type: 'welcome',
+              data: { userName: email.split('@')[0] }
+            })
+          }).catch(function(e) { console.error('Welcome email failed:', e.message); });
+        } catch (e) { console.error('Welcome email block error:', e.message); }
+      }
       }
 
       // 3. Suspicious activity detection: multi-IP check
