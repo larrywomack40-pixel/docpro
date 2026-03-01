@@ -315,72 +315,131 @@ module.exports = async function handler(req, res) {
       console.error('Credit check error (non-blocking):', creditErr.message);
     }
   }
-  // --- AI GENERATION ---
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    // ——————————— AI GENERATION ———————————
+    const documentType = (docType || 'general').toLowerCase().replace(/[^a-z0-9\s-]/g, '');
 
-  // Select system prompt based on mode
-  let systemPrompt = (mode === 'edit' && currentContent) ? EDIT_SYSTEM_PROMPT : CREATE_SYSTEM_PROMPT;
-  const documentType = docType || null;
+    // ——————————— DOCUMENT TYPE PROMPT MAPS ———————————
+    const DOC_PROMPTS = {
+      invoice: 'Generate a professional USA invoice with: company header (name, address, phone, email), invoice number, date, due date, bill-to section, itemized table (description, qty, rate, amount) with subtotal/tax/total, payment terms, and professional footer. Use proper number formatting with dollar signs.',
+      'pay stub': 'Generate a professional USA pay stub with: employer info header, employee details (name, SSN last 4, employee ID), pay period dates, earnings breakdown (regular hours, overtime, bonuses), deductions (federal tax, state tax, social security, medicare, insurance, 401k), YTD totals for all categories, net pay prominently displayed. Must include check number and pay date.',
+      receipt: 'Generate a professional receipt with: business name/logo area, receipt number, date/time, itemized list with quantities and prices, subtotal, tax calculation, total, payment method, and return policy footer.',
+      contract: 'Generate a professional legal contract with: title, parties section (Party A and Party B with full details), recitals/whereas clauses, numbered articles with sections, terms and conditions, termination clause, governing law, entire agreement clause, signature blocks with date lines and witness lines.',
+      nda: 'Generate a professional Non-Disclosure Agreement with: parties identification, definition of confidential information, obligations of receiving party, exclusions from confidential information, term and duration, remedies, return of materials, governing law, and signature blocks.',
+      lease: 'Generate a professional residential lease agreement with: landlord/tenant info, property description, lease term, rent amount and due date, security deposit, utilities responsibilities, maintenance obligations, rules and regulations, early termination clause, and signature blocks.',
+      resume: 'Generate a professional ATS-optimized resume with: contact header (name, phone, email, LinkedIn, location), professional summary, work experience (reverse chronological with bullet points using action verbs and metrics), education, skills section organized by category. Use clean formatting that parses well in ATS systems.',
+      'cover letter': 'Generate a professional cover letter with: sender contact info, date, employer address, salutation, opening paragraph (position and interest), body paragraphs (qualifications, achievements, company fit), closing paragraph (call to action), professional sign-off.',
+      'business plan': 'Generate a professional business plan with: executive summary, company description, market analysis, organization structure, product/service line, marketing strategy, funding request, financial projections, and appendix sections.',
+      proposal: 'Generate a professional business proposal with: title page, executive summary, problem statement, proposed solution, methodology, timeline, budget breakdown, team qualifications, terms and conditions, and acceptance signature block.',
+      estimate: 'Generate a professional estimate/quote with: company header, estimate number, date, valid-until date, client info, itemized services/products with descriptions and pricing, subtotal, tax, total, terms and conditions, acceptance line.',
+      'purchase order': 'Generate a professional purchase order with: PO number, vendor info, ship-to address, order date, delivery date, itemized table (item, description, qty, unit price, total), shipping terms, payment terms, authorized signature.',
+      'work order': 'Generate a professional work order with: WO number, date, client info, job site address, description of work, materials needed, labor estimates, scheduled dates, special instructions, authorization signatures.',
+      'bill of sale': 'Generate a legal bill of sale with: seller and buyer info, description of item/property, sale price, payment method, as-is clause, warranty disclaimers, transfer of ownership statement, date, and notarized signature blocks.',
+      letterhead: 'Generate professional company letterhead with: company name/logo area, address, phone, email, website in header. Include date line, recipient address block, salutation, body area, and professional closing with signature block.',
+      memo: 'Generate a professional business memo with: TO, FROM, DATE, RE (subject) header fields, followed by well-structured body paragraphs with clear purpose statement, background, action items, and deadline if applicable.',
+      report: 'Generate a professional business report with: title page, table of contents, executive summary, introduction, methodology, findings/analysis sections, conclusions, recommendations, and appendices.',
+      certificate: 'Generate a professional certificate with: decorative border styling, organization name, certificate title, recipient name prominently displayed, achievement description, date of issue, authorized signatures, certificate number.',
+      affidavit: 'Generate a legal affidavit with: title, venue (state/county), affiant identification, numbered sworn statements beginning with "I hereby swear/affirm", jurat clause, notary block with seal area, signature line with date.'
+    };
 
-  // --- TASK 5: STYLE PREFERENCE INJECTION FOR CREATE MODE ---
-  if (mode !== 'edit' && documentType && userId && supabaseAdmin) {
-    try {
-      const { data: styleData } = await supabaseAdmin
-        .from('document_styles')
-        .select('style_fingerprint')
-        .eq('user_id', userId)
-        .eq('document_type', documentType)
-        .single();
+    // Get document-specific prompt or use general
+    const docPrompt = DOC_PROMPTS[documentType] || DOC_PROMPTS[documentType.split(' ')[0]] || '';
 
-      if (styleData && styleData.style_fingerprint) {
-        const fp = styleData.style_fingerprint;
-        systemPrompt += '\n\nUSER PREFERRED STYLE FOR ' + documentType.toUpperCase() + ':\n';
-        systemPrompt += '- Primary color: ' + (fp.primary_color || '#1B3A5C') + '\n';
-        systemPrompt += '- Font: ' + (fp.font_family || 'Arial') + '\n';
-        systemPrompt += '- Header style: ' + (fp.header_style || 'navy_bar') + '\n';
-        systemPrompt += '- Table borders: ' + (fp.table_style || 'full_grid') + '\n';
-        systemPrompt += '- Body text size: ' + (fp.body_font_size || '8pt') + '\n';
-        systemPrompt += '- Spacing: ' + (fp.section_spacing || 'compact') + '\n';
-        if (fp.company_name) systemPrompt += '- Company name: ' + fp.company_name + '\n';
-        if (fp.company_address) systemPrompt += '- Company address: ' + fp.company_address + '\n';
-        if (fp.company_phone) systemPrompt += '- Company phone: ' + fp.company_phone + '\n';
-        systemPrompt += 'Use these preferences unless the user explicitly requests a different style.';
-      }
-    } catch (styleErr) { /* no stored style yet, use defaults */ }
-  }
+    // ——————————— SYSTEM PROMPT CONSTRUCTION ———————————
+    let systemPrompt;
+    if (mode === 'edit') {
+      systemPrompt = `You are an expert document editor for DraftMyForms.com. You edit and improve existing HTML documents while preserving their structure, formatting, and professional appearance.
 
-  // --- TASK 7: GOLDEN SAMPLE FEW-SHOT EXAMPLES ---
-  if (mode !== 'edit' && documentType && supabaseAdmin) {
-    try {
-      const { data: samples } = await supabaseAdmin
-        .from('golden_samples')
-        .select('prompt, html')
-        .eq('document_type', documentType)
-        .eq('active', true)
-        .gte('quality_score', 8)
-        .order('quality_score', { ascending: false })
-        .limit(1);
+EDITING RULES:
+- Preserve the existing HTML structure and CSS styling
+- Only modify the specific content the user requests
+- Maintain all existing formatting, fonts, colors, and layout
+- If the user asks to "fix" or "improve", enhance clarity and professionalism
+- Keep all existing data (names, numbers, dates) unless explicitly told to change them
+- Return the COMPLETE modified HTML document, not just the changed parts
+- Never add markdown formatting - output pure HTML only
+- Preserve all inline styles and class names`;
+    } else {
+      systemPrompt = `You are DraftMyForms AI Document Engine - a professional document generator specializing in USA business and legal documents.
 
-      if (samples && samples.length > 0) {
-        systemPrompt += '\n\nREFERENCE EXAMPLE (match this quality level):\n';
-        systemPrompt += 'Prompt: "' + samples[0].prompt + '"\n';
-        systemPrompt += samples[0].html.substring(0, 2000) + '\n...\n';
-      }
-    } catch (sampleErr) { /* no golden samples yet */ }
-  }
+CORE RULES:
+1. Output ONLY valid HTML with inline CSS - no markdown, no code fences, no commentary
+2. Every document must look print-ready at 8.5" x 11" US Letter size
+3. Use professional fonts: system-ui, Segoe UI, Arial, or serif fonts for legal docs
+4. Include proper spacing, margins, and visual hierarchy
+5. All financial figures must use proper USD formatting ($X,XXX.XX)
+6. Dates in US format (Month DD, YYYY)
+7. Include realistic placeholder data when user doesn't specify details
+8. Legal documents must include proper legal language and standard clauses
 
-  // Build user message
-  let userMessage = '';
-  if (mode === 'edit' && currentContent) {
-    console.log('[ai-generate] EDIT mode | Content length:', currentContent.length);
-    userMessage = 'Here is the current HTML document:\n\n' + currentContent + '\n\nMake this change: ' + prompt + '\n\nReturn the complete modified HTML.';
-  } else {
-    console.log('[ai-generate] CREATE mode | Type:', documentType);
-    userMessage = documentType
-      ? 'Create a professional ' + documentType + '. ' + prompt
-      : prompt;
-  }
+FORMATTING STANDARDS:
+- Use a clean container div with max-width: 800px, margin: auto, padding: 40px
+- Headers: company/document name prominent, with clear visual hierarchy
+- Tables: border-collapse, proper padding, alternating row colors for readability
+- Signature blocks: adequate spacing with signature lines (border-bottom)
+- Footer: smaller text, centered, professional
 
+${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
+    }
+
+    // ——————————— TASK 5: STYLE PREFERENCE INJECTION FOR CREATE MODE ———————————
+    if (mode !== 'edit') {
+      try {
+        const { data: styleData } = await supabaseAdmin
+          .from('user_preferences')
+          .select('style_preferences')
+          .eq('user_id', userId)
+          .eq('preference_type', 'document_style')
+          .single();
+
+        if (styleData && styleData.style_preferences) {
+          const fp = styleData.style_preferences;
+          systemPrompt += `\n\nUSER STYLE PREFERENCES:`;
+          systemPrompt += fp.colorScheme ? `\n- Color scheme: ${fp.colorScheme}` : '';
+          systemPrompt += fp.fontFamily ? `\n- Font: ${fp.fontFamily}` : '';
+          systemPrompt += fp.headerStyle ? `\n- Header style: ${fp.headerStyle}` : '';
+          systemPrompt += fp.layout ? `\n- Layout: ${fp.layout}` : '';
+          systemPrompt += fp.logoPosition ? `\n- Logo position: ${fp.logoPosition}` : '';
+          systemPrompt += fp.tableStyle ? `\n- Table style: ${fp.tableStyle}` : '';
+          systemPrompt += fp.borderStyle ? `\n- Border style: ${fp.borderStyle}` : '';
+          if (fp.companyName) systemPrompt += `\n- Company: ${fp.companyName}`;
+          if (fp.companyAddress) systemPrompt += `\n- Address: ${fp.companyAddress}`;
+          if (fp.companyPhone) systemPrompt += `\n- Phone: ${fp.companyPhone}`;
+          systemPrompt += fp.companyEmail ? `\n- Email: ${fp.companyEmail}` : '';
+        }
+      } catch(e) { /* style prefs optional */ }
+    }
+
+    // ——————————— TASK 7: GOLDEN SAMPLE FEW-SHOT EXAMPLES ———————————
+    if (mode !== 'edit') {
+      try {
+        const { data: samples } = await supabaseAdmin
+          .from('document_templates')
+          .select('html_content')
+          .eq('doc_type', documentType)
+          .eq('is_golden_sample', true)
+          .gte('quality_score', 8)
+          .order('quality_score', { ascending: false })
+          .limit(1);
+
+        if (samples && samples.length > 0) {
+          systemPrompt += `\n\nREFERENCE EXAMPLE (match this quality and style):\n${samples[0].html_content.substring(0, 2000)}`;
+          systemPrompt += `\n[Example truncated - maintain this level of quality and formatting]`;
+          systemPrompt += `\nIMPORTANT: Generate NEW content inspired by the style above, do NOT copy it.`;
+        }
+      } catch(e) { /* golden samples optional */ }
+    }
+
+    // ——————————— USER MESSAGE CONSTRUCTION ———————————
+    let userMessage;
+    if (mode === 'edit') {
+      console.log('[AI] Edit mode - content length:', currentContent ? currentContent.length : 0);
+      userMessage = `Here is the current document HTML:\n\n${currentContent || ''}\n\nUser request: ${sanitizedPrompt}`;
+    } else {
+      console.log('[AI] Create mode - docType:', documentType);
+      userMessage = templateStyle
+        ? `Create a ${documentType} document using this template style: ${templateStyle}\n\nUser specifications: ${sanitizedPrompt}`
+        : `Create a professional ${documentType} document.\n\nUser specifications: ${sanitizedPrompt}`;
+    }
   try {
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
