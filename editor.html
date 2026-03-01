@@ -491,6 +491,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <button class="btn btn-outline btn-sm" onclick="downloadPDF()" title="Export as PDF"><i class="fas fa-file-pdf"></i> PDF</button>
 <button class="btn btn-outline btn-sm" onclick="downloadDocx()" title="Export as Word Document"><i class="fas fa-file-word"></i> DOCX</button>
 <button class="btn btn-gold btn-sm" onclick="saveDocument()" title="Save Document (Ctrl+S)"><i class="fas fa-save"></i> Save</button>
+                <button class="btn btn-action" onclick="openShareModal()" title="Share Document"><i class="fas fa-share-alt"></i></button>
 <div class="theme-toggle" id="themeToggle">
 <button onclick="setTheme('light')" title="Light">&#9728;</button>
 <button onclick="setTheme('dark')" title="Dark">&#9790;</button>
@@ -2389,6 +2390,132 @@ if((localStorage.getItem('draftmyforms-theme')||'system')==='system'){setTheme('
 });
 }
 initTheme();
+
+    // ——————————— SHARE DOCUMENT ———————————
+    function openShareModal() {
+      const canvas = document.getElementById('docCanvas');
+      if (!canvas || !canvas.innerHTML.trim()) {
+        alert('Please create or load a document first before sharing.');
+        return;
+      }
+      document.getElementById('shareModal').style.display = 'flex';
+      document.getElementById('shareResult').style.display = 'none';
+      document.getElementById('shareStatus').textContent = '';
+    }
+
+    function closeShareModal() {
+      document.getElementById('shareModal').style.display = 'none';
+    }
+
+    async function createShareLink() {
+      const canvas = document.getElementById('docCanvas');
+      const html = canvas.innerHTML;
+      const titleEl = document.querySelector('.file-name');
+      const title = titleEl ? titleEl.textContent.trim() : 'Untitled Document';
+      const statusEl = document.getElementById('shareStatus');
+      const resultEl = document.getElementById('shareResult');
+      const linkInput = document.getElementById('shareLinkInput');
+      const btn = document.getElementById('shareCreateBtn');
+
+      statusEl.textContent = 'Creating share link...';
+      statusEl.style.color = 'var(--gold)';
+      btn.disabled = true;
+
+      try {
+        const user = (await window.sbClient.auth.getUser()).data.user;
+        if (!user) {
+          statusEl.textContent = 'Please sign in to share documents.';
+          statusEl.style.color = 'var(--danger)';
+          btn.disabled = false;
+          return;
+        }
+
+        const { data, error } = await window.sbClient
+          .from('shared_documents')
+          .insert({
+            user_id: user.id,
+            title: title,
+            html_content: html,
+            document_type: window.currentDocType || 'general'
+          })
+          .select('share_token')
+          .single();
+
+        if (error) throw error;
+
+        const shareUrl = window.location.origin + '/editor.html?share=' + data.share_token;
+        linkInput.value = shareUrl;
+        resultEl.style.display = 'block';
+        statusEl.textContent = 'Share link created! Link expires in 30 days.';
+        statusEl.style.color = 'var(--success)';
+      } catch (err) {
+        console.error('Share error:', err);
+        statusEl.textContent = 'Error creating share link: ' + (err.message || 'Unknown error');
+        statusEl.style.color = 'var(--danger)';
+      }
+      btn.disabled = false;
+    }
+
+    function copyShareLink() {
+      const input = document.getElementById('shareLinkInput');
+      input.select();
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('shareCopyBtn');
+        btn.textContent = 'Copied!';
+        btn.style.background = 'var(--success)';
+        setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = 'var(--gold)'; }, 2000);
+      });
+    }
+
+    // Load shared document from URL
+    (function loadSharedDoc() {
+      const params = new URLSearchParams(window.location.search);
+      const shareToken = params.get('share');
+      if (!shareToken) return;
+
+      window.sbClient.from('shared_documents')
+        .select('title, html_content, document_type')
+        .eq('share_token', shareToken)
+        .eq('is_active', true)
+        .single()
+        .then(({ data, error }) => {
+          if (error || !data) {
+            alert('This shared document is no longer available or has expired.');
+            return;
+          }
+          const canvas = document.getElementById('docCanvas');
+          if (canvas) {
+            canvas.innerHTML = data.html_content;
+            const titleEl = document.querySelector('.file-name');
+            if (titleEl) titleEl.textContent = data.title + ' (Shared)';
+          }
+          // Increment view count
+          window.sbClient.from('shared_documents')
+            .update({ views_count: (data.views_count || 0) + 1 })
+            .eq('share_token', shareToken);
+        });
+    })();
 </script>
+
+<!-- Share Document Modal -->
+<div id="shareModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border-radius:12px;padding:32px;max-width:500px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3 style="margin:0;color:var(--text);font-family:var(--font-heading);">Share Document</h3>
+      <button onclick="closeShareModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&times;</button>
+    </div>
+    <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px;">Create a shareable link to this document. Anyone with the link can view it. Links expire in 30 days.</p>
+    <button id="shareCreateBtn" onclick="createShareLink()" style="width:100%;padding:12px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:16px;">
+      <i class="fas fa-link"></i> Generate Share Link
+    </button>
+    <div id="shareResult" style="display:none;margin-bottom:12px;">
+      <div style="display:flex;gap:8px;">
+        <input id="shareLinkInput" type="text" readonly style="flex:1;padding:10px;border:1px solid var(--card-border);border-radius:6px;font-size:13px;background:var(--paper);color:var(--text);">
+        <button id="shareCopyBtn" onclick="copyShareLink()" style="padding:10px 20px;background:var(--gold);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Copy</button>
+      </div>
+    </div>
+    <p id="shareStatus" style="font-size:13px;margin:0;text-align:center;"></p>
+  </div>
+</div>
 </body>
 </html>
