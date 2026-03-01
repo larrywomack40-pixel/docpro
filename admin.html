@@ -777,8 +777,10 @@ async function checkExpiredTrials() {
     // Load URL Click Data
     async function loadClickData() {
       try {
-        var resp = await fetch('/api/admin-api?action=url_clicks', {
-          headers: { 'Authorization': 'Bearer ' + (await window.sbClient.auth.getSession()).data.session.access_token }
+        var resp = await fetch('/api/admin-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await window.sbClient.auth.getSession()).data.session.access_token },
+          body: JSON.stringify({ action: 'url_clicks' })
         });
         if (!resp.ok) throw new Error('Failed to fetch');
         var data = await resp.json();
