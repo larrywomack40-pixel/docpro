@@ -492,6 +492,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 <button class="btn btn-outline btn-sm" onclick="downloadDocx()" title="Export as Word Document"><i class="fas fa-file-word"></i> DOCX</button>
 <button class="btn btn-gold btn-sm" onclick="saveDocument()" title="Save Document (Ctrl+S)"><i class="fas fa-save"></i> Save</button>
                 <button class="btn btn-action" onclick="openShareModal()" title="Share Document"><i class="fas fa-share-alt"></i></button>
+                <button class="btn btn-action" onclick="openATSModal()" title="ATS Resume Score"><i class="fas fa-clipboard-check"></i></button>
 <div class="theme-toggle" id="themeToggle">
 <button onclick="setTheme('light')" title="Light">&#9728;</button>
 <button onclick="setTheme('dark')" title="Dark">&#9790;</button>
@@ -2468,6 +2469,77 @@ initTheme();
     }
 
     // Load shared document from URL
+
+    // ——————————— ATS RESUME ANALYZER ———————————
+    function openATSModal() {
+      var canvas = document.getElementById('docCanvas');
+      if (!canvas || !canvas.innerHTML.trim()) { alert('Create a document first.'); return; }
+      var score = analyzeATS(canvas.innerHTML);
+      showATSResults(score);
+    }
+    function analyzeATS(html) {
+      var text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      var lower = text.toLowerCase();
+      var checks = [], total = 0;
+      var hasEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/.test(lower);
+      var hasPhone = /\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/.test(text);
+      var cs = (hasEmail?5:0)+(hasPhone?5:0);
+      checks.push({name:'Contact Info',score:cs,max:10,tip:hasEmail&&hasPhone?'Email & phone found':'Add email and phone number'});
+      total+=cs;
+      var sects=['experience','education','skills','summary','objective','work history','professional'];
+      var fs=sects.filter(function(s){return lower.includes(s)});
+      var ss=Math.min(10,fs.length*3);
+      checks.push({name:'Section Headers',score:ss,max:10,tip:fs.length>=3?fs.length+' sections found':'Add headers: Experience, Education, Skills'});
+      total+=ss;
+      var words=text.split(/\s+/).length;
+      var ws=words>=200&&words<=1000?10:words<200?4:7;
+      checks.push({name:'Content Length',score:ws,max:10,tip:words+' words ('+(words>=200&&words<=1000?'good':words<200?'too short':'consider trimming')+')'});
+      total+=ws;
+      var verbs=['managed','developed','created','led','implemented','designed','achieved','improved','increased','reduced','built','launched','analyzed','coordinated','delivered'];
+      var fv=verbs.filter(function(v){return lower.includes(v)});
+      var vs=Math.min(10,fv.length*2);
+      checks.push({name:'Action Verbs',score:vs,max:10,tip:fv.length>0?fv.length+' action verbs':'Use verbs: managed, developed, created'});
+      total+=vs;
+      var nums=(text.match(/\d+[%$]|\$[\d,]+|\d+\+?\s*(years?|clients?|projects?|users?|revenue)/gi)||[]);
+      var ns=Math.min(10,nums.length*3);
+      checks.push({name:'Quantified Results',score:ns,max:10,tip:nums.length>0?nums.length+' metrics':'Add metrics: "increased sales by 30%"'});
+      total+=ns;
+      var hi=/<img/i.test(html),ht=/<table/i.test(html);
+      var fms=hi?3:ht?7:10;
+      checks.push({name:'ATS-Friendly Format',score:fms,max:10,tip:!hi&&!ht?'Clean format':hi?'Remove images':'Tables may cause issues'});
+      total+=fms;
+      var sc=(text.match(/[\u2605\u2606\u25CF\u25C6\u25BA\u25AA\u25A0\u25A1\u2022\u2023\u2043\u27A4\u2192]/g)||[]);
+      var chs=sc.length===0?10:Math.max(3,10-sc.length);
+      checks.push({name:'Plain Text Friendly',score:chs,max:10,tip:sc.length===0?'No special symbols':'Replace '+sc.length+' symbols with standard bullets'});
+      total+=chs;
+      var dates=(text.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s*\d{4}/gi)||[]);
+      var ds=dates.length>=2?10:dates.length===1?6:3;
+      checks.push({name:'Date Formatting',score:ds,max:10,tip:dates.length>=2?dates.length+' dates found':'Use consistent format: Month Year'});
+      total+=ds;
+      var li=lower.includes('linkedin'),po=lower.includes('portfolio')||lower.includes('github');
+      var ls=(li?5:0)+(po?5:0);
+      checks.push({name:'Professional Links',score:ls,max:10,tip:li||po?'Links found':'Add LinkedIn or portfolio URL'});
+      total+=ls;
+      var sk=['javascript','python','java','react','sql','html','css','aws','docker','git','agile','leadership','communication','management','excel','data','cloud'];
+      var fsk=sk.filter(function(s){return lower.includes(s)});
+      var sks=Math.min(10,fsk.length*2);
+      checks.push({name:'Skills Keywords',score:sks,max:10,tip:fsk.length>0?fsk.length+' skills found':'Add relevant skill keywords'});
+      total+=sks;
+      return {total:total,max:100,checks:checks};
+    }
+    function showATSResults(r) {
+      var pct=Math.round((r.total/r.max)*100);
+      var color=pct>=80?'var(--success)':pct>=50?'var(--gold)':'var(--danger)';
+      var label=pct>=80?'Excellent':pct>=60?'Good':pct>=40?'Needs Work':'Poor';
+      var ch=r.checks.map(function(c){
+        var cp=Math.round((c.score/c.max)*100);
+        var cl=cp>=80?'#3a6633':cp>=50?'#c99532':'#c24b3b';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--card-border);"><div><strong style="color:var(--text);">'+c.name+'</strong><br><small style="color:var(--text-muted);">'+c.tip+'</small></div><div style="min-width:50px;text-align:right;font-weight:700;color:'+cl+';">'+c.score+'/'+c.max+'</div></div>';
+      }).join('');
+      document.getElementById('atsModal').innerHTML='<div style="background:var(--card);border-radius:12px;padding:32px;max-width:550px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h3 style="margin:0;color:var(--text);font-family:var(--font-heading);">ATS Score Analysis</h3><button onclick="document.getElementById(\'atsModal\').style.display=\'none\'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&times;</button></div><div style="text-align:center;margin-bottom:24px;"><div style="width:120px;height:120px;border-radius:50%;border:8px solid '+color+';display:inline-flex;align-items:center;justify-content:center;flex-direction:column;"><span style="font-size:36px;font-weight:800;color:'+color+';">'+pct+'</span><span style="font-size:11px;color:var(--text-muted);">/ 100</span></div><p style="margin-top:8px;font-weight:600;color:'+color+';">'+label+'</p></div><div>'+ch+'</div><p style="margin-top:16px;font-size:12px;color:var(--text-muted);text-align:center;">Improve your score by addressing the suggestions above.</p></div>';
+      document.getElementById('atsModal').style.display='flex';
+    }
+
     (function loadSharedDoc() {
       const params = new URLSearchParams(window.location.search);
       const shareToken = params.get('share');
@@ -2517,5 +2589,8 @@ initTheme();
     <p id="shareStatus" style="font-size:13px;margin:0;text-align:center;"></p>
   </div>
 </div>
+
+<!-- ATS Score Modal -->
+<div id="atsModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10001;align-items:center;justify-content:center;"></div>
 </body>
 </html>
