@@ -734,5 +734,131 @@ function updateThemeButtons(t){var btns=document.querySelectorAll('#themeToggle 
 function initTheme(){var saved=localStorage.getItem('draftmyforms-theme')||'system';updateThemeButtons(saved);window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if((localStorage.getItem('draftmyforms-theme')||'system')==='system'){setTheme('system')}})}
 initTheme();
 </script>
+
+<!-- Onboarding Tour -->
+<style>
+.tour-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9998;display:none}
+.tour-overlay.active{display:block}
+.tour-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;padding:24px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);display:none;border-top:4px solid var(--gold,#c99532)}
+.tour-popup.active{display:block}
+.tour-popup h3{margin:0 0 8px;font-family:var(--font-heading,'Playfair Display',serif);color:var(--gold-dark,#a67a28);font-size:18px}
+.tour-popup p{margin:0 0 16px;color:#555;font-size:14px;line-height:1.5}
+.tour-step-indicator{display:flex;gap:6px;margin-bottom:16px}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:#ddd}
+.tour-dot.active{background:var(--gold,#c99532)}
+.tour-dot.done{background:var(--success,#3a6633)}
+.tour-actions{display:flex;justify-content:space-between;align-items:center}
+.tour-skip{background:none;border:none;color:#999;cursor:pointer;font-size:13px;padding:4px 8px}
+.tour-skip:hover{color:#666}
+.tour-next{background:var(--gold,#c99532);color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px}
+.tour-next:hover{background:var(--gold-dark,#a67a28)}
+.tour-prev{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px}
+.tour-highlight{position:relative;z-index:9999;box-shadow:0 0 0 4px var(--gold,#c99532),0 0 0 8px rgba(201,149,50,.3);border-radius:8px;transition:box-shadow .3s}
+.tour-emoji{font-size:32px;margin-bottom:8px;display:block}
+.tour-progress{font-size:12px;color:#999}
+</style>
+
+<div class="tour-overlay" id="tourOverlay"></div>
+<div class="tour-popup" id="tourPopup">
+  <div class="tour-step-indicator" id="tourDots"></div>
+  <span class="tour-emoji" id="tourEmoji"></span>
+  <h3 id="tourTitle"></h3>
+  <p id="tourDesc"></p>
+  <div class="tour-actions">
+    <button class="tour-skip" onclick="endTour()">Skip Tour</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="tour-progress" id="tourProgress"></span>
+      <button class="tour-prev" id="tourPrevBtn" onclick="prevTourStep()" style="display:none">Back</button>
+      <button class="tour-next" id="tourNextBtn" onclick="nextTourStep()">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var tourSteps=[
+  {emoji:'\ud83d\udc4b',title:'Welcome to DraftMyForms!',desc:'Let us show you around. This quick tour will help you get the most out of your document creation experience.',position:'center'},
+  {emoji:'\ud83d\udcdd',title:'Create New Documents',desc:'Click the "New Document" button to start creating invoices, contracts, resumes, and more with our AI-powered editor.',target:'.btn-primary,.btn-gold',position:'bottom'},
+  {emoji:'\ud83d\udcc4',title:'Your Recent Documents',desc:'All your saved documents appear here. You can edit, download, or share any document at any time.',target:'.doc-card,.documents-section,.recent-docs',position:'top'},
+  {emoji:'\u2b50',title:'Choose Your Plan',desc:'Upgrade to Pro or Business for unlimited AI generations, premium templates, and advanced features like ATS scoring.',target:'.plan-card,.upgrade-section,.current-plan',position:'bottom'},
+  {emoji:'\ud83d\udcc1',title:'Browse 26,000+ Templates',desc:'Access our massive library of professional templates across 14 categories. Find the perfect starting point for any document.',target:'.template-btn,.browse-templates',position:'bottom'},
+  {emoji:'\ud83e\udd16',title:'AI-Powered Generation',desc:'Describe what you need and our AI will create a professional document instantly. Just type your request and hit Send!',target:'.ai-input,.ai-prompt',position:'top'},
+  {emoji:'\ud83c\udfa8',title:'Customize Your Style',desc:'Choose from multiple document themes, fonts, and colors. Make every document match your brand.',target:'.theme-toggle,.style-selector',position:'bottom'},
+  {emoji:'\ud83d\udce4',title:'Export Anywhere',desc:'Download your documents as PDF or DOCX. Share via link or email directly from the platform.',target:'.export-btn,.download-section',position:'top'},
+  {emoji:'\ud83d\ude80',title:'You\'re All Set!',desc:'Start creating professional documents now. Need help? Our AI assistant is always ready in the editor. Happy documenting!',position:'center'}
+];
+var currentTourStep=0;
+function startTour(){
+  if(localStorage.getItem('dmf_tour_done')) return;
+  currentTourStep=0;
+  showTourStep();
+}
+function showTourStep(){
+  var step=tourSteps[currentTourStep];
+  var overlay=document.getElementById('tourOverlay');
+  var popup=document.getElementById('tourPopup');
+  var dots=document.getElementById('tourDots');
+  overlay.classList.add('active');
+  popup.classList.add('active');
+  // Remove old highlights
+  document.querySelectorAll('.tour-highlight').forEach(function(el){el.classList.remove('tour-highlight')});
+  // Build dots
+  var dotsHTML='';
+  for(var i=0;i<tourSteps.length;i++){
+    var cls='tour-dot';
+    if(i<currentTourStep) cls+=' done';
+    if(i===currentTourStep) cls+=' active';
+    dotsHTML+='<div class="'+cls+'"></div>';
+  }
+  dots.innerHTML=dotsHTML;
+  document.getElementById('tourEmoji').textContent=step.emoji;
+  document.getElementById('tourTitle').textContent=step.title;
+  document.getElementById('tourDesc').textContent=step.desc;
+  document.getElementById('tourProgress').textContent=(currentTourStep+1)+' of '+tourSteps.length;
+  document.getElementById('tourPrevBtn').style.display=currentTourStep>0?'inline-block':'none';
+  document.getElementById('tourNextBtn').textContent=currentTourStep===tourSteps.length-1?'Finish':'Next';
+  // Position popup
+  if(step.target){
+    var el=document.querySelector(step.target);
+    if(el){
+      el.classList.add('tour-highlight');
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      var rect=el.getBoundingClientRect();
+      if(step.position==='bottom'){
+        popup.style.top=(rect.bottom+12)+'px';
+        popup.style.left=Math.max(16,rect.left)+'px';
+      }else{
+        popup.style.top=Math.max(16,(rect.top-popup.offsetHeight-12))+'px';
+        popup.style.left=Math.max(16,rect.left)+'px';
+      }
+      popup.style.transform='none';
+    }else{
+      popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
+    }
+  }else{
+    popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
+  }
+}
+function nextTourStep(){
+  if(currentTourStep>=tourSteps.length-1){endTour();return;}
+  currentTourStep++;
+  showTourStep();
+}
+function prevTourStep(){
+  if(currentTourStep<=0) return;
+  currentTourStep--;
+  showTourStep();
+}
+function endTour(){
+  document.getElementById('tourOverlay').classList.remove('active');
+  document.getElementById('tourPopup').classList.remove('active');
+  document.querySelectorAll('.tour-highlight').forEach(function(el){el.classList.remove('tour-highlight')});
+  localStorage.setItem('dmf_tour_done','1');
+}
+// Auto-start tour for new users after 2 seconds
+setTimeout(function(){
+  if(!localStorage.getItem('dmf_tour_done')){startTour();}
+},2000);
+</script>
+
 </body>
 </html>
