@@ -95,6 +95,18 @@ module.exports = async (req, res) => {
       return res.json({ profiles: profiles || [] });
     }
 
+    // URL Click Tracking
+    if (action === 'url_clicks') {
+      const { data: clicks, error: clickErr } = await supabase
+        .from('url_clicks_summary')
+        .select('*')
+        .limit(50);
+      if (clickErr) {
+        return res.status(500).json({ error: 'Failed to fetch click data', detail: clickErr.message });
+      }
+      return res.status(200).json({ clicks: clicks || [] });
+    }
+
     return res.status(400).json({ error: 'Unknown action: ' + action });
   } catch (err) {
     console.error('Admin API error:', err);
