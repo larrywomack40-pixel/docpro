@@ -2162,16 +2162,62 @@ async function editorCheckout(plan) {
   async function insertSignature() {
     var dataURL = getSignatureDataURL();
     if (!dataURL) { alert('Please draw, type, or select a signature first.'); return; }
-    var shouldSave = document.getElementById('sigSaveCheck').checked;
-    if (shouldSave && sigCurrentTab !== 'saved') {
-      await saveSignatureToDb(dataURL);
+    if (document.getElementById('sigSaveCheck') && document.getElementById('sigSaveCheck').checked) {
+      var sigTab = typeof sigCurrentTab !== 'undefined' ? sigCurrentTab : 'draw';
+      if (sigTab === 'saved') { /* already saved */ } else { await saveSignatureToDb(dataURL, sigTab); }
     }
-    var imgHTML = '<div style="margin:16px 0;"><img src="' + dataURL + '" style="max-width:250px;max-height:80px;" alt="Signature"><div style="border-top:1px solid #333;width:250px;margin-top:4px;padding-top:2px;font-size:11px;color:#666;">Authorized Signature \u2022 ' + new Date().toLocaleDateString() + '</div></div>';
-    var editor = document.getElementById('docCanvas');
-    if (editor) {
-      editor.focus();
-      document.execCommand('insertHTML', false, imgHTML);
-    }
+    var canvas = document.getElementById('docCanvas');
+    if (!canvas) return;
+    // Make docCanvas position:relative if not already
+    if (getComputedStyle(canvas).position === 'static') canvas.style.position = 'relative';
+    // Create draggable signature wrapper
+    var wrapper = document.createElement('div');
+    wrapper.className = 'sig-draggable';
+    wrapper.setAttribute('contenteditable', 'false');
+    wrapper.style.cssText = 'position:absolute;bottom:60px;left:40px;cursor:move;z-index:10;border:2px dashed transparent;padding:4px;user-select:none;transition:border-color 0.2s;';
+    wrapper.innerHTML = '<img src="' + dataURL + '" style="width:200px;height:auto;display:block;pointer-events:none;" alt="Signature">'
+      + '<div style="font-size:11px;color:#666;margin-top:2px;">\u2022 Signature &bull; Date: ' + new Date().toLocaleDateString() + '</div>'
+      + '<span class="sig-remove" style="position:absolute;top:-10px;right:-10px;background:#c24b3b;color:#fff;border-radius:50%;width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:14px;cursor:pointer;line-height:20px;text-align:center;" onclick="this.parentElement.remove()">\u00d7</span>';
+    // Show controls on hover
+    wrapper.addEventListener('mouseenter', function() { this.style.borderColor = '#c99532'; this.querySelector('.sig-remove').style.display = 'flex'; });
+    wrapper.addEventListener('mouseleave', function() { this.style.borderColor = 'transparent'; this.querySelector('.sig-remove').style.display = 'none'; });
+    // Drag functionality
+    var isDragging = false, startX, startY, origLeft, origTop;
+    wrapper.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('sig-remove')) return;
+      isDragging = true;
+      var rect = wrapper.getBoundingClientRect();
+      startX = e.clientX; startY = e.clientY;
+      origLeft = wrapper.offsetLeft; origTop = wrapper.offsetTop;
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      var dx = e.clientX - startX, dy = e.clientY - startY;
+      wrapper.style.left = (origLeft + dx) + 'px';
+      wrapper.style.top = (origTop + dy) + 'px';
+      wrapper.style.bottom = 'auto';
+    });
+    document.addEventListener('mouseup', function() { isDragging = false; });
+    // Touch support for mobile
+    wrapper.addEventListener('touchstart', function(e) {
+      if (e.target.classList.contains('sig-remove')) return;
+      isDragging = true;
+      var touch = e.touches[0];
+      startX = touch.clientX; startY = touch.clientY;
+      origLeft = wrapper.offsetLeft; origTop = wrapper.offsetTop;
+      e.preventDefault();
+    }, {passive: false});
+    document.addEventListener('touchmove', function(e) {
+      if (!isDragging) return;
+      var touch = e.touches[0];
+      var dx = touch.clientX - startX, dy = touch.clientY - startY;
+      wrapper.style.left = (origLeft + dx) + 'px';
+      wrapper.style.top = (origTop + dy) + 'px';
+      wrapper.style.bottom = 'auto';
+    });
+    document.addEventListener('touchend', function() { isDragging = false; });
+    canvas.appendChild(wrapper);
     closeSignatureModal();
   }
 
