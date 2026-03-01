@@ -14,7 +14,8 @@ const COOLDOWNS = {
   credits_low: 1440,
   payment_receipt: 5,
   subscription_cancelled: 999999,
-  trial_ending: 1440
+  trial_ending: 1440,
+  admin_notification: 5
 };
 
 // ═══════════════ BRANDED EMAIL WRAPPER ═══════════════
@@ -129,6 +130,18 @@ function getEmailHTML(type, data) {
     return emailWrapper(content, 'Your trial features will be downgraded when the trial expires.');
   }
 
+  if (type === 'admin_notification') {
+    var subject = (data && data.subject) || 'Notification from DraftMyForms';
+    var message = (data && data.message) || '';
+    return '<div style="font-family:DM Sans,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e0db">' +
+      '<div style="background:#c99532;padding:24px;text-align:center"><h1 style="color:#fff;margin:0;font-size:24px">DraftMyForms</h1></div>' +
+      '<div style="padding:32px 24px">' +
+      '<h2 style="color:#1a1a1a;margin:0 0 16px">' + subject + '</h2>' +
+      '<div style="color:#555;font-size:15px;line-height:1.6">' + message.replace(/\n/g, '<br>') + '</div>' +
+      '<div style="margin-top:24px;text-align:center"><a href="https://www.draftmyforms.com/dashboard.html" style="display:inline-block;background:#c99532;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600">Go to Dashboard</a></div>' +
+      '</div>' +
+      '<div style="padding:16px 24px;background:#faf7f5;text-align:center;font-size:12px;color:#888">DraftMyForms by WMK Speciality Services L.L.C.</div></div>';
+  }
   return '';
 }
 
@@ -191,7 +204,8 @@ module.exports = async (req, res) => {
       credits_low: 'You have ' + (data && data.creditsRemaining || 0) + ' credit(s) left',
       payment_receipt: 'Payment Confirmed - ' + (data && data.planName || 'Pro') + ' Plan',
       subscription_cancelled: 'Your DraftMyForms Subscription Has Been Cancelled',
-      trial_ending: 'Your Trial Ends in ' + (data && data.daysLeft || 3) + ' Days'
+      trial_ending: 'Your Trial Ends in ' + (data && data.daysLeft || 3) + ' Days',
+      admin_notification: (data && data.subject) || 'Notification from DraftMyForms'
     };
 
     var { data: emailResult, error } = await resend.emails.send({
