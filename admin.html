@@ -277,6 +277,29 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
     <h4 style="margin:0 0 10px;">Recent Referrals</h4>
     <div id="referralsList" style="max-height:300px;overflow-y:auto;"></div>
   </div>
+
+<!-- URL Click Tracking Section -->
+<div class="admin-section" id="urlClicksSection" style="margin-top:32px">
+  <h2 style="color:var(--gold);margin-bottom:16px"><i class="fas fa-mouse-pointer"></i> URL Click Tracking (Last 30 Days)</h2>
+  <div id="clickStatsCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+    <div class="stat-card"><div class="stat-number" id="totalPageViews">--</div><div class="stat-label">Total Page Views</div></div>
+    <div class="stat-card"><div class="stat-number" id="uniqueVisitors">--</div><div class="stat-label">Unique Visitors</div></div>
+    <div class="stat-card"><div class="stat-number" id="topPageViews">--</div><div class="stat-label">Top Page Views</div></div>
+  </div>
+  <div style="background:var(--card-bg,#fff);border-radius:12px;padding:20px;border:1px solid var(--border,#e5e5e5)">
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="border-bottom:2px solid var(--gold)">
+        <th style="text-align:left;padding:10px">URL</th>
+        <th style="text-align:center;padding:10px">Total Clicks</th>
+        <th style="text-align:center;padding:10px">Unique Clicks</th>
+        <th style="text-align:center;padding:10px">Last Click</th>
+      </tr></thead>
+      <tbody id="clicksTableBody">
+        <tr><td colspan="4" style="text-align:center;padding:20px;color:#999">Loading click data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 </section>
 
 <footer>A product of <strong>WMK Speciality Services L.L.C.</strong></footer>
@@ -750,6 +773,45 @@ async function checkExpiredTrials() {
   }
 }
 
+
+    // Load URL Click Data
+    async function loadClickData() {
+      try {
+        var resp = await fetch('/api/admin-api?action=url_clicks', {
+          headers: { 'Authorization': 'Bearer ' + (await window.sbClient.auth.getSession()).data.session.access_token }
+        });
+        if (!resp.ok) throw new Error('Failed to fetch');
+        var data = await resp.json();
+        var clicks = data.clicks || [];
+        
+        var totalViews = 0, totalUnique = 0;
+        clicks.forEach(function(c) { totalViews += c.total_clicks; totalUnique += c.unique_clicks; });
+        
+        document.getElementById('totalPageViews').textContent = totalViews.toLocaleString();
+        document.getElementById('uniqueVisitors').textContent = totalUnique.toLocaleString();
+        document.getElementById('topPageViews').textContent = clicks.length > 0 ? clicks[0].total_clicks.toLocaleString() : '0';
+        
+        var tbody = document.getElementById('clicksTableBody');
+        if (clicks.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999">No click data yet. Tracking will begin as users visit your site.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = clicks.slice(0, 20).map(function(c) {
+          var urlShort = c.url.replace('https://www.draftmyforms.com', '').replace('https://draftmyforms.com', '') || '/';
+          var lastClick = c.last_click ? new Date(c.last_click).toLocaleDateString() : 'N/A';
+          return '<tr style="border-bottom:1px solid var(--border,#eee)">' +
+            '<td style="padding:10px"><a href="' + c.url + '" target="_blank" style="color:var(--gold)">' + urlShort + '</a></td>' +
+            '<td style="text-align:center;padding:10px;font-weight:600">' + c.total_clicks.toLocaleString() + '</td>' +
+            '<td style="text-align:center;padding:10px">' + c.unique_clicks.toLocaleString() + '</td>' +
+            '<td style="text-align:center;padding:10px;color:#999">' + lastClick + '</td></tr>';
+        }).join('');
+      } catch(e) {
+        console.error('Click data error:', e);
+        document.getElementById('clicksTableBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999">Unable to load click data</td></tr>';
+      }
+    }
+    // Load click data on page load
+    setTimeout(loadClickData, 2000);
 </script>
 
 <!-- Email Notification Modal -->
