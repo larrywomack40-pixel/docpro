@@ -2611,5 +2611,141 @@ initTheme();
 
 <!-- ATS Score Modal -->
 <div id="atsModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10001;align-items:center;justify-content:center;"></div>
+
+
+<!-- Writing Assistant Panel -->
+<style>
+.wa-toggle{position:fixed;right:20px;bottom:80px;width:50px;height:50px;border-radius:50%;background:var(--gold);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:999;font-size:20px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.wa-toggle:hover{transform:scale(1.1)}
+.wa-panel{position:fixed;right:-380px;top:0;width:370px;height:100vh;background:var(--paper,#faf7f5);border-left:2px solid var(--gold-light,#e8b94a);z-index:1000;transition:right .3s ease;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,.1)}
+.wa-panel.open{right:0}
+.wa-panel-header{padding:16px 20px;background:linear-gradient(135deg,var(--gold,#c99532),var(--gold-dark,#a67a28));color:#fff;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1}
+.wa-panel-header h3{margin:0;font-family:var(--font-heading,'Playfair Display',serif);font-size:18px}
+.wa-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px}
+.wa-tools{padding:12px}
+.wa-tool{width:100%;padding:12px 16px;margin-bottom:8px;border:1px solid var(--card-border,#e8ddd4);border-radius:8px;background:var(--card,#fffcf9);cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:12px}
+.wa-tool:hover{border-color:var(--gold);background:var(--gold-bg,#fef8ee);transform:translateX(-2px)}
+.wa-tool .wa-icon{font-size:22px;width:36px;text-align:center}
+.wa-tool .wa-info h4{margin:0 0 2px;font-size:14px;color:var(--text,#2d2926)}
+.wa-tool .wa-info p{margin:0;font-size:11px;color:var(--text-muted,#8a7f76)}
+.wa-result{padding:16px 20px;display:none}
+.wa-result.active{display:block}
+.wa-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.wa-result-header h4{margin:0;font-size:16px}
+.wa-back{background:none;border:none;cursor:pointer;font-size:14px;color:var(--gold);font-weight:600}
+.wa-result-content{background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:16px;min-height:100px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+.wa-loading{text-align:center;padding:30px;color:var(--text-muted)}
+.wa-loading .spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--card-border);border-top-color:var(--gold);border-radius:50%;animation:waSpin .8s linear infinite}
+@keyframes waSpin{to{transform:rotate(360deg)}}
+.wa-section-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:16px 0 8px;padding:0 4px;font-weight:600}
+.wa-credits{text-align:center;padding:8px;font-size:12px;color:var(--text-muted);border-top:1px solid var(--card-border);margin-top:8px}
+</style>
+
+<button class="wa-toggle" onclick="toggleWritingAssistant()" title="Writing Assistant">✍️</button>
+<div class="wa-panel" id="waPanel">
+  <div class="wa-panel-header">
+    <h3>✨ Writing Assistant</h3>
+    <button class="wa-close" onclick="toggleWritingAssistant()">×</button>
+  </div>
+  <div class="wa-tools" id="waTools">
+    <div class="wa-section-title">Universal Tools</div>
+    <button class="wa-tool" onclick="runWATool('improve')"><span class="wa-icon">✨</span><div class="wa-info"><h4>Improve Writing</h4><p>Enhance clarity, grammar, and flow</p></div></button>
+    <button class="wa-tool" onclick="runWATool('shorten')"><span class="wa-icon">✂️</span><div class="wa-info"><h4>Make Concise</h4><p>Shorten without losing meaning</p></div></button>
+    <button class="wa-tool" onclick="runWATool('expand')"><span class="wa-icon">📝</span><div class="wa-info"><h4>Expand & Elaborate</h4><p>Add detail and depth</p></div></button>
+    <button class="wa-tool" onclick="runWATool('formal')"><span class="wa-icon">👔</span><div class="wa-info"><h4>Make Formal</h4><p>Professional business tone</p></div></button>
+    <button class="wa-tool" onclick="runWATool('friendly')"><span class="wa-icon">😊</span><div class="wa-info"><h4>Make Friendly</h4><p>Warm, approachable language</p></div></button>
+    <button class="wa-tool" onclick="runWATool('grammar')"><span class="wa-icon">🔍</span><div class="wa-info"><h4>Fix Grammar</h4><p>Correct errors and punctuation</p></div></button>
+    <button class="wa-tool" onclick="runWATool('translate')"><span class="wa-icon">🌐</span><div class="wa-info"><h4>Translate</h4><p>Convert to Spanish, French, etc.</p></div></button>
+    <button class="wa-tool" onclick="runWATool('summarize')"><span class="wa-icon">📋</span><div class="wa-info"><h4>Summarize</h4><p>Create a brief summary</p></div></button>
+    <div class="wa-credits" id="waCredits"></div>
+  </div>
+  <div class="wa-result" id="waResult">
+    <div class="wa-result-header">
+      <h4 id="waResultTitle">Result</h4>
+      <button class="wa-back" onclick="showWATools()">← Back</button>
+    </div>
+    <div class="wa-result-content" id="waResultContent"></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-gold btn-sm" onclick="applyWAResult()">Apply to Document</button>
+      <button class="btn btn-outline btn-sm" onclick="copyWAResult()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleWritingAssistant(){
+  document.getElementById('waPanel').classList.toggle('open');
+}
+function showWATools(){
+  document.getElementById('waTools').style.display='block';
+  document.getElementById('waResult').classList.remove('active');
+}
+function getSelectedOrAllText(){
+  var sel=window.getSelection();
+  if(sel&&sel.toString().trim().length>0) return sel.toString();
+  var editor=document.getElementById('editor-content')||document.querySelector('[contenteditable]');
+  return editor?editor.innerText:'';
+}
+async function runWATool(tool){
+  var text=getSelectedOrAllText();
+  if(!text||text.trim().length<5){alert('Please select text or write content in the editor first.');return;}
+  var toolNames={improve:'Improve Writing',shorten:'Make Concise',expand:'Expand & Elaborate',formal:'Make Formal',friendly:'Make Friendly',grammar:'Fix Grammar',translate:'Translate to Spanish',summarize:'Summarize'};
+  var prompts={
+    improve:'Improve the following text for clarity, grammar, and professional flow. Return only the improved text:\n\n',
+    shorten:'Make the following text more concise while preserving the key meaning. Return only the shortened text:\n\n',
+    expand:'Expand and elaborate on the following text with more detail and depth. Return only the expanded text:\n\n',
+    formal:'Rewrite the following text in a formal, professional business tone. Return only the rewritten text:\n\n',
+    friendly:'Rewrite the following text in a warm, friendly, approachable tone. Return only the rewritten text:\n\n',
+    grammar:'Fix all grammar, spelling, and punctuation errors in the following text. Return only the corrected text:\n\n',
+    translate:'Translate the following text to Spanish. Return only the translated text:\n\n',
+    summarize:'Create a brief, clear summary of the following text. Return only the summary:\n\n'
+  };
+  document.getElementById('waResultTitle').textContent=toolNames[tool]||'Result';
+  document.getElementById('waResultContent').innerHTML='<div class="wa-loading"><div class="spinner"></div><p>Processing...</p></div>';
+  document.getElementById('waTools').style.display='none';
+  document.getElementById('waResult').classList.add('active');
+  try{
+    var sb=window.supabaseClient||window._supabase;
+    if(!sb){alert('Not logged in');showWATools();return;}
+    var session=await sb.auth.getSession();
+    var token=session.data.session?session.data.session.access_token:'';
+    var resp=await fetch('/api/ai-generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({type:'custom',customPrompt:prompts[tool]+text})
+    });
+    var data=await resp.json();
+    if(data.content){
+      document.getElementById('waResultContent').textContent=data.content;
+      window._waLastResult=data.content;
+    }else{
+      document.getElementById('waResultContent').textContent='Error: '+(data.error||'Could not process');
+    }
+  }catch(e){
+    document.getElementById('waResultContent').textContent='Error: '+e.message;
+  }
+}
+function applyWAResult(){
+  if(!window._waLastResult)return;
+  var sel=window.getSelection();
+  if(sel&&sel.rangeCount>0&&sel.toString().trim().length>0){
+    var range=sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(document.createTextNode(window._waLastResult));
+  }else{
+    var editor=document.getElementById('editor-content')||document.querySelector('[contenteditable]');
+    if(editor) editor.innerText=window._waLastResult;
+  }
+  showWATools();
+  toggleWritingAssistant();
+}
+function copyWAResult(){
+  if(!window._waLastResult)return;
+  navigator.clipboard.writeText(window._waLastResult).then(function(){
+    alert('Copied to clipboard!');
+  });
+}
+</script>
+
 </body>
 </html>
