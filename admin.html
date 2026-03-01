@@ -368,7 +368,7 @@ function renderUsers(users){
         (!isAdmin?' <button onclick="openPlanModal(\''+u.id+'\',\''+escHtml(u.email||'')+'\',\''+planDisplay+'\',\''+(u.plan_override_expires_at||'')+'\',\''+(u.plan_override_reason||'')+'\')" style="margin-left:8px;padding:2px 10px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.8em;">Change</button>':'')+
       '</td>'+
       '<td>'+(u.referral_code?'<code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;font-size:0.8em;">'+u.referral_code+'</code>':'<span style="color:#999">None</span>')+'</td>'+
-      '<td>'+(!isAdmin?'<button class="action-btn" onclick="toggleRole(\''+u.id+'\',\''+u.role+'\')">Toggle Admin</button>':'')+'</td>'+
+      '<td>'+(!isAdmin?'<button class="action-btn" onclick="toggleRole(\''+u.id+'\',\''+u.role+'\')" style="margin-right:6px">Toggle Admin</button>':'')+' <button class="btn-sm" onclick="openEmailModal(\''+escHtml(u.email||'')+'\')" title="Send email notification"><i class="fas fa-envelope"></i></button></td>'+
     '</tr>';
   }).join('');
 }
@@ -472,34 +472,40 @@ sb.auth.signOut().then(function(){window.location.href='/'});
     }
 
     async function loadLiveFeed() {
-      try {
-        var token = await getAdminToken();
-        var res = await fetch('/api/admin-api', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ action: 'live-feed' })
-        });
-        var data = await res.json();
-        if (data.error) { console.error('Feed error:', data.error); return; }
-        var tbody = document.getElementById('liveFeedBody');
-        var statusEl = document.getElementById('feedStatus');
-        if (!data.feed || data.feed.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No recent activity</td></tr>';
-          statusEl.textContent = '0 events';
-          return;
-        }
-        statusEl.textContent = data.feed.length + ' recent events';
-        tbody.innerHTML = data.feed.map(function(e) {
-          var time = new Date(e.created_at || e.logged_in_at).toLocaleString('en-US', { hour:'numeric', minute:'2-digit', month:'short', day:'numeric' });
-          return '<tr><td>' + escHtml(e.email || e.user_id || 'Unknown') + '</td>' +
-            '<td>' + escHtml(e.action || e.document_type || 'Session') + '</td>' +
-            '<td>' + escHtml((e.prompt || e.user_agent || '').substring(0, 60)) + '</td>' +
-            '<td style="color:var(--text-muted);font-size:12px">' + time + '</td></tr>';
-        }).join('');
-      } catch (err) { console.error('Live feed error:', err); }
-    }
-
-    async function loadFlags() {
+    try {
+      var token = await getAdminToken();
+      var res = await fetch('/api/admin-api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ action: 'live-feed' })
+      });
+      var data = await res.json();
+      if (data.error) { console.error('Feed error:', data.error); return; }
+      var feed = data.docs || data.feed || [];
+      var tbody = document.getElementById('liveFeedBody');
+      var statusEl = document.getElementById('feedStatus');
+      if (!feed || feed.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No recent activity</td></tr>';
+        statusEl.textContent = '0 events';
+        return;
+      }
+      // Build email lookup from cached users
+      var emailMap = {};
+      (window.__allUsers || []).forEach(function(u) { emailMap[u.id] = u.email || u.display_name || 'Unknown'; });
+      statusEl.textContent = feed.length + ' recent events';
+      tbody.innerHTML = feed.map(function(e) {
+        var time = new Date(e.created_at).toLocaleString('en-US', { hour:'numeric', minute:'2-digit', month:'short', day:'numeric' });
+        var userLabel = emailMap[e.user_id] || e.user_id || 'Unknown';
+        var actionLabel = e.action || e.document_type || 'Activity';
+        var details = (e.prompt || e.document_type || '').substring(0, 80);
+        return '<tr><td>' + escHtml(userLabel) + '</td>' +
+          '<td><span style="text-transform:capitalize;font-weight:600">' + escHtml(actionLabel) + '</span></td>' +
+          '<td style="font-size:12px;color:var(--text-secondary)">' + escHtml(details) + '</td>' +
+          '<td style="color:var(--text-muted);font-size:12px">' + time + '</td></tr>';
+      }).join('');
+    } catch (err) { console.error('Live feed error:', err); }
+  }
+  async function loadFlags() {
       try {
         var token = await getAdminToken();
         var res = await fetch('/api/admin-api', {
@@ -531,24 +537,61 @@ sb.auth.signOut().then(function(){window.location.href='/'});
     }
 
     async function resolveFlag(flagId) {
-      try {
-        var token = await getAdminToken();
-        await fetch('/api/admin-api', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ action: 'resolve-flag', flagId: flagId })
-        });
-        loadFlags();
-      } catch (err) { alert('Error resolving flag'); }
-    }
-
-    // Auto-refresh live feed every 30 seconds
+    try {
+      var token = await getAdminToken();
+      await fetch('/api/admin-api', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ action: 'resolve-flag', flagId: flagId })
+      });
+      loadFlags();
+    } catch (err) { alert('Error resolving flag'); }
+  }
+  // Auto-refresh live feed every 30 seconds
     var feedInterval = null;
     function startFeedRefresh() {
       loadLiveFeed();
       loadFlags();
       feedInterval = setInterval(function() { loadLiveFeed(); loadFlags(); }, 30000);
     }
+
+
+// === Email Notification Modal ===
+function openEmailModal(email) {
+  document.getElementById('emailModalTo').value = email;
+  document.getElementById('emailModalInfo').innerHTML = '<strong>Send to:</strong> ' + escHtml(email);
+  document.getElementById('emailModalSubject').value = '';
+  document.getElementById('emailModalBody').value = '';
+  document.getElementById('emailModalType').value = 'custom';
+  document.getElementById('emailModalOverlay').classList.add('active');
+}
+function closeEmailModal() {
+  document.getElementById('emailModalOverlay').classList.remove('active');
+}
+async function sendUserEmail() {
+  var toEmail = document.getElementById('emailModalTo').value;
+  var emailType = document.getElementById('emailModalType').value;
+  var subject = document.getElementById('emailModalSubject').value.trim();
+  var body = document.getElementById('emailModalBody').value.trim();
+  if (emailType === 'custom' && (!subject || !body)) { alert('Subject and message required for custom emails'); return; }
+  try {
+    var token = await getAdminToken();
+    var payload = { to: toEmail, type: emailType };
+    if (emailType === 'custom') { payload.subject = subject; payload.body = body; payload.type = 'admin_notification'; payload.data = { subject: subject, message: body }; }
+    else if (emailType === 'welcome') { payload.data = { name: toEmail.split('@')[0] }; }
+    else if (emailType === 'payment_receipt') { payload.data = { plan: 'Pro', amount: '$0.00', name: toEmail.split('@')[0] }; }
+    else if (emailType === 'trial_ending') { payload.data = { name: toEmail.split('@')[0], plan: 'Pro', days_left: 3 }; }
+    var res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(payload)
+    });
+    var result = await res.json();
+    if (result.error) { alert('Email error: ' + result.error); return; }
+    alert('Email sent to ' + toEmail + '!');
+    closeEmailModal();
+  } catch (err) { alert('Failed to send email: ' + err.message); }
+}
 
 init();
 
@@ -709,6 +752,30 @@ async function checkExpiredTrials() {
 
 </script>
 
+<!-- Email Notification Modal -->
+<div class="plan-modal-overlay" id="emailModalOverlay">
+  <div class="plan-modal">
+    <h3>&#9993; Send Email Notification</h3>
+    <div class="current-info" id="emailModalInfo"></div>
+    <input type="hidden" id="emailModalTo">
+    <label>Email Type</label>
+    <select id="emailModalType" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px">
+      <option value="custom">Custom Message</option>
+      <option value="welcome">Welcome Email</option>
+      <option value="payment_receipt">Payment Receipt</option>
+      <option value="subscription_cancelled">Subscription Cancelled</option>
+      <option value="trial_ending">Trial Ending Reminder</option>
+    </select>
+    <label>Subject</label>
+    <input type="text" id="emailModalSubject" placeholder="Email subject..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px">
+    <label>Message (for custom emails)</label>
+    <textarea id="emailModalBody" rows="4" placeholder="Write your message..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;margin-bottom:12px"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn-confirm" onclick="sendUserEmail()"><i class="fas fa-paper-plane"></i> Send Email</button>
+    </div>
+  </div>
+</div>
 <!-- Plan Change Modal -->
 <div class="plan-modal-overlay" id="planModalOverlay">
   <div class="plan-modal">
