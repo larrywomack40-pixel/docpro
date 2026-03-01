@@ -2472,6 +2472,14 @@ initTheme();
 
     // ——————————— ATS RESUME ANALYZER ———————————
     function openATSModal() {
+    // Pro+ plan check for ATS feature
+    var atsEmail = window.__dmfUserEmail || window.__userEmail || '';
+    var atsPlan = window.__dmfUserPlan || window.__userPlan || 'free';
+    if (atsEmail !== 'larrywomack40@gmail.com' && atsPlan === 'free') {
+      alert('ATS Resume Analyzer is a Pro+ feature. Please upgrade your plan to access this tool.');
+      return;
+    }
+
       var canvas = document.getElementById('docCanvas');
       if (!canvas || !canvas.innerHTML.trim()) { alert('Create a document first.'); return; }
       var score = analyzeATS(canvas.innerHTML);
