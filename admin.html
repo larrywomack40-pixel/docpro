@@ -596,10 +596,10 @@ async function sendUserEmail() {
   var emailType = document.getElementById('emailModalType').value;
   var subject = document.getElementById('emailModalSubject').value.trim();
   var body = document.getElementById('emailModalBody').value.trim();
-  if (emailType === 'custom' && (!subject || !body)) { alert('Subject and message required for custom emails'); return; }
+  if (emailType === 'admin_notification' && (!subject || !body)) { alert('Subject and message required for custom emails'); return; }
   try {
     var token = await getAdminToken();
-    var payload = { to: toEmail, type: emailType };
+    var payload = { email: toEmail, type: emailType, data: { subject: subject, message: body } };
     if (emailType === 'custom') { payload.subject = subject; payload.body = body; payload.type = 'admin_notification'; payload.data = { subject: subject, message: body }; }
     else if (emailType === 'welcome') { payload.data = { name: toEmail.split('@')[0] }; }
     else if (emailType === 'payment_receipt') { payload.data = { plan: 'Pro', amount: '$0.00', name: toEmail.split('@')[0] }; }
@@ -821,10 +821,10 @@ async function checkExpiredTrials() {
   <div class="plan-modal">
     <h3>&#9993; Send Email Notification</h3>
     <div class="current-info" id="emailModalInfo"></div>
-    <input type="hidden" id="emailModalTo">
+    <input type="email" id="emailModalTo" placeholder="Recipient email address..." style="width:100%;padding:10px;border:1px solid var(--border,#ddd);border-radius:8px;margin-bottom:12px;font-size:14px">
     <label>Email Type</label>
     <select id="emailModalType" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px">
-      <option value="custom">Custom Message</option>
+      <option value="admin_notification">Custom Message</option>
       <option value="welcome">Welcome Email</option>
       <option value="payment_receipt">Payment Receipt</option>
       <option value="subscription_cancelled">Subscription Cancelled</option>
