@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Free Document Templates | 11,000+ Professional Templates | DraftMyForms</title>
+<meta name="description" content="Browse 11,000+ free professional document templates. Invoices, contracts, pay stubs, resumes, and more. AI-powered editing.">
+<link rel="canonical" href="https://www.draftmyforms.com/templates.html">
+<meta property="og:title" content="Free Document Templates | DraftMyForms">
+<meta property="og:description" content="Browse 11,000+ free professional document templates with AI-powered editing.">
+<meta property="og:url" content="https://www.draftmyforms.com/templates.html">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Free Document Templates","description":"Browse 11,000+ free professional document templates","url":"https://www.draftmyforms.com/templates.html","publisher":{"@type":"Organization","name":"DraftMyForms"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"DM Sans",sans-serif;background:#f8f9fa;color:#333}
+.navbar{background:#fff;border-bottom:1px solid #eee;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:20px;font-weight:700;color:#333;text-decoration:none}
+.brand span{color:#c99532}
+.nav-links a{margin-left:16px;color:#555;text-decoration:none;font-size:14px}
+.hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);color:#fff;padding:60px 24px;text-align:center}
+.hero h1{font-size:36px;margin-bottom:12px}
+.hero p{font-size:18px;opacity:0.85;max-width:600px;margin:0 auto 24px}
+.search-box{max-width:500px;margin:0 auto;position:relative}
+.search-box input{width:100%;padding:14px 20px 14px 48px;border:none;border-radius:50px;font-size:16px;background:rgba(255,255,255,0.95)}
+.search-box i{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#999}
+.container{max-width:1200px;margin:0 auto;padding:40px 24px}
+.section-title{font-size:24px;font-weight:700;margin-bottom:24px}
+.categories-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-bottom:48px}
+.cat-card{background:#fff;border-radius:12px;padding:24px;border:1px solid #eee;transition:all 0.2s;cursor:pointer;text-decoration:none;color:#333;display:block}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.08);border-color:#c99532}
+.cat-card h3{font-size:17px;margin-bottom:8px}
+.cat-card p{font-size:13px;color:#666;margin-bottom:12px}
+.cat-card .count{font-size:12px;color:#c99532;font-weight:600}
+.templates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.tmpl-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #eee;transition:all 0.2s}
+.tmpl-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+.tmpl-preview{height:180px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:48px}
+.tmpl-info{padding:16px}
+.tmpl-info h3{font-size:15px;margin-bottom:6px}
+.tmpl-info p{font-size:13px;color:#666;margin-bottom:12px}
+.tmpl-meta{display:flex;justify-content:space-between;align-items:center}
+.tier-badge{font-size:11px;padding:3px 8px;border-radius:12px;font-weight:600}
+.tier-free{background:#e8f5e9;color:#2e7d32}
+.tier-pro{background:#e3f2fd;color:#1565c0}
+.tier-business{background:#fff3e0;color:#e65100}
+.cta-btn{display:inline-block;background:#c99532;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px}
+.cta-btn:hover{background:#b08428}
+.footer{background:#1a1a2e;color:#fff;padding:40px 24px;text-align:center;margin-top:60px}
+.footer p{opacity:0.7;font-size:13px}
+@media(max-width:768px){.hero h1{font-size:26px}.categories-grid{grid-template-columns:1fr 1fr}.templates-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+<a href="/" class="brand"><span>&#10022;</span> DraftMyForms</a>
+<div class="nav-links"><a href="/dashboard.html">Dashboard</a> <a href="/editor.html">Editor</a> <a href="/templates.html" style="color:#c99532;font-weight:600">Templates</a></div>
+</nav>
+<section class="hero">
+<h1>11,000+ Free Document Templates</h1>
+<p>Professional templates for every business need. AI-powered editing lets you customize and download instantly.</p>
+<div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search templates... (e.g., invoice, contract, resume)"></div>
+</section>
+<div class="container">
+<h2 class="section-title">Browse by Category</h2>
+<div class="categories-grid" id="categoriesGrid"></div>
+<h2 class="section-title">Popular Templates</h2>
+<div class="templates-grid" id="templatesGrid"></div>
+</div>
+<footer class="footer"><p>&copy; 2026 DraftMyForms by WMK Speciality Services L.L.C. All rights reserved.</p></footer>
+<script>
+var sbUrl="https://mupeqeuuwdmkndvtbhzb.supabase.co";
+var sbKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NzQ0MjEsImV4cCI6MjA1NjQ1MDQyMX0.vu0TxfnJJKaO4KflcUWDMSxNcGnMl8subs8SmjJm6N0";
+var sb=supabase.createClient(sbUrl,sbKey);
+async function loadCategories(){
+  var r=await sb.from("seo_categories").select("*").order("sort_order");
+  if(!r.data)return;
+  document.getElementById("categoriesGrid").innerHTML=r.data.map(function(c){
+    return '<a href="/templates.html?cat='+c.slug+'" class="cat-card"><h3><i class="fas fa-folder" style="color:#c99532;margin-right:8px"></i>'+c.name+'</h3><p>'+c.description+'</p><span class="count">'+c.template_count+' templates</span></a>';
+  }).join("");
+}
+async function loadTemplates(catSlug,search){
+  var q=sb.from("seo_templates").select("*,seo_categories(slug,name)").order("downloads",{ascending:false}).limit(50);
+  if(catSlug){
+    var cr=await sb.from("seo_categories").select("id").eq("slug",catSlug).single();
+    if(cr.data)q=q.eq("category_id",cr.data.id);
+  }
+  if(search)q=q.ilike("name","%"+search+"%");
+  var r=await q;
+  if(!r.data)return;
+  document.getElementById("templatesGrid").innerHTML=r.data.map(function(t){
+    var tc=t.tier==="pro"?"tier-pro":t.tier==="business"?"tier-business":"tier-free";
+    return '<div class="tmpl-card"><div class="tmpl-preview"><i class="fas fa-file-alt"></i></div><div class="tmpl-info"><h3>'+t.name+'</h3><p>'+(t.short_description||"").substring(0,80)+'</p><div class="tmpl-meta"><span class="tier-badge '+tc+'">'+t.tier.charAt(0).toUpperCase()+t.tier.slice(1)+'</span><a href="/editor.html?template='+t.slug+'" class="cta-btn">Use Template</a></div></div></div>';
+  }).join("");
+}
+var p=new URLSearchParams(window.location.search);
+var cf=p.get("cat");
+loadCategories();
+loadTemplates(cf);
+document.getElementById("searchInput").addEventListener("input",function(e){
+  var v=e.target.value.trim();
+  if(v.length>2||v.length===0)loadTemplates(cf,v);
+});
+</script>
+</body>
+</html>
