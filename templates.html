@@ -74,7 +74,7 @@ body{font-family:"DM Sans",sans-serif;background:#f8f9fa;color:#333}
 <footer class="footer"><p>&copy; 2026 DraftMyForms by WMK Speciality Services L.L.C. All rights reserved.</p></footer>
 <script>
 var sbUrl="https://mupeqeuuwdmkndvtbhzb.supabase.co";
-var sbKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NzQ0MjEsImV4cCI6MjA1NjQ1MDQyMX0.vu0TxfnJJKaO4KflcUWDMSxNcGnMl8subs8SmjJm6N0";
+var sbKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk";
 var sb=supabase.createClient(sbUrl,sbKey);
 async function loadCategories(){
   var r=await sb.from("seo_categories").select("*").order("sort_order");
