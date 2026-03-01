@@ -48,7 +48,6 @@ module.exports = async (req, res) => {
           }).catch(function(e) { console.error('Welcome email failed:', e.message); });
         } catch (e) { console.error('Welcome email block error:', e.message); }
       }
-      }
 
       // 3. Suspicious activity detection: multi-IP check
       try {
