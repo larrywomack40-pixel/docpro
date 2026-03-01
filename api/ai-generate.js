@@ -441,6 +441,7 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
         : `Create a professional ${documentType} document.\n\nUser specifications: ${sanitizedPrompt}`;
     }
   try {
+      const client = new Anthropic();
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 8192,
