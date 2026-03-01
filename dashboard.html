@@ -85,8 +85,8 @@ a{text-decoration:none;color:inherit}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
 .toast.show{transform:translateY(0);opacity:1}
-@media(max-width:768px){.navbar{padding:0 16px}.dashboard{padding:80px 16px 32px}.stats-row{grid-template-columns:1fr 1fr}.docs-grid{grid-template-columns:1fr}.dash-header{flex-direction:column;align-items:flex-start}}
-@media(max-width:480px){.stats-row{grid-template-columns:1fr}}
+@media(max-width:768px){.navbar{padding:0 12px;gap:8px}.dashboard{padding:80px 12px 32px}.stats-row{grid-template-columns:1fr 1fr}.docs-grid{grid-template-columns:1fr}.dash-header{flex-direction:column;align-items:flex-start}.nav-actions{gap:6px}.nav-actions .btn-gold{padding:8px 12px;font-size:12px}.nav-actions .btn-gold .btn-text-long{display:none}.user-avatar{width:40px;height:40px;font-size:16px;min-width:40px}.nav-brand{font-size:16px}}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr}.nav-actions .btn-gold{padding:6px 10px}.nav-brand{font-size:14px;gap:6px}.nav-brand .star{font-size:18px}}
 
 .upgrade-banner{background:linear-gradient(135deg,#c99532 0%,#e8b94a 50%,#c99532 100%);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#fff}
 .upgrade-banner h3{font-family:var(--font-heading);font-size:18px;margin-bottom:4px}
@@ -174,7 +174,7 @@ a{text-decoration:none;color:inherit}
 </div>
 <div class="nav-actions">
 <button class="nav-upgrade" id="navUpgradeBtn" style="display:none" onclick="openUpgradeModal()"><i class="fas fa-crown"></i> Upgrade</button>
-<a href="/editor.html" class="btn btn-gold btn-sm"><i class="fas fa-plus"></i> New Document</a>
+<a href="/editor.html" class="btn btn-gold btn-sm"><i class="fas fa-plus"></i> <span class="btn-text-long">New Document</span></a>
 <div class="user-avatar" id="userAvatar" onclick="toggleMenu()"></div>
 <div id="userDropdown" style="display:none;position:absolute;top:56px;right:32px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1001">
 <div style="padding:10px 14px;border-bottom:1px solid var(--border-light);margin-bottom:4px">
