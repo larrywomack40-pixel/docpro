@@ -147,7 +147,8 @@ function getEmailHTML(type, data) {
 
 // ═══════════════ THROTTLE CHECK ═══════════════
 async function canSendEmail(userId, emailType) {
-  try {
+    try {
+    if (!userId) return true;
     var cooldown = COOLDOWNS[emailType] || 60;
     var { data, error } = await supabase.from('email_log').select('sent_at')
       .eq('user_id', userId).eq('email_type', emailType)
@@ -183,7 +184,7 @@ module.exports = async (req, res) => {
 
   try {
     var { userId, email, type, data } = req.body;
-    if (!userId || !email || !type) return res.status(400).json({ error: 'Missing userId, email, or type' });
+    if (!email || !type) return res.status(400).json({ error: 'Missing email or type' });
 
     // Sanitize inputs
     email = sanitizeEmail(email);
