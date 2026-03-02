@@ -307,6 +307,40 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
     </table>
   </div>
 </div>
+
+<div style="background:#1e1e2e;border-radius:12px;padding:24px;margin-top:24px;border:1px solid rgba(212,175,55,0.1)">
+  <h3 style="color:#d4af37;margin:0 0 16px">&#128273; Temporary Access Links</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div>
+      <label style="color:#888;font-size:12px;display:block;margin-bottom:4px">Grant access to:</label>
+      <select id="tempAccessPage" style="width:100%;padding:8px;background:#0a0a0f;color:#fff;border:1px solid #333;border-radius:6px">
+        <option value="/editor.html">Editor (Full)</option>
+        <option value="/dashboard.html">Dashboard</option>
+        <option value="*">All Pages</option>
+      </select>
+    </div>
+    <div>
+      <label style="color:#888;font-size:12px;display:block;margin-bottom:4px">Expires in:</label>
+      <select id="tempAccessExpiry" style="width:100%;padding:8px;background:#0a0a0f;color:#fff;border:1px solid #333;border-radius:6px">
+        <option value="1">1 hour</option>
+        <option value="4">4 hours</option>
+        <option value="24" selected>24 hours</option>
+        <option value="168">7 days</option>
+        <option value="720">30 days</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-bottom:12px">
+    <label style="color:#888;font-size:12px;display:block;margin-bottom:4px">Label (who is this for?):</label>
+    <input type="text" id="tempAccessLabel" placeholder="e.g. Fiverr developer, Claude browser" style="width:100%;padding:8px;background:#0a0a0f;color:#fff;border:1px solid #333;border-radius:6px;box-sizing:border-box">
+  </div>
+  <button onclick="generateTempLink()" style="padding:10px 24px;background:#d4af37;color:#000;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:14px">Generate Access Link</button>
+  <div id="tempLinkResult" style="margin-top:12px;display:none">
+    <input type="text" id="tempLinkUrl" readonly style="width:100%;padding:10px;background:#0a0a0f;color:#d4af37;border:1px solid #d4af37;border-radius:6px;font-family:monospace;font-size:13px;box-sizing:border-box">
+    <button onclick="navigator.clipboard.writeText(document.getElementById('tempLinkUrl').value)" style="margin-top:8px;padding:6px 16px;background:transparent;color:#d4af37;border:1px solid #d4af37;border-radius:6px;cursor:pointer;font-size:13px">&#128203; Copy Link</button>
+  </div>
+  <div id="activeTempLinks" style="margin-top:20px"></div>
+</div>
 </section>
 
 <footer>A product of <strong>WMK Speciality Services L.L.C.</strong></footer>
@@ -849,6 +883,53 @@ async function checkExpiredTrials() {
     }
     // Load click data on page load
     setTimeout(loadClickData, 2000);
+
+  // ===== TEMPORARY ACCESS TOKENS =====
+  async function generateTempLink() {
+    var page = document.getElementById('tempAccessPage').value;
+    var hours = parseInt(document.getElementById('tempAccessExpiry').value);
+    var label = document.getElementById('tempAccessLabel').value || 'Guest';
+    var expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+    var r = await sbClient.from('temp_access_tokens').insert({
+      allowed_pages: [page],
+      plan_level: 'business',
+      label: label,
+      created_by: window.dmfUserEmail || 'larrywomack40@gmail.com',
+      expires_at: expiresAt,
+      max_uses: 100
+    }).select().single();
+    if (r.data && !r.error) {
+      var base = page === '*' ? '/editor.html' : page;
+      var url = 'https://www.draftmyforms.com' + base + '?access_token=' + r.data.token;
+      document.getElementById('tempLinkUrl').value = url;
+      document.getElementById('tempLinkResult').style.display = 'block';
+      loadActiveTempLinks();
+    } else {
+      alert('Error: ' + (r.error ? r.error.message : 'Unknown error'));
+    }
+  }
+  
+  async function loadActiveTempLinks() {
+    var r = await sbClient.from('temp_access_tokens').select('*').eq('is_active', true).gt('expires_at', new Date().toISOString()).order('created_at', {ascending: false}).limit(10);
+    var container = document.getElementById('activeTempLinks');
+    if (!container) return;
+    var links = r.data || [];
+    if (!links.length) { container.innerHTML = '<p style="color:#666;font-size:13px">No active access links</p>'; return; }
+    container.innerHTML = '<h4 style="color:#999;font-size:14px;margin-bottom:8px">Active Links (' + links.length + ')</h4>' + links.map(function(l) {
+      var exp = new Date(l.expires_at);
+      var hrs = Math.round((exp - Date.now()) / 3600000);
+      var lbl = hrs > 24 ? Math.round(hrs/24) + 'd left' : hrs + 'h left';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0a0a0f;border-radius:6px;margin-bottom:6px"><div><span style="color:#ccc;font-size:13px">' + (l.label||'Guest') + '</span> <span style="color:#666;font-size:11px">(' + (l.allowed_pages||[]).join(', ') + ')</span></div><div><span style="color:#d4af37;font-size:12px">' + (l.used_count||0) + ' uses</span> <span style="color:#888;font-size:11px;margin-left:8px">' + lbl + '</span><button onclick="deactivateTempLink(\'' + l.id + '\')" style="margin-left:8px;background:none;border:none;color:#f05068;cursor:pointer;font-size:11px">Revoke</button></div></div>';
+    }).join('');
+  }
+  
+  async function deactivateTempLink(id) {
+    await sbClient.from('temp_access_tokens').update({is_active: false}).eq('id', id);
+    loadActiveTempLinks();
+  }
+  
+  // Load active links on page load
+  document.addEventListener('DOMContentLoaded', function() { setTimeout(loadActiveTempLinks, 1000); });
 </script>
 
 <!-- Email Notification Modal -->
