@@ -1,22 +1,24 @@
-# DraftMyForms - AI-Powered Document Generation Platform
-# https://www.draftmyforms.com
-# 26,000+ professional templates across 14 categories
-
 User-agent: *
 Allow: /
 Allow: /templates.html
-Allow: /editor.html
 Allow: /index.html
+Allow: /dashboard.html
+Allow: /editor.html
+Allow: /settings.html
+Allow: /inbox.html
+Allow: /api/sitemap
 
-# Block private/authenticated pages from crawling
-Disallow: /dashboard.html
-Disallow: /settings.html
-Disallow: /inbox.html
 Disallow: /admin.html
-Disallow: /api/
+Disallow: /api/admin-api
+Disallow: /api/log-activity
+Disallow: /api/verify-session
+Disallow: /api/create-checkout-session
+Disallow: /api/create-portal-session
+Disallow: /api/send-email
+Disallow: /api/webhook
 
-# Sitemap location
+# DraftMyForms.com - 36,000+ Document Templates
+# Professional templates for all your legal, business, and personal document needs.
+
 Sitemap: https://www.draftmyforms.com/sitemap.xml
-
-# Crawl-delay for respectful crawling
-Crawl-delay: 1
+Sitemap: https://www.draftmyforms.com/api/sitemap
