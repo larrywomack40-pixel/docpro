@@ -935,6 +935,7 @@ function toggleAI() {
 
 // ═══ AUTH SECURITY GUARD ═══
 (function() {
+  var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNzkwNDMsImV4cCI6MjA2OTU1MDQzfQ.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';var sb=window.sbClient||(window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null);if(!sb){console.warn('DMF: Supabase not available, showing page');showPage&&showPage();return;}window.sbClient=sb;
       function showPage() {
         var s = document.getElementById('auth-guard-style');
         if (s) s.remove();
