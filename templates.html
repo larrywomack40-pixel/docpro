@@ -98,12 +98,23 @@ body{font-family:"DM Sans",sans-serif;background:#f8f9fa;color:#333}
 .footer p{opacity:0.7;font-size:13px}
 @media(max-width:768px){.hero h1{font-size:26px}.categories-grid{grid-template-columns:1fr 1fr}.templates-grid{grid-template-columns:1fr}}
 </style>
-</head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
+  <script>
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) { window['location']['replace']('index.html'); }
+    });
+  </script>
+  </head>
 <body>
 <nav class="navbar">
 <a href="/" class="brand"><span>&#10022;</span> DraftMyForms</a>
 <div class="nav-links"><a href="/dashboard.html">Dashboard</a> <a href="/editor.html">Editor</a> <a href="/templates.html" style="color:#c99532;font-weight:600">Templates</a></div>
-</nav>
+
+        <button onclick="sb.auth.signOut().then(function(){history['replaceState'](null,'','/index.html');window.location['replace']('/index.html');})" style="background:none;border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;margin-left:12px;">Sign Out</button>
+      </nav>
 <section class="hero">
 <h1>36,000+ Free Document Templates</h1>
 <p>Professional templates for every business need. AI-powered editing lets you customize and download instantly.</p>
@@ -121,6 +132,28 @@ var sbUrl="https://mupeqeuuwdmkndvtbhzb.supabase.co";
 var sbKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk";
 var sb=supabase.createClient(sbUrl,sbKey);
 async function loadCategories(){
+
+// ═══ AUTH SECURITY GUARD ═══
+(function() {
+  function showPage() {
+    var s = document.getElementById('auth-guard-style');
+    if (s) s.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  function kickOut() {
+    history['replaceState'](null,'','index.html');
+    window.location['replace']('index.html');
+  }
+  sb.auth['getSession']().then(function(r) {
+    var s = r && r.data && r.data.session;
+    if (!s) { kickOut(); } else { showPage(); }
+  }).catch(function() { kickOut(); });
+  sb.auth['onAuthStateChange'](function(ev, s) {
+    if (ev === 'SIGNED_OUT') { kickOut(); }
+    else if (ev === 'SIGNED_IN' && s) { showPage(); }
+  });
+})();
   var r=await sb.from("seo_categories").select("*").order("sort_order");
   if(!r.data)return;
   document.getElementById("categoriesGrid").innerHTML=r.data.map(function(c){
