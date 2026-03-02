@@ -162,7 +162,14 @@ a{text-decoration:none;color:inherit}
   .btn { padding: 8px 12px !important; font-size: 13px !important; }
 }
 </style>
-</head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
+  <script>
+    window.addEventListener('pageshow',function(e){if(e.persisted){window['location']['replace']('index.html');}});
+  </script>
+  </head>
 <body>
 <div id="siteBanner"></div>
 <nav class="navbar">
@@ -191,7 +198,9 @@ a{text-decoration:none;color:inherit}
 <button onclick="handleLogout()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:14px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--danger);font-family:var(--font-body);transition:background .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'"><i class="fas fa-sign-out-alt" style="width:20px"></i> Sign Out</button>
 </div>
 </div>
-</nav>
+
+        <a href="/templates.html" style="color:rgba(255,255,255,0.85);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='none'">📄 Templates</a>
+      </nav>
 <div class="dashboard" id="dashboard">
 <div class="loading-spinner" id="loadingState"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Loading your dashboard...</div>
 <div id="dashContent" style="display:none">
@@ -313,6 +322,28 @@ var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 window.__supabase = sb;
 var currentUser=null;
 var currentProfile=null;
+
+// ═══ AUTH SECURITY GUARD ═══
+(function() {
+  function showPage() {
+    var s = document.getElementById('auth-guard-style');
+    if (s) s.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  function kickOut() {
+    history['replaceState'](null,'','/index.html');
+    window.location['replace']('/index.html');
+  }
+  sb.auth['getSession']().then(function(r) {
+    var s = r && r.data && r.data.session;
+    if (!s) { kickOut(); } else { showPage(); }
+  }).catch(function() { kickOut(); });
+  sb.auth['onAuthStateChange'](function(ev, s) {
+    if (ev === 'SIGNED_OUT') { kickOut(); }
+    else if (ev === 'SIGNED_IN' && s) { showPage(); }
+  });
+})();
 
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},3000)}
 
