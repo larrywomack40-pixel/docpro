@@ -264,6 +264,14 @@ function renderSingleTemplate(t, slug) {
     }
     html += '</div>';
 
+    // Add CTA button and sensitive doc badge to html
+    var _isSensitive = ['pay-stub','paystub','paycheck','w2','1099','bank-statement','financial-statement','tax-return'].some(function(s){return slug.indexOf(s)>-1;});
+    html += '<div style="margin:24px 0;text-align:center">';
+    if (_isSensitive) { html += '<div style="display:inline-block;background:#d4af37;color:#000;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:bold;margin-bottom:12px">&#128274; Business Plan Required ($24.99/mo)</div><br>'; }
+    html += '<a href="/editor.html?template=' + slug + '" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#d4af37,#f0c060);color:#000;font-weight:bold;font-size:16px;text-decoration:none;border-radius:8px;box-shadow:0 4px 15px rgba(212,175,55,0.4)">Edit This Template Free &#8594;</a>';
+    html += '<p style="color:#888;font-size:12px;margin-top:8px">No credit card required &#183; Sign up in seconds</p>';
+    html += '</div>';
+
     // Prepend the single template view to the page
     var wrapper = document.createElement('div');
     wrapper.id = 'single-template-view';
