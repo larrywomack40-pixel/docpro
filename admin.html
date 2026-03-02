@@ -779,7 +779,7 @@ async function checkExpiredTrials() {
       try {
         var resp = await fetch('/api/admin-api', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await window.sbClient.auth.getSession()).data.session.access_token },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token },
           body: JSON.stringify({ action: 'url_clicks' })
         });
         if (!resp.ok) throw new Error('Failed to fetch');
