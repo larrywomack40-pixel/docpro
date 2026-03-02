@@ -488,6 +488,11 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 
 </head>
 <body>
+<script>
+// Shared view security - detect share mode early
+window._isSharedView = new URLSearchParams(window.location.search).has('share');
+</script>
+
 <div id="siteBanner"></div>
 <!-- TOP NAVIGATION -->
 <nav class="top-nav">
@@ -2743,6 +2748,59 @@ function copyWAResult(){
   if(!window._waLastResult)return;
   navigator.clipboard.writeText(window._waLastResult).then(function(){
     alert('Copied to clipboard!');
+  });
+}
+</script>
+
+
+<script>
+// Shared View Security: Make document view-only when accessed via share link
+if(window._isSharedView){
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      // Hide AI sidebar
+      var sidebar = document.querySelector('.ai-sidebar');
+      if(sidebar) sidebar.style.display='none';
+      // Hide toolbar (editing controls)
+      var toolbar = document.querySelector('.editor-toolbar');
+      if(toolbar) toolbar.style.display='none';
+      // Hide AI prompt area
+      var aiArea = document.querySelector('.ai-chat-area') || document.querySelector('.ai-input');
+      if(aiArea) aiArea.style.display='none';
+      // Hide Writing Assistant toggle
+      var waToggle = document.querySelector('.wa-toggle');
+      if(waToggle) waToggle.style.display='none';
+      // Make editor content read-only
+      var editor = document.getElementById('editor-content') || document.querySelector('[contenteditable]');
+      if(editor){ editor.setAttribute('contenteditable','false'); editor.style.cursor='default'; }
+      // Hide save button, replace with download-only bar
+      var saveBtn = document.querySelector('.btn-save') || document.querySelector('[onclick*="save"]');
+      var navActions = document.querySelector('.nav-actions');
+      if(navActions){
+        navActions.innerHTML = '<span style="color:var(--gold);font-weight:600;margin-right:16px">📄 Shared Document (View Only)</span>'+
+          '<button class="btn btn-gold" onclick="window.print()" style="margin-right:8px">📥 Print / Save PDF</button>'+
+          '<a href="/" class="btn btn-outline">Create Your Own →</a>';
+      }
+      // Hide template panel
+      var tmplPanel = document.querySelector('.template-panel');
+      if(tmplPanel) tmplPanel.style.display='none';
+      // Hide any modals
+      var modals = document.querySelectorAll('.modal-overlay');
+      modals.forEach(function(m){ m.remove(); });
+      // Block AI API calls by overriding fetch for /api/ai-generate
+      var origFetch = window.fetch;
+      window.fetch = function(url, opts){
+        if(typeof url === 'string' && url.includes('/api/ai-generate')){
+          return Promise.reject(new Error('AI not available in shared view'));
+        }
+        return origFetch.apply(this, arguments);
+      };
+      // Add shared view banner
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;text-align:center;padding:10px;z-index:9999;font-size:14px;font-weight:600';
+      banner.innerHTML = '📄 This is a shared document (view only). <a href="/" style="color:#fff;text-decoration:underline;margin-left:8px">Create your own documents for free →</a>';
+      document.body.appendChild(banner);
+    }, 1500);
   });
 }
 </script>
