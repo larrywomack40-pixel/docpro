@@ -6,7 +6,7 @@ Allow: /dashboard.html
 Allow: /editor.html
 Allow: /settings.html
 Allow: /inbox.html
-Allow: /api/sitemap
+Allow: /api/templates-list
 
 Disallow: /admin.html
 Disallow: /api/admin-api
@@ -20,5 +20,4 @@ Disallow: /api/webhook
 # DraftMyForms.com - 36,000+ Document Templates
 # Professional templates for all your legal, business, and personal document needs.
 
-Sitemap: https://www.draftmyforms.com/sitemap.xml
-Sitemap: https://www.draftmyforms.com/api/sitemap
+Sitemap: https://www.draftmyforms.com/api/templates-list?sitemap=index
