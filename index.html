@@ -893,31 +893,19 @@ function initTheme(){var saved=localStorage.getItem('draftmyforms-theme')||'syst
 initTheme();
 </script>
 <!-- Page View Tracking -->
-<script>
-(function(){
-  try {
-    var sb = window.supabase || null;
-    if (!sb) {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-      s.onload = function() { trackView(); };
-      document.head.appendChild(s);
-    } else { trackView(); }
-    function trackView() {
-      var client = sb || window.supabase.createClient(
-        'https://mupeqeuuwdmkndvtbhzb.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NDQ4NTgsImV4cCI6MjA1NTQyMDg1OH0.JMUpuhMmFdAWr7O5vYHS6x5Zs-2XRwt0gaA30ORk'
-      );
-      var ipHash = btoa(navigator.userAgent.substring(0,30) + screen.width).substring(0,16);
-      client.from('url_clicks').insert({
-        url: window.location.href.split('?')[0],
-        page_title: document.title,
-        referrer: document.referrer || null,
-        ip_hash: ipHash
-      }).then(function(){}).catch(function(){});
-    }
-  } catch(e){}
-})();
-</script>
+    <script>
+    (function(){
+      try {
+        if (typeof sb === 'undefined' || !sb) return;
+        var ipHash = btoa(navigator.userAgent.substring(0,30) + screen.width).substring(0,16);
+        sb.from('url_clicks').insert({
+          url: window.location.href.split('?')[0],
+          page_title: document.title,
+          referrer: document.referrer || null,
+          ip_hash: ipHash
+        }).then(function(){}).catch(function(){});
+      } catch(e){}
+    })();
+    </script>
 </body>
 </html>
