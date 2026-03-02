@@ -111,7 +111,14 @@ a:hover{text-decoration:underline}
   .settings-tab{padding:10px 14px;font-size:13px}
 }
 </style>
-</head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
+  <script>
+    window.addEventListener('pageshow',function(e){if(e.persisted){window['location']['replace']('index.html');}});
+  </script>
+  </head>
 <body>
 <div id="siteBanner"></div>
 
@@ -349,6 +356,28 @@ const SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+
+// ═══ AUTH SECURITY GUARD ═══
+(function() {
+  function showPage() {
+    var s = document.getElementById('auth-guard-style');
+    if (s) s.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  function kickOut() {
+    history['replaceState'](null,'','/index.html');
+    window.location['replace']('/index.html');
+  }
+  sb.auth['getSession']().then(function(r) {
+    var s = r && r.data && r.data.session;
+    if (!s) { kickOut(); } else { showPage(); }
+  }).catch(function() { kickOut(); });
+  sb.auth['onAuthStateChange'](function(ev, s) {
+    if (ev === 'SIGNED_OUT') { kickOut(); }
+    else if (ev === 'SIGNED_IN' && s) { showPage(); }
+  });
+})();
 let currentUser = null;
 let userProfile = null;
 
