@@ -486,6 +486,20 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
                                 }
 </style>
 
+
+  <!-- ═══ AUTH SECURITY GUARD (do not remove) ═══ -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
+  <script>
+    // Prevent browser back-button cache bypass
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        window.location.replace('/index.html');
+      }
+    });
+  </script>
 </head>
 <body>
 <script>
@@ -917,6 +931,73 @@ function toggleAI() {
       var hasDoc = canvas && canvas.innerHTML.trim().length > 0 && canvas.innerHTML.trim() !== '<br>';
       aiInput.placeholder = hasDoc ? 'Describe what changes to make to this document...' : 'Describe the document you want to create...';
     }
+
+// ═══ AUTH SECURITY GUARD ═══
+(function() {
+  function showPage() {
+    var s = document.getElementById('auth-guard-style');
+    if (s) s.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  function kickOut() {
+    history['replaceState'](null,'','/index.html');
+    window.location['replace']('/index.html');
+  }
+  sb.auth['getSession']().then(function(r) {
+    var sess = r && r.data && r.data.session;
+    if (!sess) { kickOut(); } else { showPage(); }
+  }).catch(function() { kickOut(); });
+  sb.auth['onAuthStateChange'](function(event, sess) {
+    if (event === 'SIGNED_OUT') { kickOut(); }
+    else if (event === 'SIGNED_IN' && sess) { showPage(); }
+  });
+})();
+
+
+// ═══════════════════════════════════════════════════════
+// AUTH SECURITY GUARD — runs immediately on page load
+// Hides body until session verified; redirects if not logged in
+// Prevents back-button cache bypass after logout
+// ═══════════════════════════════════════════════════════
+(function() {
+  // Remove visibility block once we confirm auth
+  function showPage() {
+    var style = document.getElementById('auth-guard-style');
+    if (style) style.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  // Hard redirect away from app
+  function redirectToLogin(msg) {
+    console.warn('Auth guard:', msg);
+    // Replace history so back button goes to homepage not app
+    history.replaceState(null, '', '/index.html');
+    window.location.replace('/index.html');
+  }
+  // Check session immediately
+  sb.auth.getSession().then(function(result) {
+    var session = result && result.data && result.data.session;
+    if (!session) {
+      redirectToLogin('No session on editor load');
+    } else {
+      showPage();
+    }
+  }).catch(function(e) {
+    redirectToLogin('Session check error: ' + e.message);
+  });
+
+  // Listen for sign out / token expire
+  sb.auth.onAuthStateChange(function(event, session) {
+    if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
+      showPage(); // briefly show for redirect UX
+      redirectToLogin('Auth state: ' + event);
+    } else if (event === 'SIGNED_IN' && session) {
+      showPage();
+    }
+  });
+})();
+
 }
 
 function addAIMessage(text, role) {
