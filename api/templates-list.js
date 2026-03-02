@@ -7,40 +7,38 @@ const supabase = createClient(
 
 const PAGE_SIZE = 30;
 
-module.exports = async function handler(req, res) {
+const CATS = [
+  { id: 1, slug: 'invoices' }, { id: 2, slug: 'pay-stubs' },
+  { id: 3, slug: 'receipts' }, { id: 4, slug: 'contracts' },
+  { id: 5, slug: 'business' }, { id: 6, slug: 'employment' },
+  { id: 7, slug: 'legal' }, { id: 8, slug: 'real-estate' },
+  { id: 9, slug: 'healthcare' }, { id: 10, slug: 'construction' },
+  { id: 11, slug: 'education' }, { id: 12, slug: 'personal' },
+  { id: 13, slug: 'government' }, { id: 14, slug: 'automotive' }
+];
 
+module.exports = async function handler(req, res) {
   // Sitemap generation (GET ?sitemap=index or ?sitemap=cat&cat=slug)
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+
   if (req.query.sitemap === 'index' || req.query.sitemap === 'true') {
     const BASE_URL = 'https://www.draftmyforms.com';
-    const CATS = [
-      { id: 1, slug: 'invoices' }, { id: 2, slug: 'pay-stubs' },
-      { id: 3, slug: 'receipts' }, { id: 4, slug: 'contracts' },
-      { id: 5, slug: 'business' }, { id: 6, slug: 'employment' },
-      { id: 7, slug: 'legal' }, { id: 8, slug: 'real-estate' },
-      { id: 9, slug: 'healthcare' }, { id: 10, slug: 'construction' },
-      { id: 11, slug: 'education' }, { id: 12, slug: 'personal' },
-      { id: 13, slug: 'government' }, { id: 14, slug: 'automotive' }
-    ];
     const today = new Date().toISOString().split('T')[0];
+    // Note: & must be &amp; in XML
     const sitemaps = CATS.map(c =>
-      `  <sitemap><loc>${BASE_URL}/api/templates-list?sitemap=cat&cat=${c.slug}</loc><lastmod>${today}</lastmod></sitemap>`
+      `  <sitemap><loc>${BASE_URL}/api/templates-list?sitemap=cat&amp;cat=${c.slug}</loc><lastmod>${today}</lastmod></sitemap>`
     ).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps}\n  <sitemap><loc>${BASE_URL}/sitemap.xml</loc><lastmod>${today}</lastmod></sitemap>\n</sitemapindex>`;
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemaps}
+  <sitemap><loc>${BASE_URL}/sitemap.xml</loc><lastmod>${today}</lastmod></sitemap>
+</sitemapindex>`;
     res.setHeader('Content-Type', 'application/xml');
     return res.status(200).send(xml);
   }
+
   if (req.query.sitemap === 'cat' && req.query.cat) {
     const BASE_URL = 'https://www.draftmyforms.com';
-    const CATS = [
-      { id: 1, slug: 'invoices' }, { id: 2, slug: 'pay-stubs' },
-      { id: 3, slug: 'receipts' }, { id: 4, slug: 'contracts' },
-      { id: 5, slug: 'business' }, { id: 6, slug: 'employment' },
-      { id: 7, slug: 'legal' }, { id: 8, slug: 'real-estate' },
-      { id: 9, slug: 'healthcare' }, { id: 10, slug: 'construction' },
-      { id: 11, slug: 'education' }, { id: 12, slug: 'personal' },
-      { id: 13, slug: 'government' }, { id: 14, slug: 'automotive' }
-    ];
     const today = new Date().toISOString().split('T')[0];
     const catObj = CATS.find(c => c.slug === req.query.cat);
     if (!catObj) return res.status(404).json({ error: 'Category not found' });
@@ -49,7 +47,10 @@ module.exports = async function handler(req, res) {
     const urls = (templates || []).map(t =>
       `  <url><loc>${BASE_URL}/templates.html?template=${encodeURIComponent(t.slug)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`
     ).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
     res.setHeader('Content-Type', 'application/xml');
     return res.status(200).send(xml);
   }
