@@ -150,5 +150,76 @@ document.getElementById("searchInput").addEventListener("input",function(e){
   if(v.length>2||v.length===0)loadTemplates(cf,v);
 });
 </script>
+
+<script>
+// Single Template Page Renderer
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var templateSlug = params.get('template');
+  if (!templateSlug) return;
+
+  // Show single template view
+  loadSingleTemplate(templateSlug);
+})();
+
+async function loadSingleTemplate(slug) {
+  try {
+    var SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
+    var SUPABASE_ANON_KEY = typeof SUPABASE_ANON !== 'undefined' ? SUPABASE_ANON : (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : null);
+    if (!SUPABASE_ANON_KEY && window.sb) {
+      // use existing client
+    }
+
+    var apiUrl = '/api/templates-list?slug=' + encodeURIComponent(slug);
+    var resp = await fetch(apiUrl);
+    var data = await resp.json();
+    var t = data.template || (Array.isArray(data) ? data[0] : null) || (data.templates ? data.templates[0] : null);
+    if (!t) return;
+
+    // Update page meta dynamically
+    document.title = (t.name || t.title || slug) + ' Template | DraftMyForms';
+    var metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', t.description || 'Free ' + (t.name || t.title || slug) + ' template. Download and customize.');
+
+    // Add DigitalDocument JSON-LD schema
+    var schema = {
+      "@context": "https://schema.org",
+      "@type": "DigitalDocument",
+      "name": (t.name || t.title || slug) + ' Template',
+      "description": t.description || 'Free ' + (t.name || t.title || slug) + ' template',
+      "url": window.location.href,
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    };
+    var schemaScript = document.createElement('script');
+    schemaScript.type = 'application/ld+json';
+    schemaScript.textContent = JSON.stringify(schema);
+    document.head.appendChild(schemaScript);
+
+    // Show template detail in page
+    var container = document.getElementById('single-template-view') || document.getElementById('templates-container') || document.body;
+    var html = '<div style="max-width:800px;margin:40px auto;padding:20px">';
+    html += '<nav style="font-size:14px;color:#666;margin-bottom:20px"><a href="/">Home</a> &rsaquo; <a href="/templates.html">Templates</a> &rsaquo; ' + (t.name || t.title || slug) + '</nav>';
+    html += '<h1 style="font-size:28px;margin-bottom:16px">' + (t.name || t.title || slug) + ' Template</h1>';
+    html += '<p style="color:#666;margin-bottom:24px">' + (t.description || '') + '</p>';
+    html += '<div style="display:flex;gap:12px;margin-bottom:24px">';
+    html += '<a href="/editor.html?template=' + encodeURIComponent(slug) + '" style="background:#4F46E5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Use This Template</a>';
+    html += '<a href="/templates.html" style="background:#f3f4f6;color:#374151;padding:12px 24px;border-radius:8px;text-decoration:none">Browse All Templates</a>';
+    html += '</div>';
+    if (t.keywords && t.keywords.length) {
+      html += '<div style="margin-top:16px">' + t.keywords.slice(0,8).map(function(k){ return '<span style="background:#e5e7eb;padding:4px 10px;border-radius:20px;font-size:13px;margin:2px;display:inline-block">' + k + '</span>'; }).join('') + '</div>';
+    }
+    html += '</div>';
+
+    // Prepend the single template view to the page
+    var wrapper = document.createElement('div');
+    wrapper.id = 'single-template-view';
+    wrapper.innerHTML = html;
+    var mainEl = document.querySelector('main') || document.querySelector('.container') || document.body;
+    mainEl.insertBefore(wrapper, mainEl.firstChild);
+
+  } catch(e) { console.error('loadSingleTemplate error:', e); }
+}
+</script>
 </body>
 </html>
