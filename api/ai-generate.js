@@ -564,6 +564,20 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
     }
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    // Notify admin of AI usage
+    try {
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          type: 'ai_usage_admin',
+          email: 'larrywomack40@gmail.com',
+          userEmail: userEmail || 'unknown',
+          creditsUsed: creditsUsed + 1,
+          creditsRemaining: Math.max(0, creditsRemaining)
+        })
+      }).catch(function() {});
+    } catch(e) {}
     return res.status(200).json({
       html: html,
       usage: {
