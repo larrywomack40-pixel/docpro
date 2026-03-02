@@ -23,6 +23,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      (function(){
+        var SURL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
+          var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNzkwNDMsImV4cCI6MjA2OTU1MDQzfQ.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+            if(!window.supabase){return;}
+              var sb=window.supabase.createClient(SURL,SKEY);
+                window.sbClient=sb;
+                  function showPage(){var s=document.getElementById('auth-guard-style');if(s)s.remove();document.body.style.visibility='';document.body.style.pointerEvents='';document.body.classList.add('authenticated');document.dispatchEvent(new CustomEvent('dmf-auth-ready'));}
+                    function kickOut(){sessionStorage.setItem('dmf_redirect',window.location.href);history.replaceState(null,'','/index.html');window.location.replace('/index.html');}
+                      var params=new URLSearchParams(window.location.search);
+                        var tok=params.get('access_token');
+                          if(tok){
+                              sb.from('temp_access_tokens').select('*').eq('token',tok).eq('is_active',true).gt('expires_at',new Date().toISOString()).single().then(function(r){
+                                    var td=r.data;
+                                          if(td&&!r.error&&td.used_count<td.max_uses){
+                                                  window.dmfUserPlan=td.plan_level||'business';
+                                                          window.dmfUserEmail='guest-'+tok.substring(0,8);
+                                                                  window.dmfGuestMode=true;
+                                                                          sb.from('temp_access_tokens').update({used_count:td.used_count+1}).eq('id',td.id);
+                                                                                  showPage();
+                                                                                        }else{kickOut();}
+                                                                                            }).catch(function(){kickOut();});
+                                                                                              }else{
+                                                                                                  sb.auth.getSession().then(function(r){
+                                                                                                        if(!r.data.session){kickOut();return;}
+                                                                                                              var u=r.data.session.user;
+                                                                                                                    window.dmfUserEmail=u.email;
+                                                                                                                          window.dmfUserName=(u.user_metadata&&u.user_metadata.full_name)||u.email.split('@')[0];
+                                                                                                                                window.dmfUserId=u.id;
+                                                                                                                                      sb.from('profiles').select('plan,display_name').eq('id',u.id).single().then(function(pr){
+                                                                                                                                              window.dmfUserPlan=(pr.data&&pr.data.plan)||'free';
+                                                                                                                                                      if(pr.data&&pr.data.display_name)window.dmfUserName=pr.data.display_name;
+                                                                                                                                                              showPage();
+                                                                                                                                                                    }).catch(function(){window.dmfUserPlan='free';showPage();});
+                                                                                                                                                                        }).catch(function(){kickOut();});
+                                                                                                                                                                            sb.auth.onAuthStateChange(function(ev,s){if(ev==='SIGNED_OUT')kickOut();});
+                                                                                                                                                                              }
+                                                                                                                                                                              })();
+                                                                                                                                                                              </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
