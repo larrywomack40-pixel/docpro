@@ -107,7 +107,14 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 .ref-stat .label { font-size:0.85em; color:#666; }
 
 </style>
-</head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
+  <script>
+    window.addEventListener('pageshow',function(e){if(e.persisted){window['location']['replace']('index.html');}});
+  </script>
+  </head>
 <body>
 
 <nav class="navbar">
@@ -311,6 +318,34 @@ var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
     var currentUser = null;
 var allUsers=[];
 
+
+// ═══ AUTH SECURITY GUARD (ADMIN ONLY) ═══
+(function() {
+  var ADMIN = 'larrywomack40@gmail.com';
+  function showPage() {
+    var s = document.getElementById('auth-guard-style');
+    if (s) s.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  function kickOut(dest) {
+    history['replaceState'](null,'',dest||'index.html');
+    window.location['replace'](dest||'index.html');
+  }
+  sb.auth['getSession']().then(function(r) {
+    var s = r && r.data && r.data.session;
+    if (!s) { kickOut(); return; }
+    if (s.user.email !== ADMIN) { kickOut('dashboard.html'); return; }
+    showPage();
+  }).catch(function() { kickOut(); });
+  sb.auth['onAuthStateChange'](function(ev, s) {
+    if (ev === 'SIGNED_OUT') { kickOut(); }
+    else if (ev === 'SIGNED_IN' && s) {
+      if (s.user.email !== ADMIN) { kickOut('dashboard.html'); }
+      else { showPage(); }
+    }
+  });
+})();
 async function init(){
 try{
 var{data:{session}}=await sb.auth.getSession();
