@@ -8,6 +8,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function() {
+    var SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
+      var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNzkwNDMsImV4cCI6MjA2OTU1MDQzfQ.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+        var ADMIN_EMAIL = 'larrywomack40@gmail.com';
+          document.documentElement.style.visibility = 'hidden';
+            window.addEventListener('load', function() {
+                try {
+                      var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                            window.sbClient = client;
+                                  client.auth.getSession().then(function(result) {
+                                          var session = result.data && result.data.session;
+                                                  if (!session) {
+                                                            window.location.replace('/index.html');
+                                                                      return;
+                                                                              }
+                                                                                      var email = session.user && session.user.email;
+                                                                                              window.dmfUserEmail = email;
+                                                                                                      if (email !== ADMIN_EMAIL) {
+                                                                                                                window.location.replace('/dashboard.html');
+                                                                                                                          return;
+                                                                                                                                  }
+                                                                                                                                          document.documentElement.style.visibility = '';
+                                                                                                                                                  document.dispatchEvent(new CustomEvent('dmf-auth-ready'));
+                                                                                                                                                        });
+                                                                                                                                                            } catch(e) {
+                                                                                                                                                                  window.location.replace('/index.html');
+                                                                                                                                                                      }
+                                                                                                                                                                        });
+                                                                                                                                                                          window.addEventListener('pageshow', function(e) {
+                                                                                                                                                                              if (e.persisted) { window.location.replace('/index.html'); }
+                                                                                                                                                                                });
+                                                                                                                                                                                })();
+                                                                                                                                                                                </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gold:#c99532;--gold-light:#e8b94a;--gold-dark:#a67a28;--gold-bg:#fef8ee;--paper:#faf7f5;--white:#ffffff;--text:#1a1a1a;--text-secondary:#555;--text-muted:#888;--border:#e5e0db;--border-light:#f0ebe6;--success:#3a6633;--danger:#c24b3b;--info:#2563eb;--font-heading:'Playfair Display',Georgia,serif;--font-body:'DM Sans',-apple-system,sans-serif}
@@ -110,10 +144,6 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
-  <script>
-    window.addEventListener('pageshow',function(e){if(e.persisted){window['location']['replace']('index.html');}});
-  </script>
   </head>
 <body>
 
@@ -349,6 +379,7 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
 var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
 var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
 var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      window.sbClient = sb; var sbClient = sb;
     var currentUser = null;
 var allUsers=[];
 
