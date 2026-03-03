@@ -916,9 +916,10 @@ initTheme();
                 var sid = localStorage.getItem('dmf_sid');
                     if (!sid) { sid = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2); localStorage.setItem('dmf_sid', sid); }
                         var params = new URLSearchParams(window.location.search);
-                            fetch('/api/track-visitor', {
+                            fetch('/api/log-activity', {
                                   method: 'POST', headers: {'Content-Type':'application/json'},
                                         body: JSON.stringify({
+                                                                  type: 'visit',
                                                 session_id: sid,
                                                         landing_page: window.location.pathname + window.location.search,
                                                                 referrer: document.referrer || '',
