@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
                       const authHeader = req.headers.authorization || '';
                             const token = authHeader.replace('Bearer ', '');
                                   if (!token) return res.status(401).json({ error: 'Unauthorized' });
-                                        const client = createClient(SB_URL, ANON_KEY);
+                                        const client = createClient(SB_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || ANON_KEY);
                                               const { data: { user }, error: uErr } = await client.auth.getUser(token);
                                                     if (uErr || !user || user.email !== 'larrywomack40@gmail.com') return res.status(403).json({ error: 'Forbidden' });
                                                           const { data: visitors } = await client.from('visitor_sessions').select('*').order('created_at', { ascending: false }).limit(200);
