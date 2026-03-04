@@ -338,6 +338,26 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
   </div>
 </div>
 
+<!-- Visitor Analytics Section -->
+<div style="background:#1e1e2e;border-radius:12px;padding:24px;margin-top:32px" id="visitorAnalyticsSection">
+  <h3 style="color:#d4af37;margin:0 0 16px">&#128205; Visitor Intelligence &amp; Customer Profiles</h3>
+    <div id="visitorSummaryCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="stat-card"><div class="stat-number" id="totalVisitors">-</div><div>Total Visitors</div></div>
+            <div class="stat-card"><div class="stat-number" id="topCountry">-</div><div>Top Country</div></div>
+                <div class="stat-card"><div class="stat-number" id="mobileVsDesktop">-</div><div>Mobile %</div></div>
+                    <div class="stat-card"><div class="stat-number" id="conversionRate">-</div><div>Conversion %</div></div>
+                      </div>
+                        <table style="width:100%;border-collapse:collapse;font-size:13px" id="visitorTable">
+                            <thead><tr style="border-bottom:2px solid var(--gold)">
+                                  <th style="text-align:left;padding:8px">Time</th>
+                                        <th style="text-align:left;padding:8px">Location</th>
+                                              <th style="text-align:left;padding:8px">Device</th>
+                                                    <th style="text-align:left;padding:8px">Referrer</th>
+                                                          <th style="text-align:left;padding:8px">Page</th>
+                                                              </tr></thead>
+                                                                  <tbody id="visitorTableBody"><tr><td colspan="5" style="text-align:center;padding:20px;color:#888">Loading visitor data...</td></tr></tbody>
+                                                                    </table>
+                                                                    </div>-->
 <div style="background:#1e1e2e;border-radius:12px;padding:24px;margin-top:24px;border:1px solid rgba(212,175,55,0.1)">
   <h3 style="color:#d4af37;margin:0 0 16px">&#128273; Temporary Access Links</h3>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
@@ -912,8 +932,41 @@ async function checkExpiredTrials() {
         document.getElementById('clicksTableBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999">Unable to load click data</td></tr>';
       }
     }
+            // Load Visitor Analytics Data
+                    async function loadVisitorData() {
+                              try {
+                                          var resp = await fetch('/api/log-activity', {
+                                                        method: 'GET',
+                                                                      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ((sbClient && sbClient.auth && (await sbClient.auth.getSession()).data.session) ? (await sbClient.auth.getSession()).data.session.access_token : '') }
+                                                                                  });
+                                                                                              if (!resp.ok) return;
+                                                                                                          var data = await resp.json();
+                                                                                                                      var visitors = data.visitors || [];
+                                                                                                                                  // Summary cards
+                                                                                                                                              document.getElementById('totalVisitors').textContent = visitors.length;
+                                                                                                                                                          var countries = visitors.map(function(v){return v.country;}).filter(Boolean);
+                                                                                                                                                                      var topC = countries.sort(function(a,b){return countries.filter(function(x){return x===b;}).length - countries.filter(function(x){return x===a;}).length;})[0] || '-';
+                                                                                                                                                                                  document.getElementById('topCountry').textContent = topC;
+                                                                                                                                                                                              var mobile = visitors.filter(function(v){return (v.device_type||'').toLowerCase()==='mobile';}).length;
+                                                                                                                                                                                                          document.getElementById('mobileVsDesktop').textContent = visitors.length > 0 ? Math.round(mobile/visitors.length*100)+'%' : '-';
+                                                                                                                                                                                                                      var converted = visitors.filter(function(v){return v.converted;}).length;
+                                                                                                                                                                                                                                  document.getElementById('conversionRate').textContent = visitors.length > 0 ? Math.round(converted/visitors.length*100)+'%' : '-';
+                                                                                                                                                                                                                                              // Table rows
+                                                                                                                                                                                                                                                          var tbody = document.getElementById('visitorTableBody');
+                                                                                                                                                                                                                                                                      if (visitors.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#888">No visitor data yet</td></tr>'; return; }
+                                                                                                                                                                                                                                                                                  tbody.innerHTML = visitors.slice(0, 50).map(function(v) {
+                                                                                                                                                                                                                                                                                                var t = new Date(v.created_at).toLocaleString();
+                                                                                                                                                                                                                                                                                                              var loc = [v.city, v.country].filter(Boolean).join(', ') || '-';
+                                                                                                                                                                                                                                                                                                                            var dev = [v.device_type, v.browser].filter(Boolean).join(' / ') || '-';
+                                                                                                                                                                                                                                                                                                                                          var ref = v.referrer ? v.referrer.replace(/https?:\/\/(www\.)?/,'').substring(0,30) : 'Direct';
+                                                                                                                                                                                                                                                                                                                                                        var pg = (v.landing_page||v.page||'-').substring(0,30);
+                                                                                                                                                                                                                                                                                                                                                                      return '<tr style="border-bottom:1px solid rgba(255,255,255,0.05)"><td style="padding:8px;color:#aaa">' + t + '</td><td style="padding:8px">' + loc + '</td><td style="padding:8px">' + dev + '</td><td style="padding:8px;color:#c99532">' + ref + '</td><td style="padding:8px">' + pg + '</td></tr>';
+                                                                                                                                                                                                                                                                                                                                                                                  }).join('');
+                                                                                                                                                                                                                                                                                                                                                                                            } catch(e) { console.error('Visitor data error:', e); }
+                                                                                                                                                                                                                                                                                                                                                                                                    }
     // Load click data on page load
     setTimeout(loadClickData, 2000);
+            setTimeout(loadVisitorData, 2500);
 
   // ===== TEMPORARY ACCESS TOKENS =====
   async function generateTempLink() {
