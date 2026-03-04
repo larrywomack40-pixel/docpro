@@ -98,15 +98,6 @@ body{font-family:"DM Sans",sans-serif;background:#f8f9fa;color:#333}
 .footer p{opacity:0.7;font-size:13px}
 @media(max-width:768px){.hero h1{font-size:26px}.categories-grid{grid-template-columns:1fr 1fr}.templates-grid{grid-template-columns:1fr}}
 </style>
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
-  <script>
-    window.addEventListener('pageshow', function(e) {
-      if (e.persisted) { window['location']['replace']('index.html'); }
-    });
-  </script>
   </head>
 <body>
 <nav class="navbar">
@@ -133,27 +124,6 @@ var sbKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6
 var sb=supabase.createClient(sbUrl,sbKey);
 async function loadCategories(){
 
-// ═══ AUTH SECURITY GUARD ═══
-(function() {
-  function showPage() {
-    var s = document.getElementById('auth-guard-style');
-    if (s) s.remove();
-    document.body.style.visibility = '';
-    document.body.style.pointerEvents = '';
-  }
-  function kickOut() {
-    history['replaceState'](null,'','index.html');
-    window.location['replace']('index.html');
-  }
-  sb.auth['getSession']().then(function(r) {
-    var s = r && r.data && r.data.session;
-    if (!s) { kickOut(); } else { showPage(); }
-  }).catch(function() { kickOut(); });
-  sb.auth['onAuthStateChange'](function(ev, s) {
-    if (ev === 'SIGNED_OUT') { kickOut(); }
-    else if (ev === 'SIGNED_IN' && s) { showPage(); }
-  });
-})();
   var r=await sb.from("seo_categories").select("*").order("sort_order");
   if(!r.data)return;
   document.getElementById("categoriesGrid").innerHTML=r.data.map(function(c){
@@ -171,7 +141,7 @@ async function loadTemplates(catSlug,search){
   if(!r.data)return;
   document.getElementById("templatesGrid").innerHTML=r.data.map(function(t){
     var tc=t.tier==="pro"?"tier-pro":t.tier==="business"?"tier-business":"tier-free";
-    return '<div class="tmpl-card"><div class="tmpl-preview"><i class="fas fa-file-alt"></i></div><div class="tmpl-info"><h3>'+t.name+'</h3><p>'+(t.short_description||"").substring(0,80)+'</p><div class="tmpl-meta"><span class="tier-badge '+tc+'">'+t.tier.charAt(0).toUpperCase()+t.tier.slice(1)+'</span><a href="/editor.html?template='+t.slug+'" class="cta-btn">Use Template</a></div></div></div>';
+        return '<div class="tmpl-card"><a href="/templates.html?template='+t.slug+'" style="text-decoration:none;color:inherit;display:block"><div class="tmpl-preview"><i class="fas fa-file-alt"></i></div><div class="tmpl-info"><h3>'+t.name+'</h3><p>'+(t.short_description||"").substring(0,80)+'</p><div class="tmpl-meta"><span class="tier-badge '+tc+'">'+t.tier.charAt(0).toUpperCase()+t.tier.slice(1)+'</span><span class="cta-btn">View Free →</span></div></div></a></div>';
   }).join("");
 }
 var p=new URLSearchParams(window.location.search);
@@ -280,3 +250,28 @@ function renderSingleTemplate(t, slug) {
     mainEl.insertBefore(wrapper, mainEl.firstChild);
 }
 </script>
+<script>
+  /* DMF Visitor Tracking */
+  (function() {
+    try {
+        var sid = localStorage.getItem('dmf_sid');
+            if (!sid) { sid = 'v' + Date.now() + Math.random().toString(36).substr(2,9); localStorage.setItem('dmf_sid', sid); }
+                var p = new URLSearchParams(window.location.search);
+                    fetch('/api/log-activity', {
+                          method: 'POST',
+                                headers: {'Content-Type':'application/json'},
+                                      body: JSON.stringify({
+                                              type: 'visit',
+                                                      session_id: sid,
+                                                              page: window.location.pathname + window.location.search,
+                                                                      referrer: document.referrer,
+                                                                              utm_source: p.get('utm_source')||'',
+                                                                                      utm_medium: p.get('utm_medium')||'',
+                                                                                              utm_campaign: p.get('utm_campaign')||''
+                                                                                                    })
+                                                                                                        }).catch(function(){});
+                                                                                                          } catch(e) {}
+                                                                                                          })();
+                                                                                                          </script>
+                                                                                                          </body>
+                                                                                                          </html>
