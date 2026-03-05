@@ -106,6 +106,39 @@ module.exports = async (req, res) => {
     }
   }
 
+  
+  // ─────────────────────────────────────────────────────────────────
+  // REFERRAL REWARD: When a referred user makes their first post-trial
+  // subscription payment, credit the referring user one free month
+  // ─────────────────────────────────────────────────────────────────
+  if (event.type === 'invoice.paid') {
+    try {
+      const inv = event.data.object;
+      if (inv.subscription && inv.billing_reason === 'subscription_cycle') {
+        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+        const { data: refProfile } = await supabase.from('profiles').select('id, plan').eq('stripe_customer_id', inv.customer).single();
+        if (refProfile && ['pro','business'].includes(refProfile.plan)) {
+          const { data: refRecord } = await supabase.from('referrals').select('id, referrer_id, status').eq('referee_id', refProfile.id).eq('status', 'signed_up').single();
+          if (refRecord) {
+            const { data: alreadyDone } = await supabase.from('referral_rewards').select('id').eq('referred_user_id', refProfile.id).eq('status', 'credited').maybeSingle();
+            if (!alreadyDone) {
+              const { data: referrerP } = await supabase.from('profiles').select('stripe_customer_id, stripe_subscription_id, referral_months_earned').eq('id', refRecord.referrer_id).single();
+              if (referrerP && referrerP.stripe_subscription_id) {
+                const sub = await stripe.subscriptions.retrieve(referrerP.stripe_subscription_id);
+                const amt = sub.items.data[0]?.price?.unit_amount || 999;
+                await stripe.customers.createBalanceTransaction(referrerP.stripe_customer_id, { amount: -amt, currency: 'usd', description: 'DraftMyForms referral reward - 1 free month' });
+                await supabase.from('referral_rewards').insert({ referring_user_id: refRecord.referrer_id, referred_user_id: refProfile.id, referral_id: refRecord.id, stripe_invoice_id: inv.id, credit_amount_cents: amt, status: 'credited', reward_applied_at: new Date().toISOString() });
+                await supabase.from('referrals').update({ status: 'converted', converted_at: new Date().toISOString() }).eq('id', refRecord.id);
+                await supabase.from('profiles').update({ referral_months_earned: (referrerP.referral_months_earned || 0) + 1, referral_last_reward_at: new Date().toISOString() }).eq('id', refRecord.referrer_id);
+                console.log('Referral reward credited to', refRecord.referrer_id, 'amount:', amt);
+              }
+            }
+          }
+        }
+      }
+    } catch(refErr) { console.error('Referral reward error (non-fatal):', refErr.message); }
+  }
+
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object;
     const { data: profile } = await supabase.from('profiles').select('id, email')
