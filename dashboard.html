@@ -133,7 +133,7 @@ a{text-decoration:none;color:inherit}
 .user-dropdown a:hover,.user-dropdown .menu-item:hover{background:#f8f6f0}
 .user-dropdown .separator{border-top:1px solid #f0f0f0;margin:4px 0}
 .user-dropdown .sign-out{color:#dc3545 !important}
-/* === Mobile Responsive — Dashboard === */
+/* === Mobile Responsive â Dashboard === */
 @media (max-width: 768px) {
   h1, .greeting { font-size: 1.4rem !important; word-break: break-word; }
   .stats-row { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
@@ -173,7 +173,7 @@ a{text-decoration:none;color:inherit}
 <body>
 <div id="siteBanner"></div>
 <nav class="navbar">
-<a href="/dashboard.html" class="nav-brand"><span class="star">✦</span> DraftMyForms</a>
+<a href="/dashboard.html" class="nav-brand"><span class="star">â¦</span> DraftMyForms</a>
 <div class="theme-toggle-dash" id="themeToggle">
 <button onclick="setTheme('light')" title="Light">&#9728;</button>
 <button onclick="setTheme('dark')" title="Dark">&#9790;</button>
@@ -199,24 +199,24 @@ a{text-decoration:none;color:inherit}
 </div>
 </div>
 
-        <a href="/templates.html" style="color:rgba(255,255,255,0.85);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='none'">📄 Templates</a>
+        <a href="/templates.html" style="color:rgba(255,255,255,0.85);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='none'">ð Templates</a>
       </nav>
 <div class="dashboard" id="dashboard">
 <div class="loading-spinner" id="loadingState"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Loading your dashboard...</div>
 <div id="dashContent" style="display:none">
 <div class="dash-header">
-<h1><span class="wave">👋</span> Welcome back, <span id="userName">User</span></h1>
+<h1><span class="wave">ð</span> Welcome back, <span id="userName">User</span></h1>
 <a href="/editor.html" class="btn btn-gold"><i class="fas fa-plus"></i> Create New Document</a>
 </div>
 <div class="stats-row">
 <div class="stat-card"><div class="stat-number" id="statDocs">0</div><div class="stat-label">Documents</div></div>
 <div class="stat-card"><div class="stat-number" id="statPlan">Free</div><div class="stat-label">Current Plan</div></div>
-<div class="stat-card"><div class="stat-number" id="statExports">∞</div><div class="stat-label">Exports Left</div></div>
+<div class="stat-card"><div class="stat-number" id="statExports">â</div><div class="stat-label">Exports Left</div></div>
 </div>
 <!-- Referral Section -->
 <div class="referral-card" id="referralCard" style="background:linear-gradient(135deg,#fffdf5,#fff8e1);border:1px solid #e8d5a3;border-radius:12px;padding:20px 25px;margin:20px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
   <div style="flex:1;min-width:200px;">
-    <h3 style="margin:0 0 5px;font-size:1.1em;color:#333;"><span style="margin-right:6px;">🎁</span> Refer a Friend</h3>
+    <h3 style="margin:0 0 5px;font-size:1.1em;color:#333;"><span style="margin-right:6px;">ð</span> Refer a Friend</h3>
     <p style="margin:0;color:#666;font-size:0.9em;">Share your referral link and earn rewards when friends sign up!</p>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -229,6 +229,27 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
+
+<!-- Referral Reward Notification Banner -->
+<div id="referralRewardBanner" style="display:none;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:1px solid #a5d6a7;border-radius:10px;padding:14px 20px;margin:0 0 16px;align-items:center;gap:12px;">
+  <span style="font-size:1.5em;">&#127881;</span>
+  <div style="flex:1;">
+    <strong style="color:#2e7d32;">New Referral Reward Credited!</strong>
+    <p style="margin:2px 0 0;color:#388e3c;font-size:0.875em;">One free month has been applied to your subscription. Thanks for spreading the word!</p>
+  </div>
+  <button onclick="document.getElementById('referralRewardBanner').style.display='none'" style="background:none;border:none;font-size:1.2em;cursor:pointer;color:#388e3c;">&#x2715;</button>
+</div>
+
+<!-- Referral List Card -->
+<div id="referralListCard" style="background:#fff;border:1px solid #e8d5a3;border-radius:12px;padding:20px 25px;margin:0 0 20px;display:none;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <h3 style="margin:0;font-size:1em;color:#333;">&#128203; Your Referrals</h3>
+    <span style="font-size:0.85em;color:#666;">Free months earned: <strong id="referralMonthsEarned">0</strong></span>
+  </div>
+  <div id="referralListBody" style="font-size:0.875em;color:#555;">
+    <p style="color:#aaa;text-align:center;margin:10px 0;">Loading referrals...</p>
+  </div>
+</div>
 
 <div class="upgrade-banner" id="upgradeBanner" style="display:none">
 <div>
@@ -298,7 +319,7 @@ a{text-decoration:none;color:inherit}
 <div class="plan-card">
 <div class="plan-name">Business</div>
 <div class="plan-price">$24.99<span>/month</span></div>
-<div class="plan-trial">No trial — instant access</div>
+<div class="plan-trial">No trial â instant access</div>
 <div class="plan-desc">For teams and growing businesses.</div>
 <ul>
 <li>Unlimited AI credits</li>
@@ -323,7 +344,7 @@ window.__supabase = sb;
 var currentUser=null;
 var currentProfile=null;
 
-// ═══ AUTH SECURITY GUARD ═══
+// âââ AUTH SECURITY GUARD âââ
 (function() {
   function showPage() {
     var s = document.getElementById('auth-guard-style');
@@ -630,32 +651,81 @@ loadSiteBanner();
 loadUnreadCount();
 
 // Referral System
-async function loadReferralInfo() {
+async async function loadReferralInfo() {
   try {
     const {data:{session}} = await sb.auth.getSession();
     if (!session) return;
     const userId = session.user.id;
-    
-    // Check if user has a referral code, generate one if not
-    const {data: profile} = await sb.from('profiles').select('referral_code').eq('id', userId).single();
+
+    // Get or generate referral code
+    const {data: profile} = await sb.from('profiles')
+      .select('referral_code, referral_months_earned, referral_last_reward_at')
+      .eq('id', userId).single();
     let code = profile?.referral_code;
     if (!code) {
       code = 'DMF' + Math.random().toString(36).substring(2, 8).toUpperCase();
       await sb.from('profiles').update({referral_code: code}).eq('id', userId);
     }
-    
+
+    // Set referral link
     const link = 'https://www.draftmyforms.com/?ref=' + code;
     const linkEl = document.getElementById('referralLink');
     if (linkEl) linkEl.value = link;
-    
-    // Get referral stats
-    const {data: referrals} = await sb.from('referrals').select('id,status').eq('referrer_id', userId);
+
+    // Show reward notification banner if reward was in last 24h
+    const lastReward = profile?.referral_last_reward_at;
+    if (lastReward && !sessionStorage.getItem('refBannerDismissed')) {
+      const hoursAgo = (Date.now() - new Date(lastReward).getTime()) / 3600000;
+      if (hoursAgo < 24) {
+        const banner = document.getElementById('referralRewardBanner');
+        if (banner) { banner.style.display = 'flex'; }
+      }
+    }
+
+    // Update months earned display
+    const monthsEl = document.getElementById('referralMonthsEarned');
+    if (monthsEl) monthsEl.textContent = profile?.referral_months_earned || 0;
+
+    // Fetch referrals list
+    const {data: referrals} = await sb.from('referrals')
+      .select('id, referee_email, status, created_at, converted_at')
+      .eq('referrer_id', userId)
+      .order('created_at', {ascending: false});
+
     const total = referrals ? referrals.length : 0;
-    const rewarded = referrals ? referrals.filter(r => r.status === 'rewarded').length : 0;
+    const converted = referrals ? referrals.filter(r => r.status === 'converted').length : 0;
+
+    // Update summary stat badges
     const countEl = document.getElementById('refCount');
     const rewardsEl = document.getElementById('refRewards');
     if (countEl) countEl.textContent = total;
-    if (rewardsEl) rewardsEl.textContent = rewarded;
+    if (rewardsEl) rewardsEl.textContent = converted;
+
+    // Show referral list card if there are referrals
+    const listCard = document.getElementById('referralListCard');
+    if (listCard) listCard.style.display = 'block';
+
+    // Render referral rows
+    const listBody = document.getElementById('referralListBody');
+    if (listBody) {
+      if (!referrals || referrals.length === 0) {
+        listBody.innerHTML = '<p style="color:#aaa;text-align:center;margin:10px 0;">No referrals yet. Share your link to get started!</p>';
+      } else {
+        listBody.innerHTML = referrals.map(r => {
+          const email = r.referee_email ? r.referee_email.replace(/(.{2}).+(@.+)/, '$1...$2') : 'Unknown';
+          const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
+          const isConverted = r.status === 'converted';
+          const badge = isConverted
+            ? '<span style="background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;">Converted &#8212; 1 month earned &#127881;</span>'
+            : '<span style="background:#fff8e1;color:#f57f17;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;">Signed up &#8212; awaiting payment</span>';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;flex-wrap:wrap;">' +
+            '<span style="color:#444;">' + email + '</span>' +
+            '<span style="color:#aaa;font-size:0.8em;">' + date + '</span>' +
+            badge +
+            '</div>';
+        }).join('');
+      }
+    }
   } catch(e) { console.error('Referral load error:', e); }
 }
 
