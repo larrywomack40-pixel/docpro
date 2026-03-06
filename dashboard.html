@@ -651,7 +651,7 @@ loadSiteBanner();
 loadUnreadCount();
 
 // Referral System
-async async function loadReferralInfo() {
+async function loadReferralInfo() {
   try {
     const {data:{session}} = await sb.auth.getSession();
     if (!session) return;
