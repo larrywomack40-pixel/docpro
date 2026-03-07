@@ -140,27 +140,122 @@ async function loadCategories(){
     return '<a href="/templates.html?cat='+c.slug+'" class="cat-card"><h3><i class="fas fa-folder" style="color:#c99532;margin-right:8px"></i>'+c.name+'</h3><p>'+c.description+'</p><span class="count">'+c.template_count+' templates</span></a>';
   }).join("");
 }
-async function loadTemplates(catSlug,search){
+async function loadTemplates(catSlug,search,indFilter){
   var q=sb.from("seo_templates").select("*,seo_categories(slug,name)").order("downloads",{ascending:false}).limit(50);
   if(catSlug){
     var cr=await sb.from("seo_categories").select("id").eq("slug",catSlug).single();
     if(cr.data)q=q.eq("category_id",cr.data.id);
   }
   if(search)q=q.ilike("name","%"+search+"%");
+  if(indFilter&&!search)q=q.ilike("name","%"+indFilter.replace(/-/g," ")+"%");
   var r=await q;
   if(!r.data)return;
   document.getElementById("templatesGrid").innerHTML=r.data.map(function(t){
     var tc=t.tier==="pro"?"tier-pro":t.tier==="business"?"tier-business":"tier-free";
-        return '<div class="tmpl-card"><a href="/templates.html?template='+t.slug+'" style="text-decoration:none;color:inherit;display:block"><div class="tmpl-preview"><i class="fas fa-file-alt"></i></div><div class="tmpl-info"><h3>'+t.name+'</h3><p>'+(t.short_description||"").substring(0,80)+'</p><div class="tmpl-meta"><span class="tier-badge '+tc+'">'+t.tier.charAt(0).toUpperCase()+t.tier.slice(1)+'</span><span class="cta-btn">View Free →</span></div></div></a></div>';
+    return '<div class="tmpl-card"><a href="/templates.html?template='+t.slug+'" style="text-decoration:none;color:inherit;display:block"><div class="tmpl-preview"><i class="fas fa-file-alt"></i></div><div class="tmpl-info"><h3>'+t.name+'</h3><p>'+(t.short_description||"").substring(0,80)+'</p><div class="tmpl-meta"><span class="tier-badge '+tc+'">'+t.tier.charAt(0).toUpperCase()+t.tier.slice(1)+'</span><span class="cta-btn">Use Free →</span></div></div></a></div>';
   }).join("");
 }
 var p=new URLSearchParams(window.location.search);
-var cf=p.get("cat");
+// Support both ?cat= (internal) and ?category= (sitemap/external links)
+var CATEGORY_MAP={
+  'invoices':'invoices','pay-stubs':'pay-stubs','receipts':'receipts',
+  'contracts':'contracts','business-forms':'business','employment-documents':'employment',
+  'legal-documents':'legal','real-estate':'real-estate','healthcare-forms':'healthcare',
+  'construction':'construction','education':'education','personal-documents':'personal',
+  'government-forms':'government','automotive':'automotive',
+  // also accept short forms directly
+  'business':'business','employment':'employment','legal':'legal','healthcare':'healthcare',
+  'personal':'personal','government':'government'
+};
+var cf=p.get("cat") || CATEGORY_MAP[p.get("category")] || null;
+var indFilter=p.get("industry")||p.get("subtype")||null;
+
+// Long-tail SEO metadata for category+industry pages
+var SEO_META={
+  'invoices':{ title:'Free Invoice Templates',desc:'Download free professional invoice templates. Editable, printable, and ready to use for freelancers and businesses.' },
+  'pay-stubs':{ title:'Free Pay Stub Templates',desc:'Create accurate pay stubs instantly. Free downloadable pay stub templates for employers and contractors.' },
+  'receipts':{ title:'Free Receipt Templates',desc:'Professional receipt templates for any transaction. Download free editable receipt forms for businesses.' },
+  'contracts':{ title:'Free Contract Templates',desc:'Legally-inspired contract templates for services, employment, NDA, freelance, and more. Free download.' },
+  'business':{ title:'Free Business Form Templates',desc:'Essential business document templates for operations, HR, and administration. Free professional forms.' },
+  'employment':{ title:'Free Employment Document Templates',desc:'Offer letters, job descriptions, employee forms and more. Free employment document templates.' },
+  'legal':{ title:'Free Legal Document Templates',desc:'Agreements, affidavits, power of attorney, and legal forms. Free downloadable legal templates.' },
+  'real-estate':{ title:'Free Real Estate Templates',desc:'Lease agreements, rental forms, property checklists and more. Free real estate document templates.' },
+  'healthcare':{ title:'Free Healthcare Form Templates',desc:'Patient intake forms, medical records, HIPAA forms and more. Free healthcare document templates.' },
+  'construction':{ title:'Free Construction Templates',desc:'Bid proposals, work orders, lien waivers, and more. Free construction document templates.' },
+  'education':{ title:'Free Education Templates',desc:'Lesson plans, syllabi, student assessments, and more. Free educational document templates.' },
+  'personal':{ title:'Free Personal Document Templates',desc:'Personal finance, letters, planners, and life admin forms. Free personal document templates.' },
+  'government':{ title:'Free Government Form Templates',desc:'Government applications, permits, notices, and compliance forms. Free official-style templates.' },
+  'automotive':{ title:'Free Automotive Templates',desc:'Vehicle bills of sale, inspection reports, repair orders, and more. Free automotive document templates.' }
+};
+
+// Industry-specific long-tail keyword enhancers
+var INDUSTRY_META={
+  'restaurant':{ adj:'Restaurant & Food Service', keywords:'restaurant invoice, food service billing, catering receipt' },
+  'construction':{ adj:'Construction & Contracting', keywords:'construction invoice, contractor billing, project estimate' },
+  'freelance':{ adj:'Freelance & Independent Contractor', keywords:'freelance invoice, contractor payment, gig worker billing' },
+  'consulting':{ adj:'Consulting & Professional Services', keywords:'consulting invoice, professional services billing, retainer agreement' },
+  'retail':{ adj:'Retail & E-commerce', keywords:'retail receipt, sales invoice, store billing template' },
+  'photography':{ adj:'Photography & Creative Services', keywords:'photography invoice, creative services billing, photo session receipt' },
+  'plumbing':{ adj:'Plumbing & HVAC Services', keywords:'plumbing invoice, HVAC billing, service repair receipt' },
+  'electrical':{ adj:'Electrical & Utility Services', keywords:'electrical contractor invoice, utility billing, electrician receipt' },
+  'landscaping':{ adj:'Landscaping & Lawn Services', keywords:'landscaping invoice, lawn service billing, grounds maintenance receipt' },
+  'cleaning':{ adj:'Cleaning & Janitorial Services', keywords:'cleaning service invoice, janitorial billing, housekeeping receipt' },
+  'trucking':{ adj:'Trucking & Logistics', keywords:'trucking invoice, freight billing, delivery service receipt' },
+  'healthcare':{ adj:'Healthcare & Medical', keywords:'medical invoice, healthcare billing, patient service receipt' },
+  'legal':{ adj:'Legal & Law Services', keywords:'legal services invoice, attorney billing, law firm receipt' },
+  'real-estate':{ adj:'Real Estate & Property', keywords:'real estate invoice, property management billing, rental service receipt' },
+  'education':{ adj:'Education & Tutoring', keywords:'tutoring invoice, educational services billing, school fee receipt' },
+  'standard':{ adj:'Standard', keywords:'standard invoice template, basic billing form' },
+  'proforma':{ adj:'Proforma', keywords:'proforma invoice, advance billing, quote invoice template' },
+  'commercial':{ adj:'Commercial', keywords:'commercial invoice, business-to-business billing, B2B invoice template' },
+  'service':{ adj:'Service', keywords:'service contract, service agreement template' },
+  'employment':{ adj:'Employment', keywords:'employment contract, job offer agreement, employee agreement' },
+  'nda':{ adj:'Non-Disclosure Agreement (NDA)', keywords:'NDA template, confidentiality agreement, non-disclosure form' },
+  'partnership':{ adj:'Partnership', keywords:'partnership agreement, business partner contract, joint venture template' },
+  'lease':{ adj:'Lease', keywords:'lease agreement, rental contract, property lease template' },
+  'vendor':{ adj:'Vendor', keywords:'vendor agreement, supplier contract, vendor management template' },
+  'delivery':{ adj:'Delivery', keywords:'delivery receipt, shipping confirmation, package delivery form' },
+  'digital':{ adj:'Digital', keywords:'digital receipt, online payment confirmation, e-receipt template' },
+  'graphic-design':{ adj:'Graphic Design & Creative', keywords:'graphic design invoice, creative services contract, design agreement' },
+  'it':{ adj:'IT & Technology Services', keywords:'IT services invoice, tech support billing, software development contract' }
+};
+
+// Apply SEO metadata if category page
+if (cf && SEO_META[cf]) {
+  var catMeta = SEO_META[cf];
+  var indMeta = indFilter ? (INDUSTRY_META[indFilter]||null) : null;
+  var pageTitle, pageDesc, pageH1;
+  if (indMeta) {
+    pageTitle = indMeta.adj + ' ' + catMeta.title + ' | Free Download | DraftMyForms';
+    pageDesc = 'Free ' + indMeta.adj.toLowerCase() + ' ' + catMeta.title.toLowerCase().replace('free ','') + '. ' + indMeta.keywords + '. Download, edit, and print instantly.';
+    pageH1 = indMeta.adj + ' ' + catMeta.title.replace('Free ','');
+  } else {
+    pageTitle = catMeta.title + ' | 100+ Free Templates | DraftMyForms';
+    pageDesc = catMeta.desc;
+    pageH1 = catMeta.title.replace('Free ','');
+  }
+  document.title = pageTitle;
+  var metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute('content', pageDesc);
+  var ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+  var ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.setAttribute('content', pageDesc);
+  var h1 = document.querySelector('.hero h1');
+  if (h1) h1.textContent = pageH1;
+  var heroP = document.querySelector('.hero p');
+  if (heroP && indMeta) heroP.textContent = 'Professionally designed ' + pageH1.toLowerCase() + ' templates. Customize with AI-powered editing and download instantly.';
+  // Add keywords meta tag
+  var kwMeta = document.createElement('meta');
+  kwMeta.name = 'keywords';
+  kwMeta.content = indMeta ? indMeta.keywords + ', free templates, download, editable' : catMeta.title.toLowerCase().replace('free ','') + ', free download, editable, printable, professional';
+  document.head.appendChild(kwMeta);
+}
 loadCategories();
-loadTemplates(cf);
+loadTemplates(cf, '', indFilter);
 document.getElementById("searchInput").addEventListener("input",function(e){
   var v=e.target.value.trim();
-  if(v.length>2||v.length===0)loadTemplates(cf,v);
+  if(v.length>2||v.length===0)loadTemplates(cf,v,indFilter);
 });
 </script>
 
