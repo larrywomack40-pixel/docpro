@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Free Document Templates | 36,000+ Professional Templates | DraftMyForms</title>
 <meta name="description" content="Browse 36,000+ free professional document templates. Invoices, contracts, pay stubs, resumes, and more. AI-powered editing.">
-<link rel="canonical" href="https://www.draftmyforms.com/templates.html">
+<link rel="canonical" id="canonical-tag" href="https://www.draftmyforms.com/templates.html">
 <meta property="og:title" content="Free Document Templates | DraftMyForms">
 <meta property="og:description" content="Browse 36,000+ free professional document templates with AI-powered editing.">
-<meta property="og:url" content="https://www.draftmyforms.com/templates.html">
+<meta property="og:url"  id="og-url-tag" content="https://www.draftmyforms.com/templates.html">
 <meta property="og:type" content="website">
 <script type="application/ld+json">
     {
@@ -98,6 +98,16 @@ body{font-family:"DM Sans",sans-serif;background:#f8f9fa;color:#333}
 .footer p{opacity:0.7;font-size:13px}
 @media(max-width:768px){.hero h1{font-size:26px}.categories-grid{grid-template-columns:1fr 1fr}.templates-grid{grid-template-columns:1fr}}
 </style>
+<script>
+  // Dynamic canonical: set to actual URL (handles ?template=, ?cat= params)
+  (function() {
+    var canonical = document.getElementById('canonical-tag');
+      var ogUrl = document.getElementById('og-url-tag');
+        var url = window.location.href.split('#')[0];
+          if (canonical) canonical.setAttribute('href', url);
+            if (ogUrl) ogUrl.setAttribute('content', url);
+            })();
+            </script>
   </head>
 <body>
 <nav class="navbar">
@@ -202,6 +212,11 @@ async function loadSingleTemplate(slug) {
 function renderSingleTemplate(t, slug) {
     // Update page meta dynamically
             var _title = t.name || slug; document.title = (_title.toLowerCase().endsWith('template') ? _title : _title + ' Template') + ' | DraftMyForms';
+                var _canonical = document.getElementById('canonical-tag');
+                    var _ogUrl = document.getElementById('og-url-tag');
+                        var _pageUrl = window.location.href.split('#')[0];
+                            if (_canonical) _canonical.setAttribute('href', _pageUrl);
+                                if (_ogUrl) _ogUrl.setAttribute('content', _pageUrl);
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', t.description || 'Free ' + (t.name || slug) + ' template. Download and customize.');
 
