@@ -884,6 +884,23 @@ function updateToolbarState() {
 
 document.addEventListener("selectionchange", function() {
   var el = document.getElementById("docCanvas");
+
+    docCanvas.addEventListener('paste', function(e) {
+        e.preventDefault();
+        let text = '';
+        if (e.clipboardData && e.clipboardData.getData) {
+            const html = e.clipboardData.getData('text/html');
+            if (html) {
+                text = sanitizeAIContent(html);
+            } else {
+                text = e.clipboardData.getData('text/plain');
+                text = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+        }
+        document.execCommand('insertHTML', false, text);
+        updateWordCount();
+        updatePreview();
+    });
   if (el && (el === document.activeElement || el.contains(document.getSelection().anchorNode))) { updateToolbarState(); }
 });
 
@@ -1323,7 +1340,7 @@ async function sendAI() {
     lastAIResponse = data.html;
     
     // Auto-apply to canvas
-    docCanvas.innerHTML = fixEncoding(data.html);
+    docCanvas.innerHTML = sanitizeAIContent(fixEncoding(data.html));
     updatePreview();
     updateWordCount();
     
@@ -1369,6 +1386,43 @@ function closeUpload() {
 
     function escapeHTML(str) {
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function sanitizeAIContent(html) {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        temp.querySelectorAll('*').forEach(el => {
+            const style = el.getAttribute('style') || '';
+            let cleaned = style
+                .replace(/white-space\s*:\s*nowrap/gi, 'white-space: pre-wrap')
+                .replace(/overflow\s*:\s*visible/gi, 'overflow: hidden')
+                .replace(/min-width\s*:\s*\d+px/gi, '');
+            const widthMatch = cleaned.match(/width\s*:\s*(\d+)px/);
+            if (widthMatch && parseInt(widthMatch[1]) > 816) {
+                cleaned = cleaned.replace(/width\s*:\s*\d+px/gi, 'width: 100%');
+            }
+            if (cleaned.trim()) {
+                el.setAttribute('style', cleaned);
+            } else {
+                el.removeAttribute('style');
+            }
+        });
+
+        temp.querySelectorAll('table').forEach(table => {
+            table.style.width = '100%';
+            table.style.maxWidth = '100%';
+            table.style.tableLayout = 'fixed';
+            table.style.wordBreak = 'break-word';
+            if (!table.parentElement.classList.contains('table-wrapper')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-wrapper';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            }
+        });
+
+        return temp.innerHTML;
     }
 
     function fixEncoding(str) {
@@ -1959,6 +2013,8 @@ async function downloadPDF() {
     clone.style.position = 'absolute';
     clone.style.left = '-9999px';
     clone.style.width = '7.5in';
+    clone.style.maxWidth = '816px';
+    clone.style.overflowX = 'hidden';
     clone.style.background = '#fff';
     clone.style.padding = '0.5in';
     document.body.appendChild(clone);
