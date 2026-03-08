@@ -319,15 +319,18 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 .sig-saved-item .sig-name{font-size:11px;color:#8a7f76;margin-top:4px}
 /* === Document Canvas Page Constraints === */
 #docCanvas {
-  max-width: 8.5in;
+  max-width: 816px;
   min-height: 11in;
   margin: 0 auto;
-  padding: 0.75in 0.85in;
+      padding: 96px 96px;
   background: #fff;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
+    width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 #docCanvas *, [contenteditable] * {
   max-width: 100%;
@@ -337,7 +340,26 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
   table-layout: fixed;
   width: 100%;
   word-wrap: break-word;
+        border-collapse: collapse;
+        word-break: break-word;
+        overflow-wrap: break-word;
 }
+    #docCanvas td, #docCanvas th {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 0;
+            padding: 8px;
+    }
+    .canvas-wrapper {
+            overflow-x: hidden;
+            width: 100%;
+            box-sizing: border-box;
+    }
+    .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+    }
 /* Live Preview overflow fix */
 .live-preview, .preview-content, .preview-frame {
   overflow-wrap: break-word;
