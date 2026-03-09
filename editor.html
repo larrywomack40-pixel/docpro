@@ -7,7 +7,7 @@
 <title>Document Editor | DraftMyForms</title>
 <meta name="description" content="Create, edit, and design professional documents with AI assistance. Free document editor by DraftMyForms.">
     <meta name="keywords" content="free document editor, AI document generator, invoice maker, contract creator, pay stub generator, professional templates, DraftMyForms">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="robots" content="index, follow, max-shnippet:-1, max-image-preview:large">
     <link rel="canonical" href="https://www.draftmyforms.com/editor.html">
     <meta property="og:title" content="Document Editor - DraftMyForms">
     <meta property="og:description" content="Create, edit, and design professional documents with AI assistance. 10,000+ free templates available.">
@@ -3096,7 +3096,7 @@ function getSelectedOrAllText(){
 }
 async function runWATool(tool){
   var text=getSelectedOrAllText();
-  if(!text||text.trim().length<5){alert('Please select text or write content in the editor first.');return;}
+  if(!text||text.trim().length<5){document.getElementById('waResultContent').textContent='Please select text or write content in the editor first.';return;}
   var toolNames={improve:'Improve Writing',shorten:'Make Concise',expand:'Expand & Elaborate',formal:'Make Formal',friendly:'Make Friendly',grammar:'Fix Grammar',translate:'Translate to Spanish',summarize:'Summarize'};
   var prompts={
     improve:'Improve the following text for clarity, grammar, and professional flow. Return only the improved text:\n\n',
@@ -3113,14 +3113,13 @@ async function runWATool(tool){
   document.getElementById('waTools').style.display='none';
   document.getElementById('waResult').classList.add('active');
   try{
-    var sb=window.supabaseClient||window._supabase;
-    if(!sb){alert('Not logged in');showWATools();return;}
-    var session=await sb.auth.getSession();
-    var token=session.data.session?session.data.session.access_token:'';
+    var sb=window.sbClient||window.supabaseClient||window._supabase;
+    if(!sb){document.getElementById('waResultContent').textContent='Please log in to use writing tools.';showWATools();return;}
+    var token='';try{var session=await sb.auth.getSession();token=session.data.session?session.data.session.access_token:'';}catch(e){}
     var resp=await fetch('/api/ai-generate',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({type:'custom',customPrompt:prompts[tool]+text})
+      body:JSON.stringify({type:'custom',customPrompt:prompts[tool]+text,userId:window._dmfUserId||null,plan:window._dmfUserPlan||'Free'})
     });
     var data=await resp.json();
     if(data.content){
@@ -3150,7 +3149,7 @@ function applyWAResult(){
 function copyWAResult(){
   if(!window._waLastResult)return;
   navigator.clipboard.writeText(window._waLastResult).then(function(){
-    alert('Copied to clipboard!');
+    document.getElementById('waResultContent').textContent='Copied to clipboard!';
   });
 }
 </script>
