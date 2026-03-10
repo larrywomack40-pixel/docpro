@@ -340,7 +340,7 @@ function renderSingleTemplate(t, slug) {
     html += '<a href="/editor.html" style="background:#4F46E5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Use This Template</a>';
     html += '<a href="/templates.html" style="background:#f3f4f6;color:#374151;padding:12px 24px;border-radius:8px;text-decoration:none">Browse All Templates</a>';
     html += '</div>';
-    if (t.keywords && t.keywords.length) {
+    var _legalCats=['contracts','legal','real-estate'];if(t.seo_categories&&_legalCats.indexOf(t.seo_categories.slug)>-1){html+='<p style="font-size:11px;color:#999;margin-top:12px;">This template is a starting point. It is not a substitute for professional legal advice.</p>';}      if (t.keywords && t.keywords.length) {
         html += '<div style="margin-top:16px">' + t.keywords.slice(0,8).map(function(k){ return '<span style="background:#e5e7eb;padding:4px 10px;border-radius:20px;font-size:13px;margin:2px;display:inline-block">' + k + '</span>'; }).join('') + '</div>';
     }
     html += '</div>';
