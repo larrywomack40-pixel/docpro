@@ -29,7 +29,7 @@ function cleanAIResponse(text) {
   return html;
 }
 // ═══════════════ SYSTEM PROMPTS ═══════════════
-const CREATE_SYSTEM_PROMPT = `You are an expert document designer that generates publication-quality HTML documents. Your output must look like it came from a professional payroll, legal, or HR software system — NOT a basic web page.
+const CREATE_SYSTEM_PROMPT = `You are an expert document designer that generates publication-quality HTML documents. Your output must look like it came from a professional payroll, formal, or HR software system — NOT a basic web page.
 
 CRITICAL RULES:
 1. Return ONLY raw HTML. No markdown fencing, no explanation, no backticks. Just HTML starting with < and ending with >.
@@ -323,7 +323,7 @@ module.exports = async function handler(req, res) {
       invoice: 'Generate a professional USA invoice with: company header (name, address, phone, email), invoice number, date, due date, bill-to section, itemized table (description, qty, rate, amount) with subtotal/tax/total, payment terms, and professional footer. Use proper number formatting with dollar signs.',
       'pay stub': 'Generate a professional USA pay stub with: employer info header, employee details (name, SSN last 4, employee ID), pay period dates, earnings breakdown (regular hours, overtime, bonuses), deductions (federal tax, state tax, social security, medicare, insurance, 401k), YTD totals for all categories, net pay prominently displayed. Must include check number and pay date.',
       receipt: 'Generate a professional receipt with: business name/logo area, receipt number, date/time, itemized list with quantities and prices, subtotal, tax calculation, total, payment method, and return policy footer.',
-      contract: 'Generate a professional legal contract with: title, parties section (Party A and Party B with full details), recitals/whereas clauses, numbered articles with sections, terms and conditions, termination clause, governing law, entire agreement clause, signature blocks with date lines and witness lines.',
+      contract: 'Generate a professional business contract with: title, parties section (Party A and Party B with full details), recitals/whereas clauses, numbered articles with sections, terms and conditions, termination clause, governing law, entire agreement clause, signature blocks with date lines and witness lines.',
       nda: 'Generate a professional Non-Disclosure Agreement with: parties identification, definition of confidential information, obligations of receiving party, exclusions from confidential information, term and duration, remedies, return of materials, governing law, and signature blocks.',
       lease: 'Generate a professional residential lease agreement with: landlord/tenant info, property description, lease term, rent amount and due date, security deposit, utilities responsibilities, maintenance obligations, rules and regulations, early termination clause, and signature blocks.',
       resume: 'Generate a professional ATS-optimized resume with: contact header (name, phone, email, LinkedIn, location), professional summary, work experience (reverse chronological with bullet points using action verbs and metrics), education, skills section organized by category. Use clean formatting that parses well in ATS systems.',
@@ -333,12 +333,12 @@ module.exports = async function handler(req, res) {
       estimate: 'Generate a professional estimate/quote with: company header, estimate number, date, valid-until date, client info, itemized services/products with descriptions and pricing, subtotal, tax, total, terms and conditions, acceptance line.',
       'purchase order': 'Generate a professional purchase order with: PO number, vendor info, ship-to address, order date, delivery date, itemized table (item, description, qty, unit price, total), shipping terms, payment terms, authorized signature.',
       'work order': 'Generate a professional work order with: WO number, date, client info, job site address, description of work, materials needed, labor estimates, scheduled dates, special instructions, authorization signatures.',
-      'bill of sale': 'Generate a legal bill of sale with: seller and buyer info, description of item/property, sale price, payment method, as-is clause, warranty disclaimers, transfer of ownership statement, date, and notarized signature blocks.',
+      'bill of sale': 'Generate a professional bill of sale with: seller and buyer info, description of item/property, sale price, payment method, as-is clause, warranty disclaimers, transfer of ownership statement, date, and notarized signature blocks.',
       letterhead: 'Generate professional company letterhead with: company name/logo area, address, phone, email, website in header. Include date line, recipient address block, salutation, body area, and professional closing with signature block.',
       memo: 'Generate a professional business memo with: TO, FROM, DATE, RE (subject) header fields, followed by well-structured body paragraphs with clear purpose statement, background, action items, and deadline if applicable.',
       report: 'Generate a professional business report with: title page, table of contents, executive summary, introduction, methodology, findings/analysis sections, conclusions, recommendations, and appendices.',
       certificate: 'Generate a professional certificate with: decorative border styling, organization name, certificate title, recipient name prominently displayed, achievement description, date of issue, authorized signatures, certificate number.',
-      affidavit: 'Generate a legal affidavit with: title, venue (state/county), affiant identification, numbered sworn statements beginning with "I hereby swear/affirm", jurat clause, notary block with seal area, signature line with date.'
+      affidavit: 'Generate a professional affidavit template with: title, venue (state/county), affiant identification, numbered sworn statements beginning with "I hereby swear/affirm", jurat clause, notary block with seal area, signature line with date.'
     };
 
     // Get document-specific prompt or use general
@@ -359,17 +359,17 @@ EDITING RULES:
 - Never add markdown formatting - output pure HTML only
 - Preserve all inline styles and class names`;
     } else {
-      systemPrompt = `You are DraftMyForms AI Document Engine - a professional document generator specializing in USA business and legal documents.
+      systemPrompt = `You are DraftMyForms AI Document Engine - a professional document generator specializing in USA business and professional documents.
 
 CORE RULES:
 1. Output ONLY valid HTML with inline CSS - no markdown, no code fences, no commentary
 2. Every document must look print-ready at 8.5" x 11" US Letter size
-3. Use professional fonts: system-ui, Segoe UI, Arial, or serif fonts for legal docs
+3. Use professional fonts: system-ui, Segoe UI, Arial, or serif fonts for formal docs
 4. Include proper spacing, margins, and visual hierarchy
 5. All financial figures must use proper USD formatting ($X,XXX.XX)
 6. Dates in US format (Month DD, YYYY)
 7. Include realistic placeholder data when user doesn't specify details
-8. Legal documents must include proper legal language and standard clauses
+8. Agreement templates should include professionally structured clauses and standard sections
 
 FORMATTING STANDARDS:
 - Use a clean container div with max-width: 800px, margin: auto, padding: 40px
