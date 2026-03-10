@@ -62,7 +62,7 @@
     { id: 'blank', label: 'Blank' },
     { id: 'consulting', label: 'Consulting' },
     { id: 'accounting', label: 'Accounting' },
-    { id: 'legal', label: 'Legal' },
+    { id: 'legal', label: 'Formal' },
     { id: 'marketing-agency', label: 'Marketing Agency' },
     { id: 'architecture', label: 'Architecture' },
     { id: 'engineering', label: 'Engineering' },
