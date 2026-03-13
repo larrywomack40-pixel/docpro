@@ -332,6 +332,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
     overflow-x: hidden;
     box-sizing: border-box;
 }
+      .uploaded-doc{line-height:1.6} .uploaded-doc table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px} .uploaded-doc th{background:#1B3A5C;color:#fff;font-weight:bold;padding:8px 10px;border:1px solid #1B3A5C;text-align:left} .uploaded-doc td{padding:8px 10px;border:1px solid #e0dcd8;text-align:left} .uploaded-doc tr:nth-child(even) td{background:#faf8f5} .uploaded-doc h1{margin:18px 0 8px;color:#1a1a1a} .uploaded-doc h2{margin:14px 0 6px;color:#2a2a2a} .uploaded-doc p{margin:4px 0;line-height:1.5} .uploaded-doc img{max-width:100%;height:auto}
 #docCanvas *, [contenteditable] * {
   max-width: 100%;
   overflow-wrap: break-word;
@@ -1466,7 +1467,7 @@ function closeUpload() {
         const line = tableLines[r];
         const isHeader = r === 0 && line.items.some(it => it.fontSize > 12);
         const tag = isHeader ? 'th' : 'td';
-        const bgStyle = isHeader ? 'background:#c99532;color:#fff;font-weight:bold;' : (r % 2 === 0 ? 'background:#faf8f5;' : '');
+        const bgStyle = isHeader ? 'background:#1B3A5C;color:#fff;font-weight:bold;' : (r % 2 === 0 ? 'background:#faf8f5;' : '');
         html += '<tr>';
         const cells = new Array(numCols).fill('');
         for (const item of line.items) {
@@ -1559,9 +1560,9 @@ function closeUpload() {
                break;
              }
            }
-           if (hasImages) {
-             const imgData = canvas.toDataURL('image/png');
-             html += '<div style="margin:10px 0;text-align:center"><img src="' + imgData + '" style="max-width:100%;height:auto" alt="Page ' + p + ' image"></div>';
+           if (hasImages && p === 1) {
+             const hh = Math.min(Math.round(canvas.height * 0.2), 300); const hc = document.createElement('canvas'); hc.width = canvas.width; hc.height = hh; hc.getContext('2d').drawImage(canvas, 0, 0, canvas.width, hh, 0, 0, canvas.width, hh); const imgData = hc.toDataURL('image/png');
+             html += '<div style="margin:10px 0;text-align:center"><img src="' + imgData + '" style="max-width:100%;height:auto" alt="Document header"></div>';
            }
          } catch(imgErr) {
            // Image extraction failed silently, continue with text
@@ -1643,7 +1644,7 @@ function closeUpload() {
        hideAILoading();
        if (html.trim()) {
          const docCanvas = document.getElementById('docCanvas');
-         docCanvas.innerHTML = '<div style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
+         docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
          document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
          updatePreview();
          updateWordCount();
@@ -1677,7 +1678,7 @@ function closeUpload() {
          hideAILoading();
          if (result.value && result.value.trim()) {
            const docCanvas = document.getElementById('docCanvas');
-           docCanvas.innerHTML = '<div style="padding:20px;font-family:var(--font-body);line-height:1.6">' + result.value + '</div>';
+           docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + result.value + '</div>';
            document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
            updateWordCount();
            updatePreview();
@@ -1711,7 +1712,7 @@ function closeUpload() {
              if (pText.trim()) html += '<p>' + escapeHTML(pText) + '</p>';
            }
            if (html) {
-             document.getElementById('docCanvas').innerHTML = '<div style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
+             document.getElementById('docCanvas').innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
              document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
              updatePreview();
              updateWordCount();
