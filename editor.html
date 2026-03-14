@@ -1011,6 +1011,7 @@ function toggleAI() {
       var hasDoc = canvas && canvas.innerHTML.trim().length > 0 && canvas.innerHTML.trim() !== '<br>';
       aiInput.placeholder = hasDoc ? 'Describe what changes to make to this document...' : 'Describe the document you want to create...';
     }
+        }
 
 // ═══ AUTH SECURITY GUARD ═══
 (function() {
@@ -1251,7 +1252,6 @@ function toggleAI() {
   });
 })();
 
-}
 
 function addAIMessage(text, role) {
   const div = document.createElement('div');
