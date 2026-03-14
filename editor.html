@@ -1641,7 +1641,7 @@ function closeUpload() {
            html += '<hr style="border:none;border-top:1px dashed #ccc;margin:20px 0">';
          }
        }
-       hideAILoading();
+       removeAILoading();
        if (html.trim()) {
          const docCanvas = document.getElementById('docCanvas');
          docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
@@ -1653,7 +1653,7 @@ function closeUpload() {
          addAIMessage('Could not extract text from this PDF. It may be image-based or encrypted.', 'system');
        }
      } catch(err) {
-       hideAILoading();
+       removeAILoading();
        addAIMessage('Error reading PDF: ' + err.message, 'system');
      } } else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
      // DOCX - use mammoth.js for high-fidelity HTML conversion, NO AI reformatting
@@ -1675,7 +1675,7 @@ function closeUpload() {
              "p[style-name='List Paragraph'] => li:fresh"
            ]
          });
-         hideAILoading();
+         removeAILoading();
          if (result.value && result.value.trim()) {
            const docCanvas = document.getElementById('docCanvas');
            docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + result.value + '</div>';
@@ -1692,7 +1692,7 @@ function closeUpload() {
          }
        } else {
          // Fallback: basic text extraction via JSZip if mammoth not available
-         hideAILoading();
+         removeAILoading();
          try {
            const zip = await JSZip.loadAsync(arrayBuffer);
            const docXml = await zip.file('word/document.xml').async('string');
@@ -1725,7 +1725,7 @@ function closeUpload() {
          }
        }
      } catch(err) {
-       hideAILoading();
+       removeAILoading();
        addAIMessage('Error processing Word file: ' + err.message, 'system');
      }
   } else {
