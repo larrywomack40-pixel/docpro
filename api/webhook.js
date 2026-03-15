@@ -176,5 +176,27 @@ module.exports = async (req, res) => {
     }
   }
 
+    // ── PAYMENT FAILED ──
+      if (event.type === 'invoice.payment_failed') {
+          try {
+                const inv = event.data.object;
+                      var failedEmail = inv.customer_email || null;
+                            if (!failedEmail && inv.customer) {
+                                    try {
+                                              const cust = await stripe.customers.retrieve(inv.customer);
+                                                        failedEmail = cust.email;
+                                                                } catch (e) { console.error('Customer lookup error:', e.message); }
+                                                                      }
+                                                                            if (failedEmail) {
+                                                                                    var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
+                                                                                            fetch(siteUrl + '/api/send-email', {
+                                                                                                      method: 'POST',
+                                                                                                                headers: { 'Content-Type': 'application/json' },
+                                                                                                                          body: JSON.stringify({ userId: inv.customer, email: failedEmail, type: 'payment_failed', data: { attempt: inv.attempt_count || 1 } })
+                                                                                                                                  }).catch(function(e) { console.error('Payment failed email error:', e.message); });
+                                                                                                                                        }
+                                                                                                                                            } catch (pfErr) { console.error('payment_failed handler error:', pfErr.message); }
+                                                                                                                                              }
+
   res.status(200).json({ received: true });
 };

@@ -23,7 +23,9 @@ const COOLDOWNS = {
   referral_converted: 999999,
   new_signup_admin: 5,
   ai_usage_admin: 60,
-  email_lead: 5
+  email_lead: 5,
+    payment_failed: 60,
+      document_shared: 5
 };
 
 // ═══════════════ BRANDED EMAIL WRAPPER ═══════════════
@@ -258,6 +260,29 @@ function getEmailHTML(type, data) {
     return adminWrapper(subject, message.replace(/\n/g, '<br>'));
   }
 
+    // ── Payment Failed ──
+      if (type === 'payment_failed') {
+          var attempt = data.attempt || 1;
+              var content = '<h1 style="font-size:20px;color:#DC2626;margin:0 0 8px;font-weight:700;">Payment Failed</h1>' +
+                    '<p style="font-size:15px;color:#555;line-height:1.6;margin:16px 0;">Hey ' + firstName + ', we were unable to process your payment. This was attempt <strong>' + attempt + '</strong>.</p>' +
+                          '<p style="font-size:15px;color:#555;line-height:1.6;margin:0;">Please update your payment method to keep your subscription active and avoid losing access to premium features.</p>' +
+                                emailButton('Update Payment Method', SITE_URL + '/settings.html', '#DC2626') +
+                                      '<p style="font-size:13px;color:#AAA;text-align:center;margin:0;">If you believe this is an error, please contact support.</p>';
+                                          return emailWrapper(content, 'Your subscription may be paused if payment is not resolved.');
+                                            }
+
+                                              // ── Document Shared ──
+                                                if (type === 'document_shared') {
+                                                    var senderName = data.senderName || 'Someone';
+                                                        var docName = data.docName || 'a document';
+                                                            var shareUrl = data.shareUrl || (SITE_URL + '/dashboard.html');
+                                                                var content = '<h1 style="font-size:20px;color:#1A1A1A;margin:0 0 8px;font-weight:700;">A document was shared with you</h1>' +
+                                                                      '<p style="font-size:15px;color:#555;line-height:1.6;margin:16px 0;"><strong>' + senderName + '</strong> shared <strong>' + docName + '</strong> with you on DraftMyForms.</p>' +
+                                                                            emailButton('View Document', shareUrl) +
+                                                                                  '<p style="font-size:13px;color:#AAA;text-align:center;margin:0;">You can view and download this document from your dashboard.</p>';
+                                                                                      return emailWrapper(content, 'You received this because someone shared a document with you on DraftMyForms.');
+                                                                                        }
+
   return '';
 }
 
@@ -330,7 +355,9 @@ module.exports = async (req, res) => {
       new_signup_admin: '👤 New Signup: ' + (data && data.newUserEmail || email),
       ai_usage_admin: '🤖 AI Usage Alert – DraftMyForms',
       email_lead: '📧 New Lead: ' + (data && data.leadEmail || email),
-      admin_notification: (data && data.subject) || 'Notification from DraftMyForms'
+      admin_notification: (data && data.subject) || 'Notification from DraftMyForms',
+            payment_failed: 'Action Required: Payment Failed',
+                  document_shared: (data && data.senderName || 'Someone') + ' shared a document with you'
     };
 
     var { data: emailResult, error } = await resend.emails.send({
