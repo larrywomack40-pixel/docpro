@@ -99,14 +99,20 @@ body{font-family:"DM Sans",sans-serif;background:#f8f9fa;color:#333}
 @media(max-width:768px){.hero h1{font-size:26px}.categories-grid{grid-template-columns:1fr 1fr}.templates-grid{grid-template-columns:1fr}}
 </style>
 <script>
-  // Dynamic canonical: set to actual URL (handles ?template=, ?cat= params)
-  (function() {
-    var canonical = document.getElementById('canonical-tag');
-      var ogUrl = document.getElementById('og-url-tag');
-        var url = window.location.href.split('#')[0];
-          if (canonical) canonical.setAttribute('href', url);
-            if (ogUrl) ogUrl.setAttribute('content', url);
-            })();
+      // Dynamic canonical: ?cat= keeps full URL, ?template= and ?category= point to base
+          (function() {
+                var canonical = document.getElementById('canonical-tag');
+                      var ogUrl = document.getElementById('og-url-tag');
+                            var params = new URLSearchParams(window.location.search);
+                                  var url;
+                                        if (params.get('template') || params.get('category')) {
+                                                url = 'https://www.draftmyforms.com/templates.html';
+                                                      } else {
+                                                              url = window.location.href.split('#')[0];
+                                                                    }
+                                                                          if (canonical) canonical.setAttribute('href', url);
+                                                                                if (ogUrl) ogUrl.setAttribute('content', url);
+                                                                                    })();
             </script>
   </head>
 <body>
@@ -338,7 +344,7 @@ function renderSingleTemplate(t, slug) {
             var _title = t.name || slug; document.title = (_title.toLowerCase().endsWith('template') ? _title : _title + ' Template') + ' | DraftMyForms';
                 var _canonical = document.getElementById('canonical-tag');
                     var _ogUrl = document.getElementById('og-url-tag');
-                        var _pageUrl = window.location.href.split('#')[0];
+                                var _pageUrl = 'https://www.draftmyforms.com/templates.html';
                             if (_canonical) _canonical.setAttribute('href', _pageUrl);
                                 if (_ogUrl) _ogUrl.setAttribute('content', _pageUrl);
     var metaDesc = document.querySelector('meta[name="description"]');
