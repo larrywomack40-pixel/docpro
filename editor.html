@@ -1231,6 +1231,8 @@ function toggleAI() {
     window.location.replace('/index.html');
   }
   // Check session immediately
+      var sb = window.sbClient;
+            if (!sb) { console.warn('Auth guard: Supabase client not ready'); return; }
   sb.auth.getSession().then(function(result) {
     var session = result && result.data && result.data.session;
     if (!session) {
