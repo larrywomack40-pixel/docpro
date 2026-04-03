@@ -153,7 +153,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
 .size-select{border:1px solid var(--card-border);border-radius:4px;padding:4px 4px;font-size:12px;outline:none;background:#fff;width:50px}
 /* EDITOR + PREVIEW SPLIT */
 .editor-split{flex:1;display:flex;overflow:hidden}
-.edit-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.edit-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-width:320px;flex-shrink:0;overflow-x:auto}
 .canvas-wrapper{flex:1;overflow:auto;padding:32px;background:var(--paper);display:flex;justify-content:center}
 .doc-canvas{width:816px;min-height:1056px;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.08);border-radius:4px;padding:72px 72px 96px;outline:none;font-size:14px;line-height:1.7;color:var(--text);position:relative}
 .doc-canvas:empty::before{content:'Start typing or use AI to create your document...';color:var(--text-muted);font-style:italic;pointer-events:none}
@@ -247,7 +247,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--text);heig
     .top-nav .nav-actions .btn-sm{padding:4px 6px}
     .doc-title-input{max-width:120px;font-size:13px}
   }
-  @media(max-width:768px){
+  @media(max-width:768px){.editor-split{flex-direction:column}.edit-pane{min-width:unset;flex-shrink:1;width:100%}
 .ai-sidebar{position:fixed;left:-100%;top:0;bottom:0;z-index:200;width:85%;max-width:320px;transition:left .3s}
 .ai-sidebar.open{left:0}
 .preview-pane,.preview-divider{display:none!important}
@@ -1531,7 +1531,7 @@ function closeUpload() {
     };
     reader.readAsDataURL(file);
 
-  } else if (file.name.endsWith('.pdf')) {
+  } else if (file.name.endsWith('.pdf') || file.type === 'application/pdf' || file.type === 'application/octet-stream' || file.type === '') {
      // PDF - extract text with structure preservation, NO AI reformatting
      addAIMessage('Processing PDF: ' + file.name + ' (preserving original format)', 'system');
      showAILoading();
@@ -1658,7 +1658,7 @@ function closeUpload() {
      } catch(err) {
        removeAILoading();
        addAIMessage('Error reading PDF: ' + err.message, 'system');
-     } } else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+     } } else if (file.name.endsWith('.docx') || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.type === 'application/octet-stream' || file.type === '' || file.name.endsWith('.doc')) {
      // DOCX - use mammoth.js for high-fidelity HTML conversion, NO AI reformatting
      addAIMessage('Processing Word document: ' + file.name + ' (preserving original format)', 'system');
      showAILoading();
