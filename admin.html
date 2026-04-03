@@ -451,6 +451,7 @@ await loadLeads();
     if(typeof loadBannerAdmin === "function") await loadBannerAdmin();
     if(typeof loadUserListForMessaging === "function") loadUserListForMessaging();
     if(typeof loadAdminMessages === "function") await loadAdminMessages();
+if(typeof loadVisitorData === "function") loadVisitorData();
 }catch(e){
 console.error('Admin init error:',e);
 document.getElementById('loadingState').innerHTML='<div style="color:var(--danger)">Error loading admin dashboard. <a href="/">Go home</a></div>';
@@ -618,7 +619,7 @@ sb.auth.signOut().then(function(){window.location.href='/'});
       var res = await fetch('/api/admin-api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ action: 'live-feed' })
+        body: JSON.stringify({ action: 'live-feed', since: new Date(Date.now() - 7*24*60*60*1000).toISOString() })
       });
       var data = await res.json();
       if (data.error) { console.error('Feed error:', data.error); return; }
@@ -693,7 +694,7 @@ sb.auth.signOut().then(function(){window.location.href='/'});
     function startFeedRefresh() {
       loadLiveFeed();
       loadFlags();
-      feedInterval = setInterval(function() { loadLiveFeed(); loadFlags(); }, 30000);
+      feedInterval = setInterval(function() { loadLiveFeed(); loadFlags(); loadVisitorData(); }, 30000);
     }
 
 
