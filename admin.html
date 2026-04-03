@@ -619,7 +619,7 @@ sb.auth.signOut().then(function(){window.location.href='/'});
       var res = await fetch('/api/admin-api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ action: 'live-feed', since: new Date(Date.now() - 7*24*60*60*1000).toISOString() })
+        body: JSON.stringify({ action: 'live-feed', since: new Date(Date.now() - 30*24*60*60*1000).toISOString() })
       });
       var data = await res.json();
       if (data.error) { console.error('Feed error:', data.error); return; }
