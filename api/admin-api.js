@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
 
     // GET /api/admin-api?action=live-feed&since=ISO_DATE
     if (action === 'live-feed') {
-      var since = req.query.since || new Date(Date.now() - 24*60*60*1000).toISOString();
+      var since = req.query.since || (req.body && req.body.since) || new Date(Date.now() - 24*60*60*1000).toISOString();
       var { data: docs } = await supabase.from('document_history')
         .select('*').gte('created_at', since)
         .order('created_at', { ascending: false }).limit(50);
