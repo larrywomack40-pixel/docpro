@@ -569,7 +569,20 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <a href="javascript:void(0)" class="btn btn-primary btn-lg" onclick="handleStartFree()">Start for free &rarr;</a>
 </section>
 
-<!-- FOOTER -->
+<!-- EMAIL NEWSLETTER SIGNUP -->
+    <section style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);padding:60px 20px;text-align:center;">
+      <div style="max-width:600px;margin:0 auto;">
+        <h2 style="color:#fff;font-size:1.8rem;margin-bottom:10px;">Stay in the loop</h2>
+        <p style="color:#ccc;margin-bottom:24px;">Get tips, templates, and product updates. No spam &mdash; unsubscribe anytime.</p>
+        <form id="leadForm" onsubmit="return captureEmail(event)" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <input type="email" id="leadEmail" placeholder="Enter your email" required style="padding:12px 18px;border-radius:8px;border:none;font-size:1rem;min-width:260px;outline:none;">
+          <button type="submit" style="padding:12px 28px;border-radius:8px;border:none;background:#c8a84e;color:#fff;font-weight:700;font-size:1rem;cursor:pointer;">Subscribe</button>
+        </form>
+        <p id="leadMsg" style="color:#8f8;margin-top:12px;display:none;"></p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
 <footer class="footer">
 <div class="footer-grid">
 <div>
@@ -937,5 +950,25 @@ initTheme();
                                                                                                     </script>
           }
       })
+<script>
+function captureEmail(e) {
+  e.preventDefault();
+  var email = document.getElementById('leadEmail').value;
+  var msg = document.getElementById('leadMsg');
+  var btn = e.target.querySelector('button');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  fetch('/api/capture-lead', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email: email, source: 'homepage'})
+  }).then(function(r){return r.json();}).then(function(d){
+    msg.style.display='block';
+    if(d.success){msg.style.color='#8f8';msg.textContent=d.message||'Subscribed!';document.getElementById('leadEmail').value='';}
+    else{msg.style.color='#f88';msg.textContent=d.error||'Something went wrong';}
+    btn.disabled=false;btn.textContent='Subscribe';
+  }).catch(function(){msg.style.display='block';msg.style.color='#f88';msg.textContent='Network error.';btn.disabled=false;btn.textContent='Subscribe';});
+  return false;
+}
+</script>
 </body>
 </html>
