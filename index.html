@@ -957,10 +957,10 @@ function captureEmail(e) {
   var msg = document.getElementById('leadMsg');
   var btn = e.target.querySelector('button');
   btn.disabled = true; btn.textContent = 'Sending...';
-  fetch('/api/capture-lead', {
+  fetch('/api/log-activity', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({email: email, source: 'homepage'})
+    body: JSON.stringify({type:'email-lead', email: email, source: 'homepage'})
   }).then(function(r){return r.json();}).then(function(d){
     msg.style.display='block';
     if(d.success){msg.style.color='#8f8';msg.textContent=d.message||'Subscribed!';document.getElementById('leadEmail').value='';}

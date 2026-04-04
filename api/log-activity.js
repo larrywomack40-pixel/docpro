@@ -81,7 +81,21 @@ return res.status(200).json({ ok: true });
                                                                                                                                                                                                                                                                                                                                                                                                     } catch(e) { return res.status(200).json({ ok: false, error: e.message }); }
                                                                                                                                                                                                                                                                                                                                                                                                       }
 
-                                                                                                                                                                                                                                                                                                                                                                                                        // Original log-activity (userId-based activity logging)
+                                                                                                                                                                                                                                                                                                                                                                                                        // ---- EMAIL LEAD CAPTURE (type=email-lead) ----
+  if (body.type === 'email-lead') {
+    try {
+      var le = (body.email || '').toLowerCase().trim();
+      if (!le || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(le)) return res.status(400).json({error:'Valid email required'});
+      var lc = createClient(SB_URL, ANON_KEY);
+      var dup = await lc.from('email_leads').select('id').eq('email',le).limit(1);
+      if (dup.data && dup.data.length > 0) return res.status(200).json({success:true,message:'Already subscribed'});
+      var ins = await lc.from('email_leads').insert({email:le,source:body.source||'homepage',created_at:new Date().toISOString()});
+      if (ins.error) return res.status(500).json({success:false,error:ins.error.message});
+      return res.status(200).json({success:true,message:'Subscribed successfully'});
+    } catch(ex) { return res.status(500).json({success:false,error:ex.message}); }
+  }
+
+  // Original log-activity (userId-based activity logging)
                                                                                                                                                                                                                                                                                                                                                                                                           try {
                                                                                                                                                                                                                                                                                                                                                                                                               const { userId, action, metadata } = req.body;
                                                                                                                                                                                                                                                                                                                                                                                                                   if (!userId) return res.status(400).json({ error: 'userId required' });
