@@ -1099,5 +1099,22 @@ setTimeout(function(){
   };
 </script>
 
+
+<!-- Document Engine Widget -->
+<script src="/public/doc-engine-widget.js"></script>
+<script>
+  window.__dmfEngineInit = async function(supabaseClient, userPlan) {
+    window.__dmf_user_plan = userPlan || 'free';
+    var badge = document.getElementById('dmf-plan-badge');
+    if (badge) badge.textContent = (userPlan || 'free').toUpperCase();
+    if (typeof initDocEngine === 'function') {
+      await initDocEngine('dmf-engine-container', supabaseClient);
+    } else {
+      document.getElementById('dmf-engine-container').innerHTML =
+        '<div style="color:#f44;font-size:12px">Engine script failed to load. Check network.</div>';
+    }
+  };
+</script>
+
 </body>
 </html>
