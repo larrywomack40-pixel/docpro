@@ -7,9 +7,10 @@
 <title>Dashboard | DraftMyForms</title>
 <meta name="description" content="Your DraftMyForms dashboard - manage documents, create new ones, and access your account.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23c99532'/%3E%3Cstop offset='100%25' stop-color='%23e8b94a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='24' fill='url(%23g)'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@40h0;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gold:#c99532;--gold-light:#e8b94a;--gold-dark:#a67a28;--gold-bg:#fef8ee;--paper:#faf7f5;--white:#ffffff;--text:#1a1a1a;--text-secondary:#555;--text-muted:#888;--border:#e5e0db;--border-light:#f0ebe6;--success:#3a6633;--danger:#c24b3b;--font-heading:'Playfair Display',Georgia,serif;--font-body:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;--max-w:1200px}
@@ -352,6 +353,24 @@ a{text-decoration:none;color:inherit}
 <div class="upgrade-footer">Secure payment via Stripe. Cancel your subscription anytime from your account settings.</div>
 </div>
 </div>
+
+<div class="upgrade-overlay" id="paymentOverlay" onclick="if(event.target===this)closePaymentModal()">
+<div class="upgrade-modal" style="max-width:480px">
+<button class="upgrade-modal-close" onclick="closePaymentModal()">&times;</button>
+<div class="upgrade-modal-header">
+<h2 id="paymentTitle">Complete Your Subscription</h2>
+<p id="paymentSubtitle">Enter your payment details below.</p>
+</div>
+<div style="padding:24px 28px">
+<div id="stripe-payment-element" style="min-height:100px"></div>
+<div id="payment-message" style="color:var(--danger);font-size:13px;margin-top:12px;display:none"></div>
+<button id="btnConfirmPayment" onclick="confirmPayment()" class="btn-checkout primary" style="width:100%;margin-top:20px;padding:14px;font-size:15px">
+<i class="fas fa-lock"></i> Subscribe Now
+</button>
+</div>
+<div class="upgrade-footer">Secured by Stripe. Your card details never touch our servers.</div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
@@ -514,18 +533,37 @@ function closeUpgradeModal() {
   document.body.style.overflow = '';
 }
 
+var stripeInstance = null;
+var stripeElements = null;
+var currentSubscriptionId = null;
+
+async function initStripe() {
+  if (stripeInstance) return stripeInstance;
+  try {
+    var resp = await fetch('/api/get-stripe-config');
+    var data = await resp.json();
+    stripeInstance = Stripe(data.publishableKey);
+    return stripeInstance;
+  } catch(e) {
+    console.error('Stripe init error:', e);
+    return null;
+  }
+}
+
 async function startCheckout(plan) {
   var btn = document.getElementById(plan === 'pro' ? 'btnCheckoutPro' : 'btnCheckoutBiz');
   var origHTML = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Redirecting...';
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
+
   try {
-    var resp = await fetch('/api/create-checkout-session', {
+    var resp = await fetch('/api/create-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan, userId: currentUser.id, userEmail: currentUser.email })
+      body: JSON.stringify({ plan: plan, userId: currentUser.id, email: currentUser.email })
     });
     var data = await resp.json();
+
     if (resp.status === 409) {
       showToast(data.message || 'You already have an active subscription.');
       closeUpgradeModal();
@@ -539,17 +577,85 @@ async function startCheckout(plan) {
       btn.innerHTML = origHTML;
       return;
     }
-    if (data.url) {
-      window.location.href = data.url;
+
+    currentSubscriptionId = data.subscriptionId;
+    var stripe = await initStripe();
+    if (!stripe) { showToast('Payment system unavailable.'); btn.disabled = false; btn.innerHTML = origHTML; return; }
+
+    var appearance = { theme: 'stripe', variables: { colorPrimary: '#c99532', borderRadius: '8px' } };
+    stripeElements = stripe.elements({ clientSecret: data.clientSecret, appearance: appearance });
+    var paymentEl = stripeElements.create(data.intentType === 'setup' ? 'payment' : 'payment');
+    document.getElementById('stripe-payment-element').innerHTML = '';
+    paymentEl.mount('#stripe-payment-element');
+
+    var title = document.getElementById('paymentTitle');
+    var subtitle = document.getElementById('paymentSubtitle');
+    if (data.trialDays > 0) {
+      title.textContent = 'Start Your ' + data.trialDays + '-Day Free Trial';
+      subtitle.textContent = 'Enter your card to start the trial. You will not be charged until the trial ends.';
+      document.getElementById('btnConfirmPayment').innerHTML = '<i class="fas fa-lock"></i> Start Free Trial';
     } else {
-      showToast('Error: ' + (data.error || 'Could not start checkout'));
-      btn.disabled = false;
-      btn.innerHTML = origHTML;
+      title.textContent = 'Subscribe to ' + plan.charAt(0).toUpperCase() + plan.slice(1);
+      subtitle.textContent = plan === 'pro' ? 'You will be charged $9.99/month.' : 'You will be charged $24.99/month.';
+      document.getElementById('btnConfirmPayment').innerHTML = '<i class="fas fa-lock"></i> Subscribe Now';
     }
+
+    window.__stripeIntentType = data.intentType;
+    window.__stripePlan = data.plan;
+    closeUpgradeModal();
+    openPaymentModal();
+    btn.disabled = false;
+    btn.innerHTML = origHTML;
   } catch (e) {
     showToast('Connection error. Please try again.');
     btn.disabled = false;
     btn.innerHTML = origHTML;
+  }
+}
+
+function openPaymentModal() {
+  document.getElementById('paymentOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+async function confirmPayment() {
+  var btn = document.getElementById('btnConfirmPayment');
+  var msgEl = document.getElementById('payment-message');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
+  msgEl.style.display = 'none';
+
+  try {
+    var stripe = await initStripe();
+    var result;
+    if (window.__stripeIntentType === 'setup') {
+      result = await stripe.confirmSetup({ elements: stripeElements, confirmParams: { return_url: window.location.origin + '/dashboard.html?payment=success' }, redirect: 'if_required' });
+    } else {
+      result = await stripe.confirmPayment({ elements: stripeElements, confirmParams: { return_url: window.location.origin + '/dashboard.html?payment=success' }, redirect: 'if_required' });
+    }
+
+    if (result.error) {
+      msgEl.textContent = result.error.message;
+      msgEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Try Again';
+    } else {
+      closePaymentModal();
+      showToast('Payment successful! Activating your plan...');
+      var plan = window.__stripePlan || 'pro';
+      await sb.from('profiles').update({ plan: plan }).eq('id', currentUser.id);
+      setTimeout(function() { location.reload(); }, 2000);
+    }
+  } catch(e) {
+    msgEl.textContent = 'An unexpected error occurred. Please try again.';
+    msgEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Try Again';
   }
 }
 
@@ -982,7 +1088,7 @@ setTimeout(function(){
 <div style="text-align:center;padding:10px 20px;font-size:11px;color:#999;font-family:var(--font-body)">Templates are for informational purposes only and do not constitute legal advice. Consult a licensed attorney for legal matters.</div>
 
 <!-- Document Engine Widget -->
-<script src="/public/doc-engine-widget.js"></script>
+<!-- doc-engine-widget removed -->
 <script>
   // Initialize engine when dashboard loads
   window.__dmfEngineInit = async function(supabaseClient, userPlan) {
