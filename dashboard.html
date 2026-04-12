@@ -540,7 +540,7 @@ var currentSubscriptionId = null;
 async function initStripe() {
   if (stripeInstance) return stripeInstance;
   try {
-    var resp = await fetch('/api/get-stripe-config');
+    var resp = await fetch('/api/create-subscription');
     var data = await resp.json();
     stripeInstance = Stripe(data.publishableKey);
     return stripeInstance;
