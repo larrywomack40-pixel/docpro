@@ -8,9 +8,15 @@ const supabase = createClient(
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  // GET: Return Stripe publishable key for frontend
+  if (req.method === 'GET') {
+    const pk = process.env.STRIPE_PUBLISHABLE_KEY;
+    if (!pk) return res.status(500).json({ error: 'Stripe publishable key not configured' });
+    return res.status(200).json({ publishableKey: pk });
+  }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
