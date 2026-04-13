@@ -1101,16 +1101,14 @@ setTimeout(function(){
 const MAXKS_ENGINE = 'https://api.maxks.site';
 
 // ─── PLAN ACCESS MAP ───────────────────────────────────────────────────────────
-const PLAN_DOCS = {
-  free:     ['pay-stub', 'invoice', 'quote', 'ramp-quote'],
-  pro:      ['pay-stub', 'invoice', 'quote', 'ramp-quote',
-             'nda', 'contractor-agreement', 'bill-of-sale',
-             'eviction-notice', 'home-mod-assessment'],
-  business: ['pay-stub', 'invoice', 'quote', 'ramp-quote',
-             'nda', 'contractor-agreement', 'bill-of-sale',
-             'eviction-notice', 'home-mod-assessment',
-             'advance-directive', 'power-of-attorney'],
-};
+const // Plan tier access — each doc in catalog has a .plan field (free/pro/business)
+// User can access any doc at their tier or below
+const PLAN_TIER = { free: 0, pro: 1, business: 2 };
+function canAccessDoc(docPlan, userPlan) {
+  const docTier  = PLAN_TIER[docPlan]  ?? 0;
+  const userTier = PLAN_TIER[userPlan] ?? 0;
+  return userTier >= docTier;
+}
 
 // ─── MAIN ENGINE UI ────────────────────────────────────────────────────────────
 async function initDocEngine(containerId, supabaseClient) {
@@ -1139,9 +1137,9 @@ async function initDocEngine(containerId, supabaseClient) {
   }
 
   // Filter by plan
-  const allowed = PLAN_DOCS[userPlan] || PLAN_DOCS.free;
-  const available = catalog.filter(doc => allowed.includes(doc.id));
-  const locked    = catalog.filter(doc => !allowed.includes(doc.id));
+  // plan access handled by canAccessDoc()
+  const available = catalog.filter(doc => canAccessDoc(doc.plan, userPlan));
+  const locked    = catalog.filter(doc => !canAccessDoc(doc.plan, userPlan));
 
   // Render UI
   container.innerHTML = `
