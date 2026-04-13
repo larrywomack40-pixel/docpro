@@ -1268,6 +1268,64 @@ function dmfSelectDoc(docId, el) {
   }).join('');
 }
 
+
+function dmfShowPreview(downloadUrl, docLabel, jwt) {
+  // Create fullscreen overlay with PDF preview
+  const overlay = document.createElement('div');
+  overlay.id = 'dmf-preview-overlay';
+  overlay.style.cssText = `
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.85);z-index:99999;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding:20px;box-sizing:border-box;
+  `;
+
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:860px;background:#fff;border-radius:12px;
+                overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  padding:14px 20px;background:#1e3a5f;color:#fff;">
+        <span style="font-weight:700;font-size:15px">📄 ${docLabel}</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a href="${downloadUrl}" download
+             style="background:#f59e0b;color:#fff;border:none;padding:8px 18px;
+                    border-radius:6px;font-weight:600;font-size:13px;cursor:pointer;
+                    text-decoration:none;">
+            ⬇ Download PDF
+          </a>
+          <button onclick="document.getElementById('dmf-preview-overlay').remove()"
+                  style="background:#ef4444;color:#fff;border:none;padding:8px 14px;
+                         border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;">
+            ✕ Close
+          </button>
+        </div>
+      </div>
+      <iframe src="${downloadUrl}#toolbar=0"
+              style="width:100%;height:75vh;border:none;"
+              title="Document Preview">
+      </iframe>
+      <div style="padding:12px 20px;background:#f8f9fa;display:flex;gap:10px;justify-content:flex-end;">
+        <a href="${downloadUrl}" download
+           style="background:#1e3a5f;color:#fff;border:none;padding:10px 24px;
+                  border-radius:6px;font-weight:600;font-size:14px;cursor:pointer;
+                  text-decoration:none;">
+          ⬇ Download PDF
+        </a>
+        <button onclick="document.getElementById('dmf-preview-overlay').remove()"
+                style="background:#6b7280;color:#fff;border:none;padding:10px 20px;
+                       border-radius:6px;font-weight:600;cursor:pointer;font-size:14px;">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  // Close on overlay click outside panel
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
 async function dmfGenerate(jwt) {
   if (!_dmfSelectedDoc) return;
   const status = document.getElementById('dmf-gen-status');
@@ -1289,15 +1347,8 @@ async function dmfGenerate(jwt) {
 
     if (d.status === 'ok') {
       if (status) { status.textContent = '✓ Ready!'; status.style.color = '#16a34a'; }
-      // Auto-download
-      const a = document.createElement('a');
-      a.href = d.download_url;
-      a.download = `${_dmfSelectedDoc.id}-${Date.now()}.pdf`;
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      // Refresh history
+      // Show inline preview instead of auto-downloading
+      dmfShowPreview(d.download_url, _dmfSelectedDoc.label, jwt);
       setTimeout(() => dmfLoadHistory(jwt), 1000);
     } else if (d.code === 'PLAN_REQUIRED') {
       if (status) {
