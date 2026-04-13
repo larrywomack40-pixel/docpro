@@ -1087,17 +1087,7 @@ setTimeout(function(){
 
 <div style="text-align:center;padding:10px 20px;font-size:11px;color:#999;font-family:var(--font-body)">Templates are for informational purposes only and do not constitute legal advice. Consult a licensed attorney for legal matters.</div>
 
-<!-- Document Engine Widget -->
-<!-- doc-engine-widget removed -->
-<script>
-  // Initialize engine when dashboard loads
-  window.__dmfEngineInit = async function(supabaseClient, userPlan) {
-    window.__dmf_user_plan = userPlan || 'free';
-    const badge = document.getElementById('dmf-plan-badge');
-    if (badge) badge.textContent = (userPlan || 'free').toUpperCase();
-    await initDocEngine('dmf-engine-container', supabaseClient);
-  };
-</script>
+
 
 
 <!-- Document Engine Widget -->
