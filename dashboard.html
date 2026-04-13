@@ -440,7 +440,7 @@ document.getElementById('menuEmail').textContent=currentUser.email;
 document.getElementById('acctEmail').textContent=currentUser.email;
 document.getElementById('acctName').textContent=name;
 var plan=(currentProfile&&currentProfile.plan)||'free';
-if(window.__dmfEngineInit&&typeof supabase!=='undefined'){window.__dmfEngineInit(supabase,plan).catch(function(e){console.log('Doc engine:',e);});}else if(window.__dmfEngineInit){setTimeout(function(){if(typeof supabase!=='undefined')window.__dmfEngineInit(supabase,plan).catch(function(){});},1000);}
+if(window.__dmfEngineInit&&typeof sb!=='undefined'){window.__dmfEngineInit(sb,plan).catch(function(e){console.log('Doc engine:',e);});}else if(window.__dmfEngineInit){setTimeout(function(){if(typeof sb!=='undefined')window.__dmfEngineInit(sb,plan).catch(function(){});},1000);}
 var planLabel=plan.charAt(0).toUpperCase()+plan.slice(1);
 document.getElementById('statPlan').textContent=planLabel;
 document.getElementById('menuPlan').textContent=planLabel;
