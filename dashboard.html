@@ -1153,24 +1153,61 @@ async function initDocEngine(containerId, supabaseClient) {
                      font-weight:500">${userPlan.toUpperCase()}</span>
       </h3>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <!-- Search + Filter Bar -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <input id="dmf-search" type="text" placeholder="🔍 Search documents..."
+               oninput="dmfFilterDocs()"
+               style="flex:1;min-width:160px;padding:7px 10px;border:1px solid #ddd;
+                      border-radius:6px;font-size:12px;outline:none"/>
+        <select id="dmf-cat-filter" onchange="dmfFilterDocs()"
+                style="padding:7px 10px;border:1px solid #ddd;border-radius:6px;
+                       font-size:12px;background:#fff;cursor:pointer">
+          <option value="">All Categories</option>
+          <option value="financial">💰 Financial</option>
+          <option value="legal">⚖️ Legal</option>
+          <option value="business">📋 Business</option>
+          <option value="estate">🏛️ Estate</option>
+          <option value="accessibility">♿ Accessibility</option>
+        </select>
+        <select id="dmf-plan-filter" onchange="dmfFilterDocs()"
+                style="padding:7px 10px;border:1px solid #ddd;border-radius:6px;
+                       font-size:12px;background:#fff;cursor:pointer">
+          <option value="">All Plans</option>
+          <option value="free">Free</option>
+          <option value="pro">Pro</option>
+          <option value="business">Business</option>
+        </select>
+      </div>
+
+      <!-- Scrollable Doc List -->
+      <div id="dmf-doc-list"
+           style="height:260px;overflow-y:auto;display:grid;
+                  grid-template-columns:1fr 1fr;gap:6px;
+                  padding-right:4px;margin-bottom:12px;
+                  scrollbar-width:thin;scrollbar-color:#cbd5e1 #f1f5f9">
         ${available.map(doc => `
           <div onclick="dmfSelectDoc('${doc.id}', this)"
                data-doc-id="${doc.id}"
-               style="border:1px solid #e0e0e0;border-radius:6px;padding:10px;
-                      cursor:pointer;transition:all 0.15s;background:#fff"
+               data-category="${doc.category}"
+               data-plan="${doc.plan}"
+               data-label="${doc.label.toLowerCase()}"
+               style="border:1px solid #e0e0e0;border-radius:6px;padding:8px 10px;
+                      cursor:pointer;transition:all 0.15s;background:#fff;height:fit-content"
                onmouseover="this.style.borderColor='#2563eb';this.style.background='#f0f5ff'"
                onmouseout="if(!this.classList.contains('selected')){this.style.borderColor='#e0e0e0';this.style.background='#fff'}">
-            <div style="font-size:12px;font-weight:600;color:#1a1a1a">${doc.icon} ${doc.label}</div>
-            <div style="font-size:10px;color:#888;margin-top:2px">${doc.description.slice(0,50)}...</div>
+            <div style="font-size:11px;font-weight:600;color:#1a1a1a">${doc.icon} ${doc.label}</div>
+            <div style="font-size:10px;color:#888;margin-top:1px">${doc.category_label}</div>
           </div>
         `).join('')}
         ${locked.map(doc => `
-          <div style="border:1px solid #e0e0e0;border-radius:6px;padding:10px;
-                      opacity:0.5;background:#fafafa;cursor:not-allowed"
-               title="Requires ${doc.id in ['advance-directive','power-of-attorney'] ? 'Business' : 'Pro'} plan">
-            <div style="font-size:12px;font-weight:600;color:#888">${doc.icon} ${doc.label} 🔒</div>
-            <div style="font-size:10px;color:#aaa;margin-top:2px">Upgrade to unlock</div>
+          <div data-doc-id="${doc.id}"
+               data-category="${doc.category}"
+               data-plan="${doc.plan}"
+               data-label="${doc.label.toLowerCase()}"
+               style="border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;
+                      opacity:0.45;background:#fafafa;cursor:not-allowed;height:fit-content">
+            <div style="font-size:11px;font-weight:600;color:#888">${doc.icon} ${doc.label} 🔒</div>
+            <div style="font-size:10px;color:#bbb;margin-top:1px">Upgrade to unlock</div>
           </div>
         `).join('')}
       </div>
@@ -1213,6 +1250,26 @@ async function initDocEngine(containerId, supabaseClient) {
 }
 
 let _dmfSelectedDoc = null;
+
+
+function dmfFilterDocs() {
+  const search = (document.getElementById('dmf-search')?.value || '').toLowerCase();
+  const cat = document.getElementById('dmf-cat-filter')?.value || '';
+  const plan = document.getElementById('dmf-plan-filter')?.value || '';
+  const cards = document.querySelectorAll('#dmf-doc-list [data-doc-id]');
+  let visible = 0;
+  cards.forEach(card => {
+    const label = card.dataset.label || '';
+    const category = card.dataset.category || '';
+    const cardPlan = card.dataset.plan || '';
+    const matchSearch = !search || label.includes(search);
+    const matchCat = !cat || category === cat;
+    const matchPlan = !plan || cardPlan === plan;
+    const show = matchSearch && matchCat && matchPlan;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+}
 
 function dmfSelectDoc(docId, el) {
   document.querySelectorAll('[data-doc-id]').forEach(e => {
