@@ -780,7 +780,7 @@ async function startStripeCheckout() {
   var btn = document.getElementById('upgradeCheckoutBtn');
   btn.disabled = true; btn.textContent = 'Redirecting to checkout...';
   try {
-    var resp = await fetch('/api/create-checkout-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: selectedPlan, userId: currentUser.id, userEmail: currentUser.email }) });
+    var resp = await fetch('/api/create-subscription', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: selectedPlan, userId: currentUser.id, userEmail: currentUser.email }) });
     var data = await resp.json();
     if (data.url) { window.location.href = data.url; }
     else { throw new Error(data.error || 'Failed to create checkout session'); }
