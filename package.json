@@ -1,11 +1,12 @@
 {
-  "name": "draftmyforms",
-  "version": "1.0.0",
-  "description": "DraftMyForms - AI Documents & Resumes",
-  "dependencies": {
-    "stripe": "^14.0.0",
-    "@supabase/supabase-js": "^2.39.0",
-    "@anthropic-ai/sdk": "^0.39.0",
-    "resend": "^4.0.0"
-  }
+    "name": "draftmyforms",
+    "version": "1.1.0",
+    "description": "DraftMyForms - Document generation platform by WMK Speciality Services LLC",
+    "dependencies": {
+          "stripe": "^14.0.0",
+          "@supabase/supabase-js": "^2.39.0",
+          "@anthropic-ai/sdk": "^0.39.0",
+          "resend": "^4.0.0",
+          "pdfkit": "^0.15.0"
+    }
 }
