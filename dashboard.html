@@ -167,7 +167,930 @@ a{text-decoration:none;color:inherit}
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <style id="auth-guard-style">body{visibility:hidden!important;pointer-events:none!important;}</style>
-  <!-- DMF DOC ENGINE START -->
+  <script>
+    window.addEventListener('pageshow',function(e){if(e.persisted){window['location']['replace']('index.html');}});
+  </script>
+  </head>
+<body>
+<div id="siteBanner"></div>
+<nav class="navbar">
+<a href="/dashboard.html" class="nav-brand"><span class="star">✦</span> DraftMyForms</a>
+<div class="theme-toggle-dash" id="themeToggle">
+<button onclick="setTheme('light')" title="Light">&#9728;</button>
+<button onclick="setTheme('dark')" title="Dark">&#9790;</button>
+<button onclick="setTheme('system')" title="System">&#128187;</button>
+</div>
+<div class="nav-actions">
+<button class="nav-upgrade" id="navUpgradeBtn" style="display:none" onclick="openUpgradeModal()"><i class="fas fa-crown"></i> Upgrade</button>
+<a href="/editor.html" class="btn btn-gold btn-sm"><i class="fas fa-plus"></i> <span class="btn-text-long">New Document</span></a>
+<div class="user-avatar" id="userAvatar" onclick="toggleMenu()"></div>
+<div id="userDropdown" style="display:none;position:absolute;top:56px;right:32px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:1001">
+<div style="padding:10px 14px;border-bottom:1px solid var(--border-light);margin-bottom:4px">
+<div style="font-weight:600;font-size:14px" id="menuName">User</div>
+<div style="font-size:12px;color:var(--text-muted)" id="menuEmail">email</div>
+<div class="plan-badge plan-free" style="margin-top:4px" id="menuPlan">Free</div>
+</div>
+<a href="#" id="menuUpgradeLink" style="display:none;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s;color:var(--gold);font-weight:600" onclick="event.preventDefault();openUpgradeModal()" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-crown" style="width:20px"></i> Upgrade Plan</a>
+<a href="/dashboard.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-home" style="width:20px"></i> Dashboard</a>
+<a href="/editor.html" style="display:block;padding:10px 14px;font-size:14px;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-edit" style="width:20px"></i> Open Editor</a>
+<a href="/inbox.html" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'" style="display:block;padding:10px 16px;text-decoration:none;color:var(--text);font-size:14px;transition:background .2s"><i class="fas fa-inbox" style="margin-right:8px;color:var(--gold)"></i>Inbox <span id="inboxBadge" style="background:var(--gold);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px;display:none"></span></a>
+<a href="/settings.html" onmouseover="this.style.background='var(--gold-bg)'" onmouseout="this.style.background='transparent'"><i class="fas fa-cog" style="width:20px"></i> Settings</a>
+<a href="/admin.html" id="menuAdminLink" style="display:none"><i class="fas fa-shield-alt"></i> Admin Dashboard</a>
+<button onclick="handleLogout()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:14px;border:none;background:none;cursor:pointer;border-radius:6px;color:var(--danger);font-family:var(--font-body);transition:background .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'"><i class="fas fa-sign-out-alt" style="width:20px"></i> Sign Out</button>
+</div>
+</div>
+
+        <a href="/templates.html" style="color:rgba(255,255,255,0.85);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='none'">📄 Templates</a>
+      </nav>
+<div class="dashboard" id="dashboard">
+<div class="loading-spinner" id="loadingState"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Loading your dashboard...</div>
+<div id="dashContent" style="display:none">
+<div class="dash-header">
+<h1><span class="wave">👋</span> Welcome back, <span id="userName">User</span></h1>
+<a href="/editor.html" class="btn btn-gold"><i class="fas fa-plus"></i> Create New Document</a>
+</div>
+<div class="stats-row">
+<div class="stat-card"><div class="stat-number" id="statDocs">0</div><div class="stat-label">Documents</div></div>
+<div class="stat-card"><div class="stat-number" id="statPlan">Free</div><div class="stat-label">Current Plan</div></div>
+<div class="stat-card"><div class="stat-number" id="statExports">∞</div><div class="stat-label">Exports Left</div></div>
+</div>
+
+<!-- ═══ DOCUMENT ENGINE (powered by MAXKS) ═══ -->
+<div style="margin:24px 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <h2 style="font-size:18px;font-weight:700;margin:0;font-family:var(--font-heading)">
+      📄 Document Engine
+    </h2>
+    <span id="dmf-plan-badge" style="font-size:11px;background:#fff8e1;color:#c8922a;
+          border:1px solid #e8d5a3;padding:3px 10px;border-radius:10px;font-weight:600">
+      FREE
+    </span>
+  </div>
+  <div id="dmf-engine-container">
+    <div style="color:var(--text-muted);font-size:13px">Loading document engine...</div>
+  </div>
+</div>
+<!-- ═══ END DOCUMENT ENGINE ═══ -->
+<!-- Referral Section -->
+<div class="referral-card" id="referralCard" style="background:linear-gradient(135deg,#fffdf5,#fff8e1);border:1px solid #e8d5a3;border-radius:12px;padding:20px 25px;margin:20px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+  <div style="flex:1;min-width:200px;">
+    <h3 style="margin:0 0 5px;font-size:1.1em;color:#333;"><span style="margin-right:6px;">🎁</span> Refer a Friend</h3>
+    <p style="margin:0;color:#666;font-size:0.9em;">Share your referral link and earn rewards when friends sign up!</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <input type="text" id="referralLink" readonly style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.85em;width:280px;background:#fff;" value="Loading...">
+    <button onclick="copyReferralLink()" style="padding:8px 16px;background:#C8922A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;">Copy Link</button>
+  </div>
+  <div id="referralStats" style="display:flex;gap:15px;font-size:0.85em;color:#666;">
+    <span><strong id="refCount">0</strong> referrals</span>
+    <span><strong id="refRewards">0</strong> rewards</span>
+  </div>
+</div>
+
+
+<!-- Referral Reward Notification Banner -->
+<div id="referralRewardBanner" style="display:none;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:1px solid #a5d6a7;border-radius:10px;padding:14px 20px;margin:0 0 16px;align-items:center;gap:12px;">
+  <span style="font-size:1.5em;">&#127881;</span>
+  <div style="flex:1;">
+    <strong style="color:#2e7d32;">New Referral Reward Credited!</strong>
+    <p style="margin:2px 0 0;color:#388e3c;font-size:0.875em;">One free month has been applied to your subscription. Thanks for spreading the word!</p>
+  </div>
+  <button onclick="document.getElementById('referralRewardBanner').style.display='none'" style="background:none;border:none;font-size:1.2em;cursor:pointer;color:#388e3c;">&#x2715;</button>
+</div>
+
+<!-- Referral List Card -->
+<div id="referralListCard" style="background:#fff;border:1px solid #e8d5a3;border-radius:12px;padding:20px 25px;margin:0 0 20px;display:none;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <h3 style="margin:0;font-size:1em;color:#333;">&#128203; Your Referrals</h3>
+    <span style="font-size:0.85em;color:#666;">Free months earned: <strong id="referralMonthsEarned">0</strong></span>
+  </div>
+  <div id="referralListBody" style="font-size:0.875em;color:#555;">
+    <p style="color:#aaa;text-align:center;margin:10px 0;">Loading referrals...</p>
+  </div>
+</div>
+
+<div class="upgrade-banner" id="upgradeBanner" style="display:none">
+<div>
+<h3><i class="fas fa-rocket"></i> Unlock the Full Power of DraftMyForms</h3>
+<p>Upgrade to Pro or Business for unlimited AI credits, premium templates, PDF/Word export, and more.</p>
+</div>
+<button class="btn-upgrade" onclick="openUpgradeModal()"><i class="fas fa-crown"></i> Upgrade Now</button>
+</div>
+
+<div class="referral-card" id="aiCreditsCard" style="margin-top:24px;">
+<h3 style="margin:0 0 8px;font-family:var(--font-heading);color:var(--gold);">
+<i class="fas fa-bolt"></i> AI Credits</h3>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+<div style="flex:1;background:var(--card-border);border-radius:8px;height:12px;overflow:hidden;">
+<div id="creditBar" style="height:100%;background:var(--gold);border-radius:8px;width:0%;transition:width 0.5s;"></div>
+</div>
+<span id="creditCount" style="font-weight:600;color:var(--text);font-size:14px;">--</span>
+</div>
+<p id="creditPlan" style="margin:0;font-size:13px;color:var(--text-muted);">Loading plan info...</p>
+<p id="creditReset" style="margin:4px 0 0;font-size:12px;color:var(--text-muted);"></p>
+</div>
+<div class="section-header">
+<h2>Your Documents</h2>
+</div>
+<div class="docs-grid" id="docsGrid">
+<div class="new-doc-card" onclick="window.location.href='/editor.html'">
+<i class="fas fa-plus-circle"></i>
+<span>Create New Document</span>
+</div>
+</div>
+<div class="section-header"><h2>Account</h2></div>
+<div class="account-section">
+<div class="account-row"><span class="label">Email</span><span class="value" id="acctEmail">-</span></div>
+<div class="account-row"><span class="label">Name</span><span class="value" id="acctName">-</span></div>
+<div class="account-row"><span class="label">Plan</span><span class="value"><span class="plan-badge plan-free" id="acctPlan">Free</span></span></div>
+<div class="account-row"><span class="label">Member Since</span><span class="value" id="acctSince">-</span></div>
+<div class="account-row"><span class="label">Actions</span><span class="value"><button class="btn btn-danger btn-sm" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button></span></div>
+<div class="account-row" id="subscriptionRow" style="display:none"><span class="label">Subscription</span><span class="value"><button class="btn btn-outline btn-sm" onclick="manageSubscription()"><i class="fas fa-credit-card"></i> Manage Subscription</button></span></div>
+</div>
+</div>
+</div>
+
+<div class="upgrade-overlay" id="upgradeOverlay" onclick="if(event.target===this)closeUpgradeModal()">
+<div class="upgrade-modal">
+<button class="upgrade-modal-close" onclick="closeUpgradeModal()">&times;</button>
+<div class="upgrade-modal-header">
+<h2>Choose Your Plan</h2>
+<p>Upgrade to unlock premium features. Cancel anytime.</p>
+</div>
+<div class="upgrade-plans">
+<div class="plan-card popular">
+<div class="popular-tag">Most Popular</div>
+<div class="plan-name">Pro</div>
+<div class="plan-price">$9.99<span>/month</span></div>
+<div class="plan-trial">3-day free trial included</div>
+<div class="plan-desc">For freelancers and professionals.</div>
+<ul>
+<li>50 AI credits per month</li>
+<li>Unlimited document types</li>
+<li>Contracts, NDAs, proposals</li>
+<li>PDF, Word &amp; HTML export</li>
+<li>Custom logo &amp; branding</li>
+<li>Priority support</li>
+</ul>
+<button class="btn-checkout primary" id="btnCheckoutPro" onclick="startCheckout('pro')"><i class="fas fa-bolt"></i> Start Free Trial</button>
+</div>
+<div class="plan-card">
+<div class="plan-name">Business</div>
+<div class="plan-price">$24.99<span>/month</span></div>
+<div class="plan-trial">No trial — instant access</div>
+<div class="plan-desc">For teams and growing businesses.</div>
+<ul>
+<li>Unlimited AI credits</li>
+<li>Everything in Pro</li>
+<li>Team collaboration (Coming Soon)</li>
+<li>CRM &amp; Sheets auto-fill (Coming Soon)</li>
+<li>API access (Coming Soon)</li>
+<li>Dedicated account manager</li>
+</ul>
+<button class="btn-checkout outline" id="btnCheckoutBiz" onclick="startCheckout('business')"><i class="fas fa-building"></i> Get Started</button>
+</div>
+</div>
+<div class="upgrade-footer">Secure payment via Stripe. Cancel your subscription anytime from your account settings.</div>
+</div>
+</div>
+
+<div class="upgrade-overlay" id="paymentOverlay" onclick="if(event.target===this)closePaymentModal()">
+<div class="upgrade-modal" style="max-width:480px">
+<button class="upgrade-modal-close" onclick="closePaymentModal()">&times;</button>
+<div class="upgrade-modal-header">
+<h2 id="paymentTitle">Complete Your Subscription</h2>
+<p id="paymentSubtitle">Enter your payment details below.</p>
+</div>
+<div style="padding:24px 28px">
+<div id="stripe-payment-element" style="min-height:100px"></div>
+<div id="payment-message" style="color:var(--danger);font-size:13px;margin-top:12px;display:none"></div>
+<button id="btnConfirmPayment" onclick="confirmPayment()" class="btn-checkout primary" style="width:100%;margin-top:20px;padding:14px;font-size:15px">
+<i class="fas fa-lock"></i> Subscribe Now
+</button>
+</div>
+<div class="upgrade-footer">Secured by Stripe. Your card details never touch our servers.</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
+var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+window.__supabase = sb;
+var currentUser=null;
+var currentProfile=null;
+
+// âââ AUTH SECURITY GUARD âââ
+(function() {
+  function showPage() {
+    var s = document.getElementById('auth-guard-style');
+    if (s) s.remove();
+    document.body.style.visibility = '';
+    document.body.style.pointerEvents = '';
+  }
+  function kickOut() {
+    history['replaceState'](null,'','/index.html');
+    window.location['replace']('/index.html');
+  }
+  sb.auth['getSession']().then(function(r) {
+    var s = r && r.data && r.data.session;
+    if (!s) { kickOut(); } else { showPage(); }
+  }).catch(function() { kickOut(); });
+  sb.auth['onAuthStateChange'](function(ev, s) {
+    if (ev === 'SIGNED_OUT') { kickOut(); }
+    else if (ev === 'SIGNED_IN' && s) { showPage(); }
+  });
+})();
+
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},3000)}
+
+function toggleMenu(){var d=document.getElementById('userDropdown');d.style.display=d.style.display==='none'?'block':'none'}
+document.addEventListener('click',function(e){var d=document.getElementById('userDropdown');var a=document.getElementById('userAvatar');if(!d.contains(e.target)&&e.target!==a)d.style.display='none'});
+
+async function init(){
+try{
+var r=await sb.auth.getSession();
+if(!r.data.session||!r.data.session.user){window.location.href='/';return}
+currentUser=r.data.session.user;
+var p=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+if(p.data)currentProfile=p.data;
+renderDashboard();
+loadSavedDocuments();
+// Fire auth-callback for session logging + welcome email
+fetch("/api/auth-callback", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    userId: currentUser.id,
+    email: currentUser.email,
+    name: (currentProfile && currentProfile.display_name) || currentUser.email
+  })
+}).catch(function() {});
+}catch(e){console.error('Init error:',e);window.location.href='/'}
+}
+
+function renderDashboard(){
+document.getElementById('loadingState').style.display='none';
+document.getElementById('dashContent').style.display='block';
+var name=(currentProfile&&currentProfile.display_name)||currentUser.email.split('@')[0];
+document.getElementById('userName').textContent=name;
+document.getElementById('userAvatar').textContent=name.charAt(0).toUpperCase();
+document.getElementById('menuName').textContent=name;
+document.getElementById('menuEmail').textContent=currentUser.email;
+document.getElementById('acctEmail').textContent=currentUser.email;
+document.getElementById('acctName').textContent=name;
+var plan=(currentProfile&&currentProfile.plan)||'free';
+if(window.__dmfEngineInit&&typeof sb!=='undefined'){window.__dmfEngineInit(sb,plan).catch(function(e){console.log('Doc engine:',e);});}else if(window.__dmfEngineInit){setTimeout(function(){if(typeof sb!=='undefined')window.__dmfEngineInit(sb,plan).catch(function(){});},1000);}
+var planLabel=plan.charAt(0).toUpperCase()+plan.slice(1);
+document.getElementById('statPlan').textContent=planLabel;
+document.getElementById('menuPlan').textContent=planLabel;
+document.getElementById('menuPlan').className='plan-badge plan-'+plan;
+document.getElementById('acctPlan').textContent=planLabel;
+document.getElementById('acctPlan').className='plan-badge plan-'+plan;
+if(currentUser.created_at){var d=new Date(currentUser.created_at);document.getElementById('acctSince').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+showUpgradeElements(plan);
+if(currentProfile&&currentProfile.role==='admin'){var al=document.getElementById('menuAdminLink');if(al)al.style.display='block';}
+}
+}
+
+function loadSavedDocuments(){
+  const container=document.getElementById('docsGrid');
+  if(!container)return;
+  // Get current user ID for filtering
+  let currentUserId = null;
+  try {
+    const sessionStr = localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token');
+    if(sessionStr){const sData=JSON.parse(sessionStr);currentUserId=sData?.user?.id||sData?.currentSession?.user?.id||null;}
+  } catch(e){}
+  
+  let docs=[];
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key.startsWith('dmf_doc_')){
+      try{
+        const d=JSON.parse(localStorage.getItem(key));
+        // Migration: if doc has no user_id, tag it with current user
+        if(!d.user_id && currentUserId){
+          d.user_id=currentUserId;
+          localStorage.setItem(key,JSON.stringify(d));
+        }
+        // Only show docs belonging to current user (or untagged if no user)
+        if(currentUserId && d.user_id && d.user_id !== currentUserId) continue;
+        docs.push({key:key,data:d});
+      }catch(e){}
+    }
+  }
+  let html='<div class="doc-card new-doc" onclick="window.location.href=\'/editor.html\'"><div class="doc-preview" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-plus" style="font-size:2em;color:var(--primary);"></i></div><div class="doc-info"><h4>Create New Document</h4></div></div>';
+  document.getElementById('statDocs').textContent=docs.length;
+  docs.sort((a,b)=>(b.data.updated_at||b.data.created_at||0)-(a.data.updated_at||a.data.created_at||0));
+  docs.forEach(({key,data:d})=>{
+    const title=d.title||'Untitled Document';
+    const date=d.updated_at?new Date(d.updated_at).toLocaleDateString():'';
+    const rawHtml = d.html || d.content || '';
+    const previewText = rawHtml.replace(/<[^>]*>/g,'').substring(0,80);
+    html+='<div class="doc-card" onclick="openDoc(\'' + key.replace(/'/g,"\\'") + '\')"><div class="doc-preview"><div class="doc-preview-inner">' + rawHtml + '</div></div><div class="doc-info"><h4>'+title.substring(0,40)+'</h4><p class="doc-date">'+(date||'Draft')+'</p><p class="doc-excerpt">'+previewText+'</p></div></div>';
+  });
+  container.innerHTML=html;
+}
+
+function openDoc(key){
+sessionStorage.setItem('dmf_load_doc',key);
+window.location.href='/editor.html';
+}
+
+function downloadDoc(key){
+try{
+var doc=JSON.parse(localStorage.getItem(key));
+if(doc&&doc.content){
+var canvas=document.createElement('div');
+canvas.innerHTML=doc.content;
+showToast('Opening document for download...');
+sessionStorage.setItem('dmf_load_doc',key);
+window.location.href='/editor.html?action=pdf';
+}
+}catch(e){showToast('Error loading document')}
+}
+
+function deleteDoc(key,event){
+event.stopPropagation();
+showToast('To delete documents, please use the editor. Documents are stored locally for your privacy.');
+}
+
+async function handleLogout(){
+await sb.auth.signOut();
+currentUser=null;currentProfile=null;
+window.location.href='/';
+}
+
+
+function openUpgradeModal() {
+  document.getElementById('upgradeOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+var stripeInstance = null;
+var stripeElements = null;
+var currentSubscriptionId = null;
+
+async function initStripe() {
+  if (stripeInstance) return stripeInstance;
+  try {
+    var resp = await fetch('/api/create-subscription');
+    var data = await resp.json();
+    stripeInstance = Stripe(data.publishableKey);
+    return stripeInstance;
+  } catch(e) {
+    console.error('Stripe init error:', e);
+    return null;
+  }
+}
+
+async function startCheckout(plan) {
+  var btn = document.getElementById(plan === 'pro' ? 'btnCheckoutPro' : 'btnCheckoutBiz');
+  var origHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
+
+  try {
+    var resp = await fetch('/api/create-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan, userId: currentUser.id, email: currentUser.email })
+    });
+    var data = await resp.json();
+
+    if (resp.status === 409) {
+      showToast(data.message || 'You already have an active subscription.');
+      closeUpgradeModal();
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+      return;
+    }
+    if (!resp.ok) {
+      showToast('Error: ' + (data.error || 'Could not start checkout'));
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+      return;
+    }
+
+    currentSubscriptionId = data.subscriptionId;
+    var stripe = await initStripe();
+    if (!stripe) { showToast('Payment system unavailable.'); btn.disabled = false; btn.innerHTML = origHTML; return; }
+
+    var appearance = { theme: 'stripe', variables: { colorPrimary: '#c99532', borderRadius: '8px' } };
+    stripeElements = stripe.elements({ clientSecret: data.clientSecret, appearance: appearance });
+    var paymentEl = stripeElements.create(data.intentType === 'setup' ? 'payment' : 'payment');
+    document.getElementById('stripe-payment-element').innerHTML = '';
+    paymentEl.mount('#stripe-payment-element');
+
+    var title = document.getElementById('paymentTitle');
+    var subtitle = document.getElementById('paymentSubtitle');
+    if (data.trialDays > 0) {
+      title.textContent = 'Start Your ' + data.trialDays + '-Day Free Trial';
+      subtitle.textContent = 'Enter your card to start the trial. You will not be charged until the trial ends.';
+      document.getElementById('btnConfirmPayment').innerHTML = '<i class="fas fa-lock"></i> Start Free Trial';
+    } else {
+      title.textContent = 'Subscribe to ' + plan.charAt(0).toUpperCase() + plan.slice(1);
+      subtitle.textContent = plan === 'pro' ? 'You will be charged $9.99/month.' : 'You will be charged $24.99/month.';
+      document.getElementById('btnConfirmPayment').innerHTML = '<i class="fas fa-lock"></i> Subscribe Now';
+    }
+
+    window.__stripeIntentType = data.intentType;
+    window.__stripePlan = data.plan;
+    closeUpgradeModal();
+    openPaymentModal();
+    btn.disabled = false;
+    btn.innerHTML = origHTML;
+  } catch (e) {
+    showToast('Connection error. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = origHTML;
+  }
+}
+
+function openPaymentModal() {
+  document.getElementById('paymentOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+async function confirmPayment() {
+  var btn = document.getElementById('btnConfirmPayment');
+  var msgEl = document.getElementById('payment-message');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
+  msgEl.style.display = 'none';
+
+  try {
+    var stripe = await initStripe();
+    var result;
+    if (window.__stripeIntentType === 'setup') {
+      result = await stripe.confirmSetup({ elements: stripeElements, confirmParams: { return_url: window.location.origin + '/dashboard.html?payment=success' }, redirect: 'if_required' });
+    } else {
+      result = await stripe.confirmPayment({ elements: stripeElements, confirmParams: { return_url: window.location.origin + '/dashboard.html?payment=success' }, redirect: 'if_required' });
+    }
+
+    if (result.error) {
+      msgEl.textContent = result.error.message;
+      msgEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Try Again';
+    } else {
+      closePaymentModal();
+      showToast('Payment successful! Activating your plan...');
+      var plan = window.__stripePlan || 'pro';
+      await sb.from('profiles').update({ plan: plan }).eq('id', currentUser.id);
+      setTimeout(function() { location.reload(); }, 2000);
+    }
+  } catch(e) {
+    msgEl.textContent = 'An unexpected error occurred. Please try again.';
+    msgEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Try Again';
+  }
+}
+
+function showUpgradeElements(plan) {
+  var isFree = !plan || plan === 'free';
+  var banner = document.getElementById('upgradeBanner');
+  var navBtn = document.getElementById('navUpgradeBtn');
+  var menuLink = document.getElementById('menuUpgradeLink');
+  if (banner) banner.style.display = isFree ? 'flex' : 'none';
+  if (navBtn) navBtn.style.display = isFree ? 'inline-flex' : 'none';
+  if (menuLink) menuLink.style.display = isFree ? 'block' : 'none';
+  var subRow = document.getElementById('subscriptionRow');
+  if (subRow) {
+    var isPaid = (plan === 'pro' || plan === 'business');
+    var hasStripeId = currentProfile && currentProfile.stripe_customer_id;
+    if (isPaid && !hasStripeId) {
+      subRow.style.display = '';
+      subRow.querySelector('.value').innerHTML = '<span style="font-size:13px;color:var(--text-muted)"><i class="fas fa-shield-alt"></i> Plan managed by admin</span>';
+    } else if (isPaid) {
+      subRow.style.display = '';
+    } else {
+      subRow.style.display = 'none';
+    }
+  }
+}
+
+
+// Handle payment success redirect from Stripe
+var urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('payment') === 'success') {
+  var sessionId = urlParams.get('session_id');
+  window.history.replaceState({}, '', '/dashboard.html');
+  if (sessionId) {
+    (async function() {
+      try {
+        var user = (await sb.auth.getUser()).data.user;
+        if (user) {
+          var resp = await fetch('/api/verify-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: sessionId, userId: user.id })
+          });
+          var data = await resp.json();
+          if (data.plan && data.customerId) {
+            await sb.from('profiles').update({
+              plan: data.plan,
+              stripe_customer_id: data.customerId
+            }).eq('id', user.id);
+            showToast('Welcome to ' + data.plan.charAt(0).toUpperCase() + data.plan.slice(1) + '! Your subscription is active.');
+            setTimeout(function() { location.reload(); }, 1500);
+          } else {
+            showToast('Payment successful! Your plan will update shortly.');
+          }
+        }
+      } catch(e) {
+        console.error('Payment verification error:', e);
+        showToast('Payment received! Plan updating...');
+      }
+    })();
+  } else {
+    showToast('Payment successful! Your plan has been upgraded.');
+  }
+}
+if (urlParams.get('payment') === 'cancelled') {
+  window.history.replaceState({}, '', '/dashboard.html');
+  showToast('Checkout was cancelled. No charges were made.');
+}
+
+// Manage subscription via Stripe Customer Portal
+async function manageSubscription() {
+  var user = (await sb.auth.getUser()).data.user;
+  if (!user) return;
+
+  try {
+    var resp = await fetch('/api/create-portal-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id })
+    });
+    var data = await resp.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      showToast(data.error || 'Could not open subscription portal. Please try again.');
+    }
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+}
+init();
+
+
+// Load site banner
+async function loadSiteBanner() {
+  try {
+    const { data } = await sb.from("site_banners").select("*").eq("is_active", true).order("created_at", { ascending: false }).limit(1);
+    if (data && data.length) {
+      const b = data[0];
+      if (b.ends_at && new Date(b.ends_at) < new Date()) return;
+      document.getElementById("siteBanner").innerHTML = '<div style="background:' + (b.bg_color || "#c99532") + ';color:' + (b.text_color || "#fff") + ';padding:10px 20px;text-align:center;font-size:14px;font-weight:500">' + b.message + (b.link_url ? ' <a href="' + b.link_url + '" style="color:inherit;text-decoration:underline">' + (b.link_text || "Learn more") + '</a>' : '') + (b.is_dismissible ? ' <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;margin-left:10px;font-size:18px">&times;</button>' : '') + '</div>';
+    }
+  } catch(e) { console.log("Banner load error:", e); }
+}
+
+// Load unread message count
+async function loadUnreadCount() {
+  try {
+    const user = (await sb.auth.getUser()).data.user;
+    if (!user) return;
+    const { count } = await sb.from("messages").select("*", { count: "exact", head: true }).eq("recipient_id", user.id).eq("is_read", false);
+    const badge = document.getElementById("inboxBadge");
+    if (badge && count > 0) { badge.textContent = count; badge.style.display = "inline"; }
+  } catch(e) {}
+}
+
+loadSiteBanner();
+loadUnreadCount();
+
+// Referral System
+async function loadReferralInfo() {
+  try {
+    const {data:{session}} = await sb.auth.getSession();
+    if (!session) return;
+    const userId = session.user.id;
+
+    // Get or generate referral code
+    const {data: profile} = await sb.from('profiles')
+      .select('referral_code, referral_months_earned, referral_last_reward_at')
+      .eq('id', userId).single();
+    let code = profile?.referral_code;
+    if (!code) {
+      code = 'DMF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      await sb.from('profiles').update({referral_code: code}).eq('id', userId);
+    }
+
+    // Set referral link
+    const link = 'https://www.draftmyforms.com/?ref=' + code;
+    const linkEl = document.getElementById('referralLink');
+    if (linkEl) linkEl.value = link;
+
+    // Show reward notification banner if reward was in last 24h
+    const lastReward = profile?.referral_last_reward_at;
+    if (lastReward && !sessionStorage.getItem('refBannerDismissed')) {
+      const hoursAgo = (Date.now() - new Date(lastReward).getTime()) / 3600000;
+      if (hoursAgo < 24) {
+        const banner = document.getElementById('referralRewardBanner');
+        if (banner) { banner.style.display = 'flex'; }
+      }
+    }
+
+    // Update months earned display
+    const monthsEl = document.getElementById('referralMonthsEarned');
+    if (monthsEl) monthsEl.textContent = profile?.referral_months_earned || 0;
+
+    // Fetch referrals list
+    const {data: referrals} = await sb.from('referrals')
+      .select('id, referee_email, status, created_at, converted_at')
+      .eq('referrer_id', userId)
+      .order('created_at', {ascending: false});
+
+    const total = referrals ? referrals.length : 0;
+    const converted = referrals ? referrals.filter(r => r.status === 'converted').length : 0;
+
+    // Update summary stat badges
+    const countEl = document.getElementById('refCount');
+    const rewardsEl = document.getElementById('refRewards');
+    if (countEl) countEl.textContent = total;
+    if (rewardsEl) rewardsEl.textContent = converted;
+
+    // Show referral list card if there are referrals
+    const listCard = document.getElementById('referralListCard');
+    if (listCard) listCard.style.display = 'block';
+
+    // Render referral rows
+    const listBody = document.getElementById('referralListBody');
+    if (listBody) {
+      if (!referrals || referrals.length === 0) {
+        listBody.innerHTML = '<p style="color:#aaa;text-align:center;margin:10px 0;">No referrals yet. Share your link to get started!</p>';
+      } else {
+        listBody.innerHTML = referrals.map(r => {
+          const email = r.referee_email ? r.referee_email.replace(/(.{2}).+(@.+)/, '$1...$2') : 'Unknown';
+          const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
+          const isConverted = r.status === 'converted';
+          const badge = isConverted
+            ? '<span style="background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;">Converted &#8212; 1 month earned &#127881;</span>'
+            : '<span style="background:#fff8e1;color:#f57f17;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;">Signed up &#8212; awaiting payment</span>';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;flex-wrap:wrap;">' +
+            '<span style="color:#444;">' + email + '</span>' +
+            '<span style="color:#aaa;font-size:0.8em;">' + date + '</span>' +
+            badge +
+            '</div>';
+        }).join('');
+      }
+    }
+  } catch(e) { console.error('Referral load error:', e); }
+}
+
+
+    async function loadAICredits() {
+      try {
+        var session = (await sb.auth.getSession()).data.session;
+        if (!session) return;
+        var uid = session.user.id;
+        var { data: p } = await sb.from('profiles').select('plan, plan_override, ai_credits_used, ai_credits_reset_at, ai_credits_limit').eq('id', uid).single();
+        if (!p) return;
+        var effectivePlan = p.plan_override || p.plan || 'Free';
+    var limits = { free: 5, starter: 50, pro: 50, professional: 50, business: Infinity, enterprise: Infinity, Free: 5, Starter: 50, Professional: 200, Enterprise: Infinity };
+        var limit = p.ai_credits_limit || limits[effectivePlan] || 5;
+        var used = p.ai_credits_used || 0;
+    var isUnlimited = (limit === Infinity || limit >= 999999);
+    var remaining = isUnlimited ? Infinity : Math.max(0, limit - used);
+    var pct = (!isUnlimited && limit > 0) ? Math.min(100, (used / limit) * 100) : 0;
+    var bar = document.getElementById('creditBar');
+    var count = document.getElementById('creditCount');
+    var planEl = document.getElementById('creditPlan');
+    var resetEl = document.getElementById('creditReset');
+    if (bar) { if (isUnlimited) { bar.parentElement.style.display = 'none'; } else { bar.parentElement.style.display = ''; bar.style.width = pct + '%'; if (pct > 80) bar.style.background = 'var(--danger)'; else bar.style.background = 'var(--gold)'; } }
+    if (count) count.textContent = isUnlimited ? '\u221e' : remaining + ' / ' + limit;
+    if (planEl) planEl.textContent = effectivePlan.toLowerCase() + ' Plan' + (isUnlimited ? ' (Unlimited)' : '');
+    if (resetEl) { if (isUnlimited) { resetEl.style.display = 'none'; } else if (p.ai_credits_reset_at) { resetEl.style.display = ''; var rd = new Date(p.ai_credits_reset_at); rd.setMonth(rd.getMonth() + 1); resetEl.textContent = 'Resets ' + rd.toLocaleDateString(); } }
+      } catch(e) { console.error('loadAICredits error:', e); }
+    }
+
+function copyReferralLink() {
+  const linkEl = document.getElementById('referralLink');
+  if (linkEl) {
+    navigator.clipboard.writeText(linkEl.value).then(() => {
+      const btn = event.target;
+      btn.textContent = 'Copied!';
+      btn.style.background = '#4CAF50';
+      setTimeout(() => { btn.textContent = 'Copy Link'; btn.style.background = '#C8922A'; }, 2000);
+    });
+  }
+}
+
+// Call on load
+setTimeout(() => { loadReferralInfo();
+        loadAICredits(); }, 500);
+
+// Process stored referral code on first login
+async function processReferral() {
+  try {
+    const refCode = localStorage.getItem('dmf_referral');
+    if (!refCode) return;
+    
+    const {data:{session}} = await sb.auth.getSession();
+    if (!session) return;
+    const userId = session.user.id;
+    
+    // Check if already processed (user has referred_by set)
+    const {data: profile} = await sb.from('profiles').select('referred_by').eq('id', userId).single();
+    if (profile?.referred_by) {
+      localStorage.removeItem('dmf_referral');
+      localStorage.removeItem('dmf_referral_time');
+      return;
+    }
+    
+    // Find the referrer by code
+    const {data: referrer} = await sb.from('profiles').select('id').eq('referral_code', refCode).single();
+    if (!referrer || referrer.id === userId) {
+      localStorage.removeItem('dmf_referral');
+      return;
+    }
+    
+    // Record the referral
+    await sb.from('profiles').update({referred_by: referrer.id}).eq('id', userId);
+    await sb.from('referrals').insert({
+      referrer_id: referrer.id,
+      referred_id: userId,
+      referral_code: refCode,
+      status: 'completed',
+      completed_at: new Date().toISOString()
+    });
+    
+    localStorage.removeItem('dmf_referral');
+    localStorage.removeItem('dmf_referral_time');
+  } catch(e) { console.error('Referral process error:', e); }
+}
+setTimeout(() => { processReferral(); }, 1000);
+
+// ===== ACTIVE DAY TRACKING FOR TRIAL ELIGIBILITY =====
+(function logDashboardActivity() {
+  try {
+    var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
+    var token = session.access_token;
+    var userId = session.user ? session.user.id : null;
+    if (!token || !userId) return;
+    fetch('/api/log-activity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ userId: userId, action: 'dashboard_visit' })
+    }).catch(function() {});
+  } catch(e) {}
+})();
+</script>
+<div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services L.L.C.</strong></div>
+
+<script>
+function setTheme(t){localStorage.setItem('draftmyforms-theme',t);var r=t;if(t==='system'){r=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',r);updateThemeButtons(t)}
+function updateThemeButtons(t){var btns=document.querySelectorAll('#themeToggle button');btns.forEach(function(b,i){var vals=['light','dark','system'];b.classList.toggle('active',vals[i]===t)})}
+function initTheme(){var saved=localStorage.getItem('draftmyforms-theme')||'system';updateThemeButtons(saved);window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if((localStorage.getItem('draftmyforms-theme')||'system')==='system'){setTheme('system')}})}
+initTheme();
+</script>
+
+<!-- Onboarding Tour -->
+<style>
+.tour-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9998;display:none}
+.tour-overlay.active{display:block}
+.tour-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;padding:24px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);display:none;border-top:4px solid var(--gold,#c99532)}
+.tour-popup.active{display:block}
+.tour-popup h3{margin:0 0 8px;font-family:var(--font-heading,'Playfair Display',serif);color:var(--gold-dark,#a67a28);font-size:18px}
+.tour-popup p{margin:0 0 16px;color:#555;font-size:14px;line-height:1.5}
+.tour-step-indicator{display:flex;gap:6px;margin-bottom:16px}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:#ddd}
+.tour-dot.active{background:var(--gold,#c99532)}
+.tour-dot.done{background:var(--success,#3a6633)}
+.tour-actions{display:flex;justify-content:space-between;align-items:center}
+.tour-skip{background:none;border:none;color:#999;cursor:pointer;font-size:13px;padding:4px 8px}
+.tour-skip:hover{color:#666}
+.tour-next{background:var(--gold,#c99532);color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px}
+.tour-next:hover{background:var(--gold-dark,#a67a28)}
+.tour-prev{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px}
+.tour-highlight{position:relative;z-index:9999;box-shadow:0 0 0 4px var(--gold,#c99532),0 0 0 8px rgba(201,149,50,.3);border-radius:8px;transition:box-shadow .3s}
+.tour-emoji{font-size:32px;margin-bottom:8px;display:block}
+.tour-progress{font-size:12px;color:#999}
+</style>
+
+<div class="tour-overlay" id="tourOverlay"></div>
+<div class="tour-popup" id="tourPopup">
+  <div class="tour-step-indicator" id="tourDots"></div>
+  <span class="tour-emoji" id="tourEmoji"></span>
+  <h3 id="tourTitle"></h3>
+  <p id="tourDesc"></p>
+  <div class="tour-actions">
+    <button class="tour-skip" onclick="endTour()">Skip Tour</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="tour-progress" id="tourProgress"></span>
+      <button class="tour-prev" id="tourPrevBtn" onclick="prevTourStep()" style="display:none">Back</button>
+      <button class="tour-next" id="tourNextBtn" onclick="nextTourStep()">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var tourSteps=[
+  {emoji:'\ud83d\udc4b',title:'Welcome to DraftMyForms!',desc:'Let us show you around. This quick tour will help you get the most out of your document creation experience.',position:'center'},
+  {emoji:'\ud83d\udcdd',title:'Create New Documents',desc:'Click the "New Document" button to start creating invoices, contracts, resumes, and more with our AI-powered editor.',target:'.btn-primary,.btn-gold',position:'bottom'},
+  {emoji:'\ud83d\udcc4',title:'Your Recent Documents',desc:'All your saved documents appear here. You can edit, download, or share any document at any time.',target:'.doc-card,.documents-section,.recent-docs',position:'top'},
+  {emoji:'\u2b50',title:'Choose Your Plan',desc:'Upgrade to Pro or Business for unlimited AI generations, premium templates, and advanced features like ATS scoring.',target:'.plan-card,.upgrade-section,.current-plan',position:'bottom'},
+  {emoji:'\ud83d\udcc1',title:'Browse 26,000+ Templates',desc:'Access our massive library of professional templates across 14 categories. Find the perfect starting point for any document.',target:'.template-btn,.browse-templates',position:'bottom'},
+  {emoji:'\ud83e\udd16',title:'AI-Powered Generation',desc:'Describe what you need and our AI will create a professional document instantly. Just type your request and hit Send!',target:'.ai-input,.ai-prompt',position:'top'},
+  {emoji:'\ud83c\udfa8',title:'Customize Your Style',desc:'Choose from multiple document themes, fonts, and colors. Make every document match your brand.',target:'.theme-toggle,.style-selector',position:'bottom'},
+  {emoji:'\ud83d\udce4',title:'Export Anywhere',desc:'Download your documents as PDF or DOCX. Share via link or email directly from the platform.',target:'.export-btn,.download-section',position:'top'},
+  {emoji:'\ud83d\ude80',title:'You\'re All Set!',desc:'Start creating professional documents now. Need help? Our AI assistant is always ready in the editor. Happy documenting!',position:'center'}
+];
+var currentTourStep=0;
+function startTour(){
+  if(localStorage.getItem('dmf_tour_done')) return;
+  currentTourStep=0;
+  showTourStep();
+}
+function showTourStep(){
+  var step=tourSteps[currentTourStep];
+  var overlay=document.getElementById('tourOverlay');
+  var popup=document.getElementById('tourPopup');
+  var dots=document.getElementById('tourDots');
+  overlay.classList.add('active');
+  popup.classList.add('active');
+  // Remove old highlights
+  document.querySelectorAll('.tour-highlight').forEach(function(el){el.classList.remove('tour-highlight')});
+  // Build dots
+  var dotsHTML='';
+  for(var i=0;i<tourSteps.length;i++){
+    var cls='tour-dot';
+    if(i<currentTourStep) cls+=' done';
+    if(i===currentTourStep) cls+=' active';
+    dotsHTML+='<div class="'+cls+'"></div>';
+  }
+  dots.innerHTML=dotsHTML;
+  document.getElementById('tourEmoji').textContent=step.emoji;
+  document.getElementById('tourTitle').textContent=step.title;
+  document.getElementById('tourDesc').textContent=step.desc;
+  document.getElementById('tourProgress').textContent=(currentTourStep+1)+' of '+tourSteps.length;
+  document.getElementById('tourPrevBtn').style.display=currentTourStep>0?'inline-block':'none';
+  document.getElementById('tourNextBtn').textContent=currentTourStep===tourSteps.length-1?'Finish':'Next';
+  // Position popup
+  if(step.target){
+    var el=document.querySelector(step.target);
+    if(el){
+      el.classList.add('tour-highlight');
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      var rect=el.getBoundingClientRect();
+      if(step.position==='bottom'){
+        popup.style.top=(rect.bottom+12)+'px';
+        popup.style.left=Math.max(16,rect.left)+'px';
+      }else{
+        popup.style.top=Math.max(16,(rect.top-popup.offsetHeight-12))+'px';
+        popup.style.left=Math.max(16,rect.left)+'px';
+      }
+      popup.style.transform='none';
+    }else{
+      popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
+    }
+  }else{
+    popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
+  }
+}
+function nextTourStep(){
+  if(currentTourStep>=tourSteps.length-1){endTour();return;}
+  currentTourStep++;
+  showTourStep();
+}
+function prevTourStep(){
+  if(currentTourStep<=0) return;
+  currentTourStep--;
+  showTourStep();
+}
+function endTour(){
+  document.getElementById('tourOverlay').classList.remove('active');
+  document.getElementById('tourPopup').classList.remove('active');
+  document.querySelectorAll('.tour-highlight').forEach(function(el){el.classList.remove('tour-highlight')});
+  localStorage.setItem('dmf_tour_done','1');
+}
+// Auto-start tour for new users after 2 seconds
+setTimeout(function(){
+  if(!localStorage.getItem('dmf_tour_done')){startTour();}
+},2000);
+</script>
+
+<div style="text-align:center;padding:10px 20px;font-size:11px;color:#999;font-family:var(--font-body)">Templates are for informational purposes only and do not constitute legal advice. Consult a licensed attorney for legal matters.</div>
+
+
+
+
+<!-- DMF DOC ENGINE START -->
 <script>
 (function () {
   var DOC_ENGINE_BASE = '';
@@ -626,145 +1549,19 @@ function dmfFilterDocs() {
 })();
 </script>
 <!-- DMF DOC ENGINE END -->
-<div style="text-align:center;padding:8px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-light);margin-top:20px">A product of <strong>WMK Speciality Services LLC</strong></div>
-
 <script>
-function setTheme(t){localStorage.setItem('draftmyforms-theme',t);var r=t;if(t==='system'){r=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',r);updateThemeButtons(t)}
-function updateThemeButtons(t){var btns=document.querySelectorAll('#themeToggle button');btns.forEach(function(b,i){var vals=['light','dark','system'];b.classList.toggle('active',vals[i]===t)})}
-function initTheme(){var saved=localStorage.getItem('draftmyforms-theme')||'system';updateThemeButtons(saved);window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if((localStorage.getItem('draftmyforms-theme')||'system')==='system'){setTheme('system')}})}
-initTheme();
-</script>
-
-<!-- Onboarding Tour -->
-<style>
-.tour-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9998;display:none}
-.tour-overlay.active{display:block}
-.tour-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;padding:24px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);display:none;border-top:4px solid var(--gold,#c99532)}
-.tour-popup.active{display:block}
-.tour-popup h3{margin:0 0 8px;font-family:var(--font-heading,'Playfair Display',serif);color:var(--gold-dark,#a67a28);font-size:18px}
-.tour-popup p{margin:0 0 16px;color:#555;font-size:14px;line-height:1.5}
-.tour-step-indicator{display:flex;gap:6px;margin-bottom:16px}
-.tour-dot{width:8px;height:8px;border-radius:50%;background:#ddd}
-.tour-dot.active{background:var(--gold,#c99532)}
-.tour-dot.done{background:var(--success,#3a6633)}
-.tour-actions{display:flex;justify-content:space-between;align-items:center}
-.tour-skip{background:none;border:none;color:#999;cursor:pointer;font-size:13px;padding:4px 8px}
-.tour-skip:hover{color:#666}
-.tour-next{background:var(--gold,#c99532);color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px}
-.tour-next:hover{background:var(--gold-dark,#a67a28)}
-.tour-prev{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px}
-.tour-highlight{position:relative;z-index:9999;box-shadow:0 0 0 4px var(--gold,#c99532),0 0 0 8px rgba(201,149,50,.3);border-radius:8px;transition:box-shadow .3s}
-.tour-emoji{font-size:32px;margin-bottom:8px;display:block}
-.tour-progress{font-size:12px;color:#999}
-</style>
-
-<div class="tour-overlay" id="tourOverlay"></div>
-<div class="tour-popup" id="tourPopup">
-  <div class="tour-step-indicator" id="tourDots"></div>
-  <span class="tour-emoji" id="tourEmoji"></span>
-  <h3 id="tourTitle"></h3>
-  <p id="tourDesc"></p>
-  <div class="tour-actions">
-    <button class="tour-skip" onclick="endTour()">Skip Tour</button>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span class="tour-progress" id="tourProgress"></span>
-      <button class="tour-prev" id="tourPrevBtn" onclick="prevTourStep()" style="display:none">Back</button>
-      <button class="tour-next" id="tourNextBtn" onclick="nextTourStep()">Next</button>
-    </div>
-  </div>
-</div>
-
-<script>
-var tourSteps=[
-  {emoji:'\ud83d\udc4b',title:'Welcome to DraftMyForms!',desc:'Let us show you around. This quick tour will help you get the most out of your document creation experience.',position:'center'},
-  {emoji:'\ud83d\udcdd',title:'Create New Documents',desc:'Click the "New Document" button to start creating invoices, contracts, resumes, and more with our AI-powered editor.',target:'.btn-primary,.btn-gold',position:'bottom'},
-  {emoji:'\ud83d\udcc4',title:'Your Recent Documents',desc:'All your saved documents appear here. You can edit, download, or share any document at any time.',target:'.doc-card,.documents-section,.recent-docs',position:'top'},
-  {emoji:'\u2b50',title:'Choose Your Plan',desc:'Upgrade to Pro or Business for unlimited AI generations, premium templates, and advanced features like ATS scoring.',target:'.plan-card,.upgrade-section,.current-plan',position:'bottom'},
-  {emoji:'\ud83d\udcc1',title:'Browse 26,000+ Templates',desc:'Access our massive library of professional templates across 14 categories. Find the perfect starting point for any document.',target:'.template-btn,.browse-templates',position:'bottom'},
-  {emoji:'\ud83e\udd16',title:'AI-Powered Generation',desc:'Describe what you need and our AI will create a professional document instantly. Just type your request and hit Send!',target:'.ai-input,.ai-prompt',position:'top'},
-  {emoji:'\ud83c\udfa8',title:'Customize Your Style',desc:'Choose from multiple document themes, fonts, and colors. Make every document match your brand.',target:'.theme-toggle,.style-selector',position:'bottom'},
-  {emoji:'\ud83d\udce4',title:'Export Anywhere',desc:'Download your documents as PDF or DOCX. Share via link or email directly from the platform.',target:'.export-btn,.download-section',position:'top'},
-  {emoji:'\ud83d\ude80',title:'You\'re All Set!',desc:'Start creating professional documents now. Need help? Our AI assistant is always ready in the editor. Happy documenting!',position:'center'}
-];
-var currentTourStep=0;
-function startTour(){
-  if(localStorage.getItem('dmf_tour_done')) return;
-  currentTourStep=0;
-  showTourStep();
-}
-function showTourStep(){
-  var step=tourSteps[currentTourStep];
-  var overlay=document.getElementById('tourOverlay');
-  var popup=document.getElementById('tourPopup');
-  var dots=document.getElementById('tourDots');
-  overlay.classList.add('active');
-  popup.classList.add('active');
-  // Remove old highlights
-  document.querySelectorAll('.tour-highlight').forEach(function(el){el.classList.remove('tour-highlight')});
-  // Build dots
-  var dotsHTML='';
-  for(var i=0;i<tourSteps.length;i++){
-    var cls='tour-dot';
-    if(i<currentTourStep) cls+=' done';
-    if(i===currentTourStep) cls+=' active';
-    dotsHTML+='<div class="'+cls+'"></div>';
-  }
-  dots.innerHTML=dotsHTML;
-  document.getElementById('tourEmoji').textContent=step.emoji;
-  document.getElementById('tourTitle').textContent=step.title;
-  document.getElementById('tourDesc').textContent=step.desc;
-  document.getElementById('tourProgress').textContent=(currentTourStep+1)+' of '+tourSteps.length;
-  document.getElementById('tourPrevBtn').style.display=currentTourStep>0?'inline-block':'none';
-  document.getElementById('tourNextBtn').textContent=currentTourStep===tourSteps.length-1?'Finish':'Next';
-  // Position popup
-  if(step.target){
-    var el=document.querySelector(step.target);
-    if(el){
-      el.classList.add('tour-highlight');
-      el.scrollIntoView({behavior:'smooth',block:'center'});
-      var rect=el.getBoundingClientRect();
-      if(step.position==='bottom'){
-        popup.style.top=(rect.bottom+12)+'px';
-        popup.style.left=Math.max(16,rect.left)+'px';
-      }else{
-        popup.style.top=Math.max(16,(rect.top-popup.offsetHeight-12))+'px';
-        popup.style.left=Math.max(16,rect.left)+'px';
-      }
-      popup.style.transform='none';
-    }else{
-      popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
+  window.__dmfEngineInit = async function(supabaseClient, userPlan) {
+    window.__dmf_user_plan = userPlan || 'free';
+    var badge = document.getElementById('dmf-plan-badge');
+    if (badge) badge.textContent = (userPlan || 'free').toUpperCase();
+    if (typeof initDocEngine === 'function') {
+      await initDocEngine('dmf-engine-container', supabaseClient);
+    } else {
+      document.getElementById('dmf-engine-container').innerHTML =
+        '<div style="color:#f44;font-size:12px">Engine script failed to load. Check network.</div>';
     }
-  }else{
-    popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
-  }
-}
-function nextTourStep(){
-  if(currentTourStep>=tourSteps.length-1){endTour();return;}
-  currentTourStep++;
-  showTourStep();
-}
-function prevTourStep(){
-  if(currentTourStep<=0) return;
-  currentTourStep--;
-  showTourStep();
-}
-function endTour(){
-  document.getElementById('tourOverlay').classList.remove('active');
-  document.getElementById('tourPopup').classList.remove('active');
-  document.querySelectorAll('.tour-highlight').forEach(function(el){el.classList.remove('tour-highlight')});
-  localStorage.setItem('dmf_tour_done','1');
-}
-// Auto-start tour for new users after 2 seconds
-setTimeout(function(){
-  if(!localStorage.getItem('dmf_tour_done')){startTour();}
-},2000);
+  };
 </script>
-
-<div style="text-align:center;padding:10px 20px;font-size:11px;color:#999;font-family:var(--font-body)">Templates are for informational purposes only and do not constitute legal advice. Consult a licensed attorney for legal matters.</div>
-
-
-
-
 
 </body>
 </html>
