@@ -9,6 +9,28 @@ module.exports = async function handler(req, res) {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         if (req.method === 'OPTIONS') return res.status(200).end();
 
+  // --- link_session: associate a visitor_sessions row with a registered user (additive, non-breaking) ---
+  try {
+    let __body = req.body;
+    if (typeof __body === 'string') { try { __body = JSON.parse(__body); } catch (e) { __body = {}; } }
+    const __action = (req.query && req.query.action) || (__body && __body.action);
+    if (__action === 'link_session') {
+      const __SVC = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!__SVC) { return res.status(500).json({ error: 'Server not configured' }); }
+      const __sid = __body && __body.session_id;
+      if (!__sid) { return res.status(400).json({ error: 'Missing session_id' }); }
+      const __authHeader = req.headers.authorization || '';
+      const __token = __authHeader.replace('Bearer ', '');
+      if (!__token) { return res.status(401).json({ error: 'Unauthorized' }); }
+      const __admin = createClient(SB_URL, __SVC, { auth: { persistSession: false } });
+      const { data: __ud, error: __ue } = await __admin.auth.getUser(__token);
+      if (__ue || !__ud || !__ud.user || !__ud.user.email) { return res.status(401).json({ error: 'Invalid session' }); }
+      const { error: __upe } = await __admin.from('visitor_sessions').update({ user_email: __ud.user.email }).eq('session_id', __sid);
+      if (__upe) { return res.status(500).json({ error: 'Update failed' }); }
+      return res.status(200).json({ ok: true });
+    }
+  } catch (e) { /* fall through to normal handling on any error */ }
+
           // GET: return visitor sessions for admin dashboard
             if (req.method === 'GET') {
                 try {
