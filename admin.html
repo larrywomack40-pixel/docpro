@@ -338,6 +338,36 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
     </table>
   </div>
 </div>
+
+<!-- ===== USER GLOBE WIDGET (added) ===== -->
+<div id="userGlobeWidget" style="margin:24px 0;border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at top,#0a1530 0%,#050813 70%);box-shadow:0 8px 32px rgba(0,0,0,0.4);position:relative;border:1px solid rgba(120,160,255,0.15);">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(120,160,255,0.12);flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:22px;">🌍</span>
+      <div>
+        <div style="color:#e8eefc;font-weight:700;font-size:16px;font-family:Georgia,serif;">Where Our Users Are From</div>
+        <div style="color:#7d8db5;font-size:12px;">Drag to spin • Scroll to zoom • Click a glowing point</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-flex;align-items:center;gap:5px;color:#ffd166;font-size:11px;"><span style="width:9px;height:9px;border-radius:50%;background:#ffd166;display:inline-block;"></span>Locations</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;color:#4ad6c4;font-size:11px;"><span style="width:9px;height:9px;border-radius:50%;background:#4ad6c4;display:inline-block;"></span>Visitors</span>
+      <button id="globeAutoRotate" style="background:rgba(120,160,255,0.12);color:#aebfe8;border:1px solid rgba(120,160,255,0.25);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">⏸ Pause Spin</button>
+    </div>
+  </div>
+  <div style="position:relative;display:flex;flex-wrap:wrap;">
+    <div id="globeCanvasWrap" style="flex:1 1 480px;min-height:440px;position:relative;cursor:grab;"></div>
+    <div id="globeInfoPanel" style="flex:1 1 300px;max-width:360px;background:rgba(8,14,30,0.7);border-left:1px solid rgba(120,160,255,0.12);display:flex;flex-direction:column;">
+      <div id="globeInfoDefault" style="padding:28px 22px;color:#7d8db5;font-size:13px;line-height:1.6;">
+        <div style="font-size:38px;margin-bottom:12px;">📍</div>
+        <div style="color:#aebfe8;font-weight:600;font-size:15px;margin-bottom:6px;">Click a point on the globe</div>
+        Select any glowing marker to see details about where that visitor came from, with a photo of the area.
+        <div id="globeStatsSummary" style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(120,160,255,0.12);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== END USER GLOBE WIDGET ===== -->
 <div style="background:#1e1e2e;border-radius:12px;padding:24px;margin-top:32px" id="visitorAnalyticsSection">
   <h3 style="color:#d4af37;margin:0 0 16px">&#128205; Visitor Intelligence &amp; Customer Profiles</h3>
     <div id="visitorSummaryCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
@@ -1091,5 +1121,96 @@ async function checkExpiredTrials() {
   </div>
 </div>
 
+
+<!-- USER GLOBE SCRIPT (added) -->
+<script>
+(function(){
+  var GEO = {
+    'singapore, singapore':[1.3521,103.8198],'mumbai, india':[19.0760,72.8777],
+    'porto velho, brazil':[-8.7619,-63.9039],'warsaw, poland':[52.2297,21.0122],
+    'monte vista, united states':[37.5797,-106.1486],'washington, united states':[38.9072,-77.0369],
+    'boardman, united states':[45.8399,-119.7000],'beijing, china':[39.9042,116.4074],
+    'staten island, united states':[40.5795,-74.1502],'singapore':[1.3521,103.8198],
+    'new york, united states':[40.7128,-74.0060],'london, united kingdom':[51.5074,-0.1278],
+    'toronto, canada':[43.6532,-79.3832],'sydney, australia':[-33.8688,151.2093],
+    'tokyo, japan':[35.6762,139.6503],'paris, france':[48.8566,2.3522],
+    'berlin, germany':[52.5200,13.4050],'dubai, united arab emirates':[25.2048,55.2708]
+  };
+  var CITY_IMG = {
+    'singapore':'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&q=70',
+    'mumbai':'https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=600&q=70',
+    'porto velho':'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=600&q=70',
+    'warsaw':'https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=600&q=70',
+    'monte vista':'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=70',
+    'washington':'https://images.unsplash.com/photo-1617581629397-a72507c3de9e?w=600&q=70',
+    'boardman':'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=70',
+    'beijing':'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=600&q=70',
+    'staten island':'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&q=70'
+  };
+  var FALLBACK_IMG='https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=70';
+  function init(){
+    var THREE=window.THREE; var wrap=document.getElementById('globeCanvasWrap');
+    if(!wrap||!THREE){return;} wrap.innerHTML='';
+    var visitorTable=null;
+    document.querySelectorAll('table').forEach(function(t){ if(t.textContent.indexOf('Location')>-1||t.textContent.indexOf('LOCATION')>-1) visitorTable=t; });
+    var counts={};
+    if(visitorTable){ Array.prototype.forEach.call(visitorTable.querySelectorAll('tbody tr'),function(rr){ var c=Array.prototype.map.call(rr.querySelectorAll('td'),function(x){return x.textContent.trim();}); if(c.length>=2&&c[1]&&c[1]!=='-'){counts[c[1]]=(counts[c[1]]||0)+1;} }); }
+    var locations=Object.keys(counts).map(function(name){ var g=GEO[name.toLowerCase()]; return g?{name:name,count:counts[name],lat:g[0],lon:g[1]}:null; }).filter(Boolean);
+    var W=wrap.clientWidth,H=Math.max(wrap.clientHeight,440);
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(45,W/H,0.1,1000); camera.position.z=3.2;
+    var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(W,H); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2)); wrap.appendChild(renderer.domElement);
+    var starGeo=new THREE.BufferGeometry(),sp=[]; for(var i=0;i<1200;i++){var rr=50+Math.random()*50,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1); sp.push(rr*Math.sin(ph)*Math.cos(th),rr*Math.sin(ph)*Math.sin(th),rr*Math.cos(ph));}
+    starGeo.setAttribute('position',new THREE.Float32BufferAttribute(sp,3)); scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:0.3})));
+    var earthGroup=new THREE.Group(); scene.add(earthGroup);
+    var loader=new THREE.TextureLoader(); loader.setCrossOrigin('anonymous');
+    var earthMat=new THREE.MeshPhongMaterial({color:0x1b3a6b,emissive:0x0a1a35,shininess:8});
+    earthGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1,64,64),earthMat));
+    loader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',function(tex){earthMat.map=tex;earthMat.color.set(0xffffff);earthMat.emissive.set(0x112244);earthMat.needsUpdate=true;});
+    var atmMat=new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,uniforms:{c:{value:new THREE.Color(0x4a90ff)}},vertexShader:'varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'varying vec3 vN; uniform vec3 c; void main(){ float i=pow(0.65-dot(vN,vec3(0,0,1.0)),3.0); gl_FragColor=vec4(c,1.0)*i;}'});
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.12,64,64),atmMat));
+    scene.add(new THREE.AmbientLight(0xffffff,0.55)); var dir=new THREE.DirectionalLight(0xffffff,1.0); dir.position.set(5,3,5); scene.add(dir);
+    function llToVec(lat,lon,radius){var phi=(90-lat)*Math.PI/180,theta=(lon+180)*Math.PI/180; return new THREE.Vector3(-radius*Math.sin(phi)*Math.cos(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.sin(theta));}
+    function makeVisitorTexture(){var cv=document.createElement('canvas');cv.width=64;cv.height=64;var ctx=cv.getContext('2d');ctx.fillStyle='#4ad6c4';ctx.beginPath();ctx.arc(32,32,30,0,Math.PI*2);ctx.fill();ctx.fillStyle='#06231f';ctx.beginPath();ctx.arc(32,26,9,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(16,50);ctx.quadraticCurveTo(32,34,48,50);ctx.lineTo(48,54);ctx.lineTo(16,54);ctx.closePath();ctx.fill();return new THREE.CanvasTexture(cv);}
+    var visitorTex=makeVisitorTexture();
+    var markerObjs=[]; var maxCount=Math.max.apply(null,locations.map(function(l){return l.count;}).concat([1]));
+    locations.forEach(function(loc){
+      var pos=llToVec(loc.lat,loc.lon,1.01); var size=0.022+0.02*(loc.count/maxCount);
+      var dot=new THREE.Mesh(new THREE.SphereGeometry(size,16,16),new THREE.MeshBasicMaterial({color:0xffd166})); dot.position.copy(pos); dot.userData=loc; earthGroup.add(dot);
+      var ring=new THREE.Mesh(new THREE.RingGeometry(size*1.6,size*2.6,24),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:0.35,side:THREE.DoubleSide})); ring.position.copy(pos); ring.lookAt(pos.clone().multiplyScalar(2)); earthGroup.add(ring);
+      var topPos=llToVec(loc.lat,loc.lon,1.07+0.12*(loc.count/maxCount));
+      earthGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pos,topPos]),new THREE.LineBasicMaterial({color:0xffd166,transparent:true,opacity:0.6})));
+      var spr=new THREE.Sprite(new THREE.SpriteMaterial({map:visitorTex,transparent:true})); spr.position.copy(topPos); var ss=0.10+0.05*(loc.count/maxCount); spr.scale.set(ss,ss,ss); spr.userData=loc; earthGroup.add(spr);
+      markerObjs.push({dot:dot,ring:ring,sprite:spr,loc:loc});
+    });
+    var state={autoRotate:true,dragging:false,lastX:0,lastY:0,velX:0,velY:0,rotY:0,rotX:0,downX:0,downY:0}; window.__GLOBE_STATE=state;
+    var ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),canvas=renderer.domElement;
+    function setMouse(e){var r=canvas.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;}
+    canvas.addEventListener('pointerdown',function(e){state.dragging=true;state.lastX=e.clientX;state.lastY=e.clientY;state.downX=e.clientX;state.downY=e.clientY;wrap.style.cursor='grabbing';});
+    window.addEventListener('pointerup',function(){state.dragging=false;wrap.style.cursor='grab';});
+    window.addEventListener('pointermove',function(e){ if(state.dragging){var dx=e.clientX-state.lastX,dy=e.clientY-state.lastY; state.rotY+=dx*0.005; state.rotX+=dy*0.005; state.rotX=Math.max(-1.2,Math.min(1.2,state.rotX)); state.velX=dx*0.005; state.velY=dy*0.005; state.lastX=e.clientX; state.lastY=e.clientY;} });
+    canvas.addEventListener('wheel',function(e){e.preventDefault(); camera.position.z=Math.max(1.6,Math.min(6,camera.position.z+e.deltaY*0.002));},{passive:false});
+    canvas.addEventListener('pointerup',function(e){ if(Math.abs(e.clientX-state.downX)>5||Math.abs(e.clientY-state.downY)>5) return; setMouse(e); ray.setFromCamera(mouse,camera); var objs=[]; markerObjs.forEach(function(m){objs.push(m.dot);objs.push(m.sprite);}); var hits=ray.intersectObjects(objs); if(hits.length){ showInfo(hits[0].object.userData); } });
+    canvas.addEventListener('pointermove',function(e){ if(state.dragging)return; setMouse(e); ray.setFromCamera(mouse,camera); var objs=[]; markerObjs.forEach(function(m){objs.push(m.dot);objs.push(m.sprite);}); wrap.style.cursor=ray.intersectObjects(objs).length?'pointer':'grab'; });
+    var btn=document.getElementById('globeAutoRotate'); if(btn){ btn.onclick=function(){ state.autoRotate=!state.autoRotate; btn.textContent=state.autoRotate?'⏸ Pause Spin':'▶ Resume Spin'; }; }
+    var t=0; (function animate(){ requestAnimationFrame(animate); t+=0.016; if(state.autoRotate&&!state.dragging){state.rotY+=0.0025;} if(!state.dragging){state.rotY+=state.velX;state.rotX+=state.velY;state.velX*=0.95;state.velY*=0.95;state.rotX=Math.max(-1.2,Math.min(1.2,state.rotX));} earthGroup.rotation.y=state.rotY; earthGroup.rotation.x=state.rotX; markerObjs.forEach(function(m,i){var s=1+0.25*Math.sin(t*3+i); m.ring.scale.setScalar(s); m.ring.material.opacity=0.4-0.2*Math.sin(t*3+i);}); renderer.render(scene,camera); })();
+    window.addEventListener('resize',function(){var w=wrap.clientWidth,h=Math.max(wrap.clientHeight,440); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);});
+    var summary=document.getElementById('globeStatsSummary'); if(summary){ var countries=[]; locations.forEach(function(l){var c=l.name.split(',').pop().trim(); if(countries.indexOf(c)<0)countries.push(c);}); summary.innerHTML='<div style="color:#aebfe8;font-weight:600;margin-bottom:8px;">📊 At a glance</div><div style="display:flex;justify-content:space-between;margin:4px 0;"><span>Plotted locations</span><span style="color:#ffd166;">'+locations.length+'</span></div><div style="display:flex;justify-content:space-between;margin:4px 0;"><span>Countries</span><span style="color:#ffd166;">'+countries.length+'</span></div>'; }
+    function showInfo(loc){
+      var def=document.getElementById('globeInfoDefault'); if(def)def.style.display='none';
+      var panel=document.getElementById('globeInfoPanel'); var card=document.getElementById('globeInfoCard'); if(!card){card=document.createElement('div');card.id='globeInfoCard';panel.appendChild(card);}
+      var city=loc.name.split(',')[0].trim(),country=loc.name.split(',').pop().trim(); var imgUrl=CITY_IMG[city.toLowerCase()]||FALLBACK_IMG;
+      card.innerHTML='<div id="globeImgWrap" style="height:170px;background:linear-gradient(135deg,#13264d,#0a1730);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;"><img id="globeAreaImg" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s;"/><div id="globeImgLoading" style="position:absolute;color:#5a6b94;font-size:13px;">📷 Loading…</div><div style="position:absolute;bottom:0;left:0;right:0;padding:6px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.7));color:#cdd8f0;font-size:10px;">📷 '+city+'</div></div>'+'<div style="padding:18px 20px;"><div style="color:#ffd166;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">'+country+'</div><div style="color:#eef3ff;font-size:22px;font-weight:700;font-family:Georgia,serif;line-height:1.1;">'+city+'</div><div style="display:flex;gap:8px;margin:14px 0;"><div style="flex:1;background:rgba(74,214,196,0.1);border:1px solid rgba(74,214,196,0.25);border-radius:8px;padding:10px;text-align:center;"><div style="color:#4ad6c4;font-size:20px;font-weight:700;">'+loc.count+'</div><div style="color:#8a9bc4;font-size:11px;">visitor'+(loc.count>1?'s':'')+'</div></div><div style="flex:1;background:rgba(120,160,255,0.08);border:1px solid rgba(120,160,255,0.18);border-radius:8px;padding:10px;text-align:center;"><div style="color:#aebfe8;font-size:13px;font-weight:600;">'+loc.lat.toFixed(1)+'°, '+loc.lon.toFixed(1)+'°</div><div style="color:#8a9bc4;font-size:11px;">coordinates</div></div></div><div id="globeAreaDesc" style="color:#9fb0d6;font-size:13px;line-height:1.55;max-height:130px;overflow:auto;">Loading area info…</div><button id="globeBackBtn" style="margin-top:14px;width:100%;background:rgba(120,160,255,0.12);color:#aebfe8;border:1px solid rgba(120,160,255,0.25);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;">← Back</button></div>';
+      document.getElementById('globeBackBtn').onclick=function(){card.remove(); if(def)def.style.display='block';};
+      var imgEl=document.getElementById('globeAreaImg'),loadingEl=document.getElementById('globeImgLoading'); imgEl.onload=function(){imgEl.style.opacity='1'; if(loadingEl)loadingEl.style.display='none';}; imgEl.onerror=function(){if(loadingEl)loadingEl.innerHTML='🏙';}; imgEl.src=imgUrl;
+      var desc=document.getElementById('globeAreaDesc'); function dflt(){return city+' is located in '+country+'. '+loc.count+' visitor'+(loc.count>1?'s have':' has')+' reached your site from this area.';}
+      fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(city)).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(d){if(desc)desc.textContent=d.extract||dflt();}).catch(function(){if(desc)desc.textContent=dflt();});
+      var st=window.__GLOBE_STATE; if(st){st.autoRotate=false; var b=document.getElementById('globeAutoRotate'); if(b)b.textContent='▶ Resume Spin'; var theta=(loc.lon+180)*Math.PI/180; st.rotY=-theta+Math.PI/2; st.rotX=loc.lat*Math.PI/180*0.6;}
+    }
+  }
+  function boot(){ if(window.THREE){init();} else { var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.onload=init; document.head.appendChild(s); } }
+  if(document.readyState==='complete'||document.readyState==='interactive'){ setTimeout(boot,1500); } else { window.addEventListener('DOMContentLoaded',function(){setTimeout(boot,1500);}); }
+})();
+</script>
 </body>
 </html>
