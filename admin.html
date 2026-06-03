@@ -352,6 +352,7 @@ select.plan-select{padding:4px 8px;border:1px solid var(--border);border-radius:
     <div style="display:flex;align-items:center;gap:8px;">
       <span style="display:inline-flex;align-items:center;gap:5px;color:#ffd166;font-size:11px;"><span style="width:9px;height:9px;border-radius:50%;background:#ffd166;display:inline-block;"></span>Locations</span>
       <span style="display:inline-flex;align-items:center;gap:5px;color:#4ad6c4;font-size:11px;"><span style="width:9px;height:9px;border-radius:50%;background:#4ad6c4;display:inline-block;"></span>Visitors</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;color:#c08bff;font-size:11px;"><span style="width:9px;height:9px;border-radius:50%;background:#c08bff;display:inline-block;"></span>Registered Users</span>
       <button id="globeAutoRotate" style="background:rgba(120,160,255,0.12);color:#aebfe8;border:1px solid rgba(120,160,255,0.25);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">⏸ Pause Spin</button>
     </div>
   </div>
@@ -1183,6 +1184,32 @@ async function checkExpiredTrials() {
       var spr=new THREE.Sprite(new THREE.SpriteMaterial({map:visitorTex,transparent:true})); spr.position.copy(topPos); var ss=0.10+0.05*(loc.count/maxCount); spr.scale.set(ss,ss,ss); spr.userData=loc; earthGroup.add(spr);
       markerObjs.push({dot:dot,ring:ring,sprite:spr,loc:loc});
     });
+    
+    // --- REGISTERED_USERS_LAYER: plot sessions linked to registered users (purple stars) ---
+    function makeUserTexture(){var cv=document.createElement('canvas');cv.width=64;cv.height=64;var ctx=cv.getContext('2d');ctx.fillStyle='#c08bff';ctx.beginPath();ctx.arc(32,32,30,0,Math.PI*2);ctx.fill();ctx.fillStyle='#2a0f4a';ctx.font='bold 36px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('\u2605',32,35);return new THREE.CanvasTexture(cv);}
+    var userTex=makeUserTexture();
+    (function loadRegisteredUsers(){
+      try {
+        var sb = window.sbClient;
+        if(!sb || !sb.from) return;
+        sb.from('visitor_sessions').select('user_email,country,city').not('user_email','is',null).then(function(resp){
+          if(!resp || resp.error || !resp.data) return;
+          var byLoc={};
+          resp.data.forEach(function(r){ if(!r.city && !r.country) return; var key=(r.city||'')+', '+(r.country||''); if(!byLoc[key]){byLoc[key]={users:{},count:0};} byLoc[key].users[r.user_email]=true; byLoc[key].count++; });
+          Object.keys(byLoc).forEach(function(key){
+            var g=GEO[key.toLowerCase()]; if(!g) return;
+            var info=byLoc[key]; var userCount=Object.keys(info.users).length;
+            var pos=llToVec(g[0],g[1],1.01); var topPos=llToVec(g[0],g[1],1.16);
+            earthGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pos,topPos]),new THREE.LineBasicMaterial({color:0xc08bff,transparent:true,opacity:0.7})));
+            var spr=new THREE.Sprite(new THREE.SpriteMaterial({map:userTex,transparent:true})); spr.position.copy(topPos); spr.scale.set(0.14,0.14,0.14);
+            spr.userData={name:key, count:userCount, lat:g[0], lon:g[1], isUser:true};
+            earthGroup.add(spr);
+            markerObjs.push({dot:spr,ring:{scale:{setScalar:function(){}},material:{}},sprite:spr,loc:spr.userData});
+          });
+        });
+      } catch(e){}
+    })();
+
     var state={autoRotate:true,dragging:false,lastX:0,lastY:0,velX:0,velY:0,rotY:0,rotX:0,downX:0,downY:0}; window.__GLOBE_STATE=state;
     var ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),canvas=renderer.domElement;
     function setMouse(e){var r=canvas.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;}
