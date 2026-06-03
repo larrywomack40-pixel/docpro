@@ -1552,5 +1552,33 @@ function dmfFilterDocs() {
 <!-- DMF DOC ENGINE END -->
 
 
+
+<!-- AUTO_LINK_SESSION: associate this visitor session with the logged-in user (additive) -->
+<script>
+(function(){
+  try {
+    function run(){
+      try {
+        var sid = localStorage.getItem('dmf_sid');
+        if (!sid) return;
+        var token = null;
+        for (var i=0;i<localStorage.length;i++){
+          var k = localStorage.key(i);
+          if (k && k.indexOf('-auth-token') > -1) {
+            try { var v = JSON.parse(localStorage.getItem(k)); token = v && (v.access_token || (v.currentSession && v.currentSession.access_token)); } catch(e){}
+            if (token) break;
+          }
+        }
+        if (!token) return;
+        if (sessionStorage.getItem('dmf_linked_'+sid)) return;
+        fetch('/api/log-activity', { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+token }, body: JSON.stringify({ action:'link_session', session_id: sid }) })
+          .then(function(r){ if (r && r.ok) { try { sessionStorage.setItem('dmf_linked_'+sid,'1'); } catch(e){} } })
+          .catch(function(){});
+      } catch(e){}
+    }
+    setTimeout(run, 4000);
+  } catch(e){}
+})();
+</script>
 </body>
 </html>
