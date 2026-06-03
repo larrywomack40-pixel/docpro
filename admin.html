@@ -1208,8 +1208,25 @@ async function checkExpiredTrials() {
       var st=window.__GLOBE_STATE; if(st){st.autoRotate=false; var b=document.getElementById('globeAutoRotate'); if(b)b.textContent='▶ Resume Spin'; var theta=(loc.lon+180)*Math.PI/180; st.rotY=-theta+Math.PI/2; st.rotX=loc.lat*Math.PI/180*0.6;}
     }
   }
-  function boot(){ if(window.THREE){init();} else { var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.onload=init; document.head.appendChild(s); } }
-  if(document.readyState==='complete'||document.readyState==='interactive'){ setTimeout(boot,1500); } else { window.addEventListener('DOMContentLoaded',function(){setTimeout(boot,1500);}); }
+  function countLocatedRows(){
+  var vt=null; document.querySelectorAll('table').forEach(function(t){ if(t.textContent.indexOf('Location')>-1||t.textContent.indexOf('LOCATION')>-1) vt=t; });
+  if(!vt) return 0; var n=0;
+  Array.prototype.forEach.call(vt.querySelectorAll('tbody tr'),function(rr){ var c=Array.prototype.map.call(rr.querySelectorAll('td'),function(x){return x.textContent.trim();}); if(c.length>=2&&c[1]&&c[1]!=='-') n++; });
+  return n;
+}
+function runInit(){ init(); }
+function whenDataReady(cb){
+  var tries=0;
+  (function poll(){ tries++; if(countLocatedRows()>0){ cb(); } else if(tries<60){ setTimeout(poll,500); } else { cb(); } })();
+}
+function boot(){
+  function start(){ whenDataReady(function(){ runInit();
+    var vt=null; document.querySelectorAll('table').forEach(function(t){ if(t.textContent.indexOf('Location')>-1||t.textContent.indexOf('LOCATION')>-1) vt=t; });
+    if(vt && window.MutationObserver){ var last=countLocatedRows(); var mo=new MutationObserver(function(){ var now=countLocatedRows(); if(now!==last){ last=now; runInit(); } }); mo.observe(vt,{childList:true,subtree:true}); }
+  }); }
+  if(window.THREE){ start(); } else { var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.onload=start; document.head.appendChild(s); }
+}
+  if(document.readyState==='complete'||document.readyState==='interactive'){ setTimeout(boot,800); } else { window.addEventListener('DOMContentLoaded',function(){setTimeout(boot,800);}); }
 })();
 </script>
 </body>
