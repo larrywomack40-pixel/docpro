@@ -443,7 +443,7 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
   try {
       const client = new Anthropic();
     const message = await client.messages.create({
-        model: 'claude-3-haiku-20240307', max_tokens: 8192,
+            model: 'claude-3-5-sonnet-20241022', max_tokens: 8192,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
     });
