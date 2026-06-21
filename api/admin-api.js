@@ -107,6 +107,44 @@ module.exports = async (req, res) => {
       return res.status(200).json({ clicks: clicks || [] });
     }
 
+    // GET /api/admin-api?action=lifecycle
+    // Per-user activation + churn funnel, plus aggregate stage counts.
+    if (action === 'lifecycle') {
+      const { data: rows, error: lfErr } = await supabase.rpc('get_lifecycle_funnel');
+      if (lfErr) {
+        return res.status(500).json({ error: 'Failed to load lifecycle funnel', detail: lfErr.message });
+      }
+      const users = rows || [];
+      const funnel = {
+        signed_up: users.length,
+        reached_editor: users.filter(function (u) { return u.reached_editor; }).length,
+        generated_doc: users.filter(function (u) { return u.generated_doc; }).length,
+        saved_doc: users.filter(function (u) { return u.saved_doc; }).length,
+        converted: users.filter(function (u) { return u.upgraded; }).length
+      };
+      const stages = {};
+      users.forEach(function (u) { stages[u.lifecycle_stage] = (stages[u.lifecycle_stage] || 0) + 1; });
+      return res.status(200).json({ users: users, funnel: funnel, stages: stages });
+    }
+
+    // GET /api/admin-api?action=user-timeline&userId=UUID
+    // Merged chronological event timeline for a single user (events + documents + sessions).
+    if (action === 'user-timeline') {
+      const uid = req.query.userId || (req.body && req.body.userId);
+      if (!uid) return res.status(400).json({ error: 'userId required' });
+      const [evs, docs, sess] = await Promise.all([
+        supabase.from('user_events').select('event_name, page, metadata, created_at').eq('user_id', uid).order('created_at', { ascending: false }).limit(200),
+        supabase.from('document_history').select('action, document_type, created_at').eq('user_id', uid).order('created_at', { ascending: false }).limit(100),
+        supabase.from('user_sessions').select('logged_in_at, last_active_at, ip_address').eq('user_id', uid).order('logged_in_at', { ascending: false }).limit(50)
+      ]);
+      const timeline = [];
+      (evs.data || []).forEach(function (e) { timeline.push({ type: 'event', label: e.event_name, page: e.page, meta: e.metadata, at: e.created_at }); });
+      (docs.data || []).forEach(function (d) { timeline.push({ type: 'document', label: (d.action || 'document') + (d.document_type ? ' (' + d.document_type + ')' : ''), at: d.created_at }); });
+      (sess.data || []).forEach(function (s) { timeline.push({ type: 'session', label: 'login', at: s.logged_in_at }); });
+      timeline.sort(function (a, b) { return new Date(b.at) - new Date(a.at); });
+      return res.status(200).json({ timeline: timeline });
+    }
+
     return res.status(400).json({ error: 'Unknown action: ' + action });
   } catch (err) {
     console.error('Admin API error:', err);
