@@ -1,6 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
+  <script>
+  /* DraftMyForms Lifecycle & Churn dashboard widget (self-contained, additive). */
+  (function () {
+    function getToken() {
+      try {
+        if (window.sbClient && window.sbClient.auth) {} // reuse if available
+      } catch (e) {}
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && k.indexOf('-auth-token') !== -1) {
+            var p = JSON.parse(localStorage.getItem(k));
+            if (p && p.access_token) return p.access_token;
+            if (p && p.currentSession && p.currentSession.access_token) return p.currentSession.access_token;
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    var STAGE_LABELS = {
+      converted: 'Converted', active: 'Active', at_risk: 'At Risk',
+      churned: 'Churned', never_activated: 'Never Activated'
+    };
+    var STAGE_COLORS = {
+      converted: '#1f9d55', active: '#3b82f6', at_risk: '#d97706',
+      churned: '#dc2626', never_activated: '#6b7280'
+    };
+    var RISK_COLORS = { low: '#1f9d55', medium: '#d97706', high: '#ea580c', lost: '#dc2626' };
+
+    function el(tag, props, html) {
+      var e = document.createElement(tag);
+      if (props) for (var k in props) e.setAttribute(k, props[k]);
+      if (html != null) e.innerHTML = html;
+      return e;
+    }
+
+    function fmtDays(d) {
+      if (d == null) return '-';
+      if (d < 1) return 'today';
+      return Math.round(d) + 'd';
+    }
+
+    function buildUI(container) {
+      container.innerHTML =
+        '<div style="background:#fff;border:1px solid #ececec;border-radius:14px;padding:24px;margin:24px 0;box-shadow:0 1px 3px rgba(0,0,0,.05)">' +
+          '<h2 style="font-family:Playfair Display,serif;margin:0 0 4px;font-size:1.5rem">&#128202; Lifecycle &amp; Churn</h2>' +
+          '<p style="color:#777;margin:0 0 18px;font-size:.9rem">Understand why users sign up and stop using DraftMyForms. Activation funnel, lifecycle stages and churn-risk re-engagement list.</p>' +
+          '<div id="lc-loading" style="color:#999;padding:20px 0">Loading lifecycle data&hellip;</div>' +
+          '<div id="lc-content" style="display:none">' +
+            '<div id="lc-funnel" style="margin-bottom:22px"></div>' +
+            '<div id="lc-stages" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px"></div>' +
+            '<h3 style="margin:0 0 10px;font-size:1.05rem">&#9888;&#65039; Churn-risk &mdash; users to re-engage</h3>' +
+            '<div style="overflow-x:auto"><table id="lc-risk" style="width:100%;border-collapse:collapse;font-size:.85rem"></table></div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function renderFunnel(funnel) {
+      var steps = [
+        ['Signed up', funnel.signed_up],
+        ['Reached editor', funnel.reached_editor],
+        ['Generated a doc', funnel.generated_doc],
+        ['Saved a doc', funnel.saved_doc],
+        ['Converted (paid)', funnel.converted]
+      ];
+      var max = funnel.signed_up || 1;
+      var html = '<h3 style="margin:0 0 10px;font-size:1.05rem">Activation funnel</h3>';
+      steps.forEach(function (s) {
+        var pct = Math.round((s[1] / max) * 100);
+        html += '<div style="margin-bottom:8px">' +
+          '<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:3px">' +
+            '<span>' + s[0] + '</span><span style="color:#777">' + s[1] + ' (' + pct + '%)</span></div>' +
+          '<div style="background:#f1f1f1;border-radius:6px;height:18px;overflow:hidden">' +
+            '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#caa84a,#a8862f)"></div></div>' +
+        '</div>';
+      });
+      document.getElementById('lc-funnel').innerHTML = html;
+    }
+
+    function renderStages(stages) {
+      var wrap = document.getElementById('lc-stages');
+      wrap.innerHTML = '';
+      Object.keys(STAGE_LABELS).forEach(function (key) {
+        var n = stages[key] || 0;
+        var card = el('div', { style:
+          'flex:1;min-width:120px;background:#fafafa;border:1px solid #eee;border-left:4px solid ' +
+          STAGE_COLORS[key] + ';border-radius:10px;padding:14px' });
+        card.innerHTML = '<div style="font-size:1.7rem;font-weight:700;color:' + STAGE_COLORS[key] + '">' + n +
+          '</div><div style="font-size:.8rem;color:#666">' + STAGE_LABELS[key] + '</div>';
+        wrap.appendChild(card);
+      });
+    }
+
+    function renderRisk(users) {
+      var risky = users.filter(function (u) { return !u.upgraded && (u.churn_risk === 'high' || u.churn_risk === 'medium' || u.churn_risk === 'lost'); });
+      risky.sort(function (a, b) { return b.churn_risk_score - a.churn_risk_score; });
+      var t = document.getElementById('lc-risk');
+      t.innerHTML = '<thead><tr style="text-align:left;border-bottom:2px solid #eee;color:#888">' +
+        '<th style="padding:8px">User</th><th>Stage</th><th>Risk</th><th>Score</th>' +
+        '<th>Last active</th><th>Docs</th><th>Last event</th></tr></thead><tbody></tbody>';
+      var tb = t.querySelector('tbody');
+      if (!risky.length) { tb.innerHTML = '<tr><td style="padding:12px;color:#999" colspan="7">No at-risk users right now. &#127881;</td></tr>'; return; }
+      risky.forEach(function (u) {
+        var tr = el('tr', { style: 'border-bottom:1px solid #f3f3f3' });
+        tr.innerHTML =
+          '<td style="padding:8px">' + (u.email || u.user_id) + '</td>' +
+          '<td><span style="background:' + STAGE_COLORS[u.lifecycle_stage] + '22;color:' + STAGE_COLORS[u.lifecycle_stage] + ';padding:2px 8px;border-radius:10px;font-size:.75rem">' + (STAGE_LABELS[u.lifecycle_stage] || u.lifecycle_stage) + '</span></td>' +
+          '<td style="color:' + (RISK_COLORS[u.churn_risk] || '#666') + ';font-weight:600;text-transform:capitalize">' + u.churn_risk + '</td>' +
+          '<td><b>' + u.churn_risk_score + '</b></td>' +
+          '<td>' + fmtDays(u.days_since_active) + '</td>' +
+          '<td>' + u.documents_count + '</td>' +
+          '<td style="color:#888">' + (u.last_event_name || '-') + '</td>';
+        tb.appendChild(tr);
+      });
+    }
+
+    function load() {
+      var token = getToken();
+      var headers = token ? { Authorization: 'Bearer ' + token } : {};
+      fetch('/api/admin-api?action=lifecycle', { headers: headers })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data || !data.users) throw new Error(data && data.error ? data.error : 'No data');
+          document.getElementById('lc-loading').style.display = 'none';
+          document.getElementById('lc-content').style.display = 'block';
+          renderFunnel(data.funnel || {});
+          renderStages(data.stages || {});
+          renderRisk(data.users || []);
+        })
+        .catch(function (e) {
+          var l = document.getElementById('lc-loading');
+          if (l) l.innerHTML = '<span style="color:#dc2626">Could not load lifecycle data: ' + (e.message || e) + '</span>';
+        });
+    }
+
+    function mount() {
+      if (document.getElementById('lc-widget')) return;
+      var host = el('div', { id: 'lc-widget', style: 'max-width:1100px;margin:0 auto;padding:0 16px' });
+      var anchor = document.querySelector('main') || document.body;
+      anchor.appendChild(host);
+      buildUI(host);
+      load();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+    else mount();
+  })();
+  </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin Dashboard | DraftMyForms</title>
