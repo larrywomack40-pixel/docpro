@@ -1,14 +1,11 @@
 /*
- * DraftMyForms behavioral analytics tracker.
- * Lightweight, dependency-free. Fires lifecycle events to /api/log-activity
- * (type=event) so we can understand the signup -> activation -> churn journey.
+ * DraftMyForms behavioral analytics tracker (auto-instrumenting).
+ * Dependency-free. Fires lifecycle events to /api/log-activity (type=event)
+ * so we can understand the signup -> activation -> churn journey.
  *
- * Usage:
- *   DMFTrack.event('editor_opened', { template: 'invoice' });
- *   DMFTrack.event('document_generated', { type: 'nda' });
- *
- * The endpoint resolves the logged-in user from the Supabase bearer token
- * automatically, so events tie to accounts when the user is signed in.
+ * Just include on any page:  <script src="/track.js"></script>
+ * It auto-detects the page and wires the relevant funnel events. You can
+ * also fire events manually:  DMFTrack.event('document_generated', {type:'nda'});
  */
 (function () {
   var ENDPOINT = '/api/log-activity';
@@ -25,8 +22,6 @@
     } catch (e) { return 'no_storage'; }
   }
 
-  // Best-effort read of the Supabase access token from localStorage so the
-  // server can resolve user_id. Token never leaves the first-party origin.
   function getAccessToken() {
     try {
       for (var i = 0; i < localStorage.length; i++) {
@@ -57,24 +52,13 @@
     var headers = { 'Content-Type': 'application/json' };
     var token = getAccessToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
-
     try {
-      // Prefer fetch with keepalive so events survive page unloads.
-      fetch(ENDPOINT, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(function () {});
+      fetch(ENDPOINT, { method: 'POST', headers: headers, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
     } catch (e) {
-      // Fallback: sendBeacon (no auth header, anonymous event)
-      try {
-        navigator.sendBeacon(ENDPOINT, new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-      } catch (e2) {}
+      try { navigator.sendBeacon(ENDPOINT, new Blob([JSON.stringify(payload)], { type: 'application/json' })); } catch (e2) {}
     }
   }
 
-  // De-dupe identical events within a short window (avoids double-fires).
   var recent = {};
   function track(eventName, metadata) {
     var key = eventName + '|' + JSON.stringify(metadata || {});
@@ -84,15 +68,59 @@
     send(eventName, metadata);
   }
 
-  // Auto-fire a heartbeat so last_active is fresh on every page load.
-  function init() {
-    track('page_view', { path: location.pathname });
+  // ---- Auto-instrumentation -------------------------------------------------
+  function textOf(el) {
+    return ((el.innerText || el.textContent || el.value || el.getAttribute('aria-label') || el.id || '') + '').toLowerCase();
   }
 
-  window.DMFTrack = {
-    event: track,
-    sessionId: getSessionId
-  };
+  // Map a clicked control's text to a funnel event name.
+  function classify(t) {
+    if (!t) return null;
+    if (/\bgenerate\b|\bcreate document\b|\bai (write|generate|draft)\b|generate with ai/.test(t)) return 'document_generated';
+    if (/\bdownload\b|\bexport\b|\bpdf\b|\bdocx\b/.test(t)) return 'document_downloaded';
+    if (/\bsave\b/.test(t)) return 'document_saved';
+    if (/\bprint\b/.test(t)) return 'document_printed';
+    if (/\bsign\b|signature/.test(t)) return 'document_signed';
+    if (/\bshare\b/.test(t)) return 'document_shared';
+    if (/\bupgrade\b|\bsubscribe\b|\bgo pro\b|\bget pro\b|\bbusiness plan\b|\bpricing\b/.test(t)) return 'upgrade_clicked';
+    if (/\btemplate\b|\buse this\b/.test(t)) return 'template_selected';
+    if (/\bsign up\b|create account|get started|register/.test(t)) return 'signup_clicked';
+    if (/\bsign in\b|\blog ?in\b/.test(t)) return 'login_clicked';
+    return null;
+  }
+
+  function onClick(e) {
+    var el = e.target;
+    for (var hops = 0; el && hops < 4; hops++) {
+      if (el.tagName && (el.tagName === 'BUTTON' || el.tagName === 'A' || el.getAttribute('role') === 'button' || el.tagName === 'INPUT')) {
+        var name = classify(textOf(el));
+        if (name) { track(name, { label: (el.innerText || el.value || '').trim().slice(0, 60) }); return; }
+      }
+      el = el.parentElement;
+    }
+  }
+
+  function pageEvent() {
+    var p = (location.pathname || '').toLowerCase();
+    if (p.indexOf('editor') !== -1) return 'editor_opened';
+    if (p.indexOf('dashboard') !== -1) return 'dashboard_viewed';
+    if (p.indexOf('templates') !== -1) return 'templates_browsed';
+    if (p.indexOf('index') !== -1 || p === '/' || p === '') return 'landing_viewed';
+    return 'page_view';
+  }
+
+  function init() {
+    track(pageEvent(), { path: location.pathname });
+    document.addEventListener('click', onClick, true);
+    // Mark activation milestone the first time auth token appears on editor.
+    try {
+      if (getAccessToken() && location.pathname.toLowerCase().indexOf('editor') !== -1) {
+        track('authenticated_editor_session', {});
+      }
+    } catch (e) {}
+  }
+
+  window.DMFTrack = { event: track, sessionId: getSessionId };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
