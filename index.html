@@ -26,6 +26,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/auth-headers.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -204,6 +205,7 @@ img{max-width:100%}
 .comp-cell{padding:10px 12px}.footer-grid{grid-template-columns:1fr 1fr}.mobile-menu-btn{display:block!important}
 .upgrade-plans{flex-direction:column}.auth-modal{padding:28px}
 }
+@media(max-width:480px){.theme-toggle-home{display:none}.nav-actions{gap:6px}.nav-actions .btn-sm{padding:8px 10px;font-size:13px}.nav-brand{font-size:17px}}
 @media(max-width:480px){.demo-browser{border-radius:8px}.demo-content{height:350px}.footer-grid{grid-template-columns:1fr}}
 .mobile-menu-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:8px}
 .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;bottom:0;background:var(--white);z-index:999;padding:24px;flex-direction:column;gap:4px}
@@ -596,7 +598,7 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <a href="/templates.html">Templates</a><a href="/#features">AI Generator</a><a href="/#pricing" onclick="smoothScroll('pricing'); return true;">Pricing</a><a href="/#features">Integrations</a>
 </div>
 <div class="footer-col"><h4>Documents</h4>
-<a href="/templates.html?cat=invoices">Invoices</a><a href="/templates.html?cat=contracts">Contracts</a><a href="/templates.html?cat=resume">Resumes</a><a href="/templates.html?cat=nda">NDAs</a><a href="/templates.html?cat=proposal">Proposals</a><a href="/templates.html?cat=report">Reports</a><a href="/templates.html?cat=pay_stub">Pay Stubs</a>
+<a href="/templates.html?cat=invoices">Invoices</a><a href="/templates.html?cat=contracts">Contracts</a><a href="/templates.html?cat=employment">Resumes</a><a href="/templates.html?cat=legal">NDAs</a><a href="/templates.html?cat=business-forms">Proposals</a><a href="/templates.html?cat=business-forms">Reports</a><a href="/templates.html?cat=pay-stubs">Pay Stubs</a>
 </div>
 <div class="footer-col"><h4>Company</h4><a href="/about.html">About</a><a href="/blog/">Blog</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="mailto:support@draftmyforms.com">Contact</a></div>
 </div>
@@ -607,7 +609,10 @@ Don't have an account? <a onclick="switchAuthMode('signup')">Sign up free</a>
 <script>
 var SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
-var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Remember whether this load is the return from an email/OAuth sign-in link, before supabase-js clears the URL.
+var dmfAuthLinkReturn = /access_token=|[?&]code=/.test(location.hash + location.search);
+var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+if (!sb) console.error('Supabase library failed to load; sign-in is unavailable.');
 var currentUser = null;
 var currentProfile = null;
 var selectedPlan = 'pro';
@@ -661,7 +666,7 @@ function toggleUserMenu() { document.getElementById('userMenu').classList.toggle
 document.addEventListener('click', function(e) {
   var menu = document.getElementById('userMenu');
   var avatar = document.getElementById('userAvatar');
-  if (!menu && menu.contains(e.target) && e.target !== avatar) menu.classList.remove('show');
+  if (menu && !menu.contains(e.target) && e.target !== avatar) menu.classList.remove('show');
 });
 
 function openAuthModal(mode) {
@@ -709,8 +714,9 @@ async function handleAuth(e) {
         currentUser = r.data.user;
         await loadProfile();
         updateUIForLoggedIn();
+        var planAfterAuth = pendingPlan;
         closeAuthModal();
-        if (pendingPlan) { selectedPlan = pendingPlan; pendingPlan = null; openUpgradeModal(selectedPlan); }
+        if (planAfterAuth) { selectedPlan = planAfterAuth; openUpgradeModal(selectedPlan); }
         else { window.location.href = '/dashboard.html'; }
       }
     } else {
@@ -719,9 +725,10 @@ async function handleAuth(e) {
       currentUser = r.data.user;
       await loadProfile();
       updateUIForLoggedIn();
+      var planAfterAuth = pendingPlan;
       closeAuthModal();
       if (currentProfile && currentProfile.role === 'admin') { window.location.href = '/admin.html'; }
-      else if (pendingPlan) { selectedPlan = pendingPlan; pendingPlan = null; openUpgradeModal(selectedPlan); }
+      else if (planAfterAuth) { selectedPlan = planAfterAuth; openUpgradeModal(selectedPlan); }
       else { window.location.href = '/dashboard.html'; }
     }
   } catch(err) {
@@ -767,26 +774,22 @@ function openUpgradeModal(plan) {
   document.getElementById('upgradeOverlay').classList.add('active');
   document.getElementById('upgradePro').classList.toggle('selected', selectedPlan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', selectedPlan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro &mdash; 3-Day Free Trial' : 'Start Business &mdash; $24.99/mo';
+  document.getElementById('upgradeCheckoutBtn').textContent = selectedPlan === 'pro' ? 'Start Pro \u2014 3-Day Free Trial' : 'Start Business \u2014 $24.99/mo';
 }
 function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('active'); }
 function selectUpgradePlan(plan) {
   selectedPlan = plan;
   document.getElementById('upgradePro').classList.toggle('selected', plan === 'pro');
   document.getElementById('upgradeBusiness').classList.toggle('selected', plan === 'business');
-  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro &mdash; 3-Day Free Trial' : 'Start Business &mdash; $24.99/mo';
+  document.getElementById('upgradeCheckoutBtn').textContent = plan === 'pro' ? 'Start Pro \u2014 3-Day Free Trial' : 'Start Business \u2014 $24.99/mo';
 }
 
 async function startStripeCheckout() {
   if (!currentUser) { closeUpgradeModal(); pendingPlan = selectedPlan; openAuthModal('signup'); return; }
   var btn = document.getElementById('upgradeCheckoutBtn');
   btn.disabled = true; btn.textContent = 'Redirecting to checkout...';
-  try {
-    var resp = await fetch('/api/create-subscription', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: selectedPlan, userId: currentUser.id, userEmail: currentUser.email }) });
-    var data = await resp.json();
-    if (data.url) { window.location.href = data.url; }
-    else { throw new Error(data.error || 'Failed to create checkout session'); }
-  } catch(err) { alert('Checkout error: ' + err.message); btn.disabled = false; btn.textContent = selectedPlan === 'pro' ? 'Start Pro - $9.99/mo' : 'Start Business - $24.99/mo'; }
+  // Card entry lives on the dashboard.
+  window.location.href = '/dashboard.html?upgrade=' + encodeURIComponent(selectedPlan);
 }
 
 function smoothScroll(id) {
@@ -841,10 +844,14 @@ if (urlParams.get('payment') === 'success') {
 
 
 // Auth state change listener (fixes mobile login 404 - Issue 9)
-sb.auth.onAuthStateChange(function(event, session) {
+if (sb) sb.auth.onAuthStateChange(function(event, session) {
 if (event === 'SIGNED_IN' && session) {
 currentUser = session.user;
 loadProfile().then(function() { updateUIForLoggedIn();
+              // Only navigate after returning from a sign-in link. A restored session must not
+              // pull a signed-in visitor off the homepage, and the sign-in form navigates itself.
+              if (!dmfAuthLinkReturn) return;
+              dmfAuthLinkReturn = false;
               var _redir = sessionStorage.getItem('dmf_redirect');
               if (_redir) { sessionStorage.removeItem('dmf_redirect'); window.location.href = _redir; } else { window.location['replace']('/editor.html'); } });
 }
@@ -855,7 +862,7 @@ updateUIForLoggedOut();
 }
 });
 
-checkSession();
+if (sb) checkSession();
 
 
   // ===== SITE BANNER LOADER =====
@@ -950,8 +957,6 @@ initTheme();
                                                                                                     } catch(e){}
                                                                                                     })();
                                                                                                     </script>
-          }
-      })
 <script>
 function captureEmail(e) {
   e.preventDefault();

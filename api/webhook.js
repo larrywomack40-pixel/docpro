@@ -1,16 +1,36 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
+const { adminClient } = require('../lib/auth');
+const { sendEmail } = require('../lib/email');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabase = adminClient();
 
 // Price ID to plan name mapping
 const PRICE_TO_PLAN = {
   [process.env.STRIPE_PRO_PRICE_ID]: 'pro',
   [process.env.STRIPE_BUSINESS_PRICE_ID]: 'business',
 };
+
+// Plan for a subscription, or null when it doesn't grant one (unknown price, unpaid, cancelled...).
+function planForSubscription(sub) {
+  if (!sub || !['active', 'trialing'].includes(sub.status)) return null;
+  const priceId = sub.items && sub.items.data[0] && sub.items.data[0].price && sub.items.data[0].price.id;
+  return (priceId && PRICE_TO_PLAN[priceId]) || null;
+}
+
+// True when the customer still has another subscription that grants a plan.
+async function hasOtherActiveSub(customerId, exceptId) {
+  const subs = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 20 });
+  return subs.data.some(s => s.id !== exceptId && planForSubscription(s));
+}
+
+// Referral rewards need the subscription id. Saved separately so a missing
+// stripe_subscription_id column (see supabase/security-fixes.sql) can't block plan updates.
+async function saveSubscriptionId(match, subscriptionId) {
+  if (!subscriptionId) return;
+  const [col, val] = Object.entries(match)[0];
+  const { error } = await supabase.from('profiles').update({ stripe_subscription_id: subscriptionId }).eq(col, val);
+  if (error) console.error('Saving stripe_subscription_id failed:', error.message);
+}
 
 async function getRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -52,45 +72,52 @@ module.exports = async (req, res) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const userId = session.client_reference_id || session.metadata?.userId;
+    const userId = session.client_reference_id || session.metadata?.userId || session.metadata?.supabase_uid;
     const customerId = session.customer;
     const subscriptionId = session.subscription;
-    if (!userId) return res.status(400).json({ error: 'No userId in session' });
+    // Returning an error here makes Stripe retry for days, so only log unmatched sessions.
+    if (!userId) {
+      console.error('checkout.session.completed without a user id:', session.id);
+      return res.status(200).json({ received: true, ignored: 'no user id' });
+    }
 
-    let planName = session.metadata?.plan || 'pro';
+    let planName = null;
     try {
-      if (subscriptionId) {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
-        const priceId = sub.items.data[0]?.price?.id;
-        if (priceId && PRICE_TO_PLAN[priceId]) planName = PRICE_TO_PLAN[priceId];
-      }
+      if (subscriptionId) planName = planForSubscription(await stripe.subscriptions.retrieve(subscriptionId));
     } catch (err) { console.error('Sub retrieve error:', err.message); }
+    if (!planName) {
+      console.error('checkout.session.completed with no plan-granting subscription:', session.id);
+      return res.status(200).json({ received: true, ignored: 'no active subscription' });
+    }
 
     const { error } = await supabase.from('profiles').update({
       plan: planName, stripe_customer_id: customerId, updated_at: new Date().toISOString()
     }).eq('id', userId);
     if (error) return res.status(500).json({ error: 'Failed to update plan' });
+    await saveSubscriptionId({ id: userId }, subscriptionId);
     console.log('Updated ' + userId + ' to ' + planName);
 
-    // Send payment receipt email
+    const customerEmail = session.customer_details && session.customer_details.email || session.customer_email || null;
+    if (customerEmail) {
+      const amount = session.amount_total ? (session.amount_total / 100).toFixed(2) : '9.99';
+      await sendEmail({ userId, email: customerEmail, type: 'payment_receipt', data: { planName, amount } });
+    }
+  }
+
+  // Subscription created, upgraded, downgraded, past due, unpaid...: keep the profile's plan in step.
+  if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
+    const sub = event.data.object;
     try {
-      var customerEmail = session.customer_details && session.customer_details.email || session.customer_email || null;
-      if (customerEmail) {
-        var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
-        var emailUrl = siteUrl + '/api/send-email';
-        var amount = session.amount_total ? (session.amount_total / 100).toFixed(2) : '9.99';
-        fetch(emailUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: userId,
-            email: customerEmail,
-            type: 'payment_receipt',
-            data: { planName: planName, amount: amount }
-          })
-        }).catch(function(e) { console.error('Payment email failed:', e.message); });
+      const plan = planForSubscription(sub);
+      if (plan) {
+        await supabase.from('profiles').update({ plan, updated_at: new Date().toISOString() })
+          .eq('stripe_customer_id', sub.customer);
+        await saveSubscriptionId({ stripe_customer_id: sub.customer }, sub.id);
+      } else if (['canceled', 'unpaid', 'incomplete_expired', 'past_due'].includes(sub.status) && !(await hasOtherActiveSub(sub.customer, sub.id))) {
+        await supabase.from('profiles').update({ plan: 'free', updated_at: new Date().toISOString() })
+          .eq('stripe_customer_id', sub.customer);
       }
-    } catch (emailErr) { console.error('Email block error:', emailErr.message); }
+    } catch (err) { console.error(event.type + ' error:', err.message); }
   }
 
   if (event.type === 'invoice.paid') {
@@ -98,10 +125,12 @@ module.exports = async (req, res) => {
     if (inv.subscription) {
       try {
         const sub = await stripe.subscriptions.retrieve(inv.subscription);
-        const priceId = sub.items.data[0]?.price?.id;
-        const plan = (priceId && PRICE_TO_PLAN[priceId]) ? PRICE_TO_PLAN[priceId] : 'pro';
-        await supabase.from('profiles').update({ plan, updated_at: new Date().toISOString() })
-          .eq('stripe_customer_id', inv.customer);
+        const plan = planForSubscription(sub);
+        if (plan) {
+          await supabase.from('profiles').update({ plan, updated_at: new Date().toISOString() })
+            .eq('stripe_customer_id', inv.customer);
+          await saveSubscriptionId({ stripe_customer_id: inv.customer }, sub.id);
+        }
       } catch (err) { console.error('invoice.paid error:', err.message); }
     }
   }
@@ -115,7 +144,6 @@ module.exports = async (req, res) => {
     try {
       const inv = event.data.object;
       if (inv.subscription && inv.billing_reason === 'subscription_cycle') {
-        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
         const { data: refProfile } = await supabase.from('profiles').select('id, plan').eq('stripe_customer_id', inv.customer).single();
         if (refProfile && ['pro','business'].includes(refProfile.plan)) {
           const { data: refRecord } = await supabase.from('referrals').select('id, referrer_id, status').eq('referee_id', refProfile.id).eq('status', 'signed_up').single();
@@ -142,21 +170,19 @@ module.exports = async (req, res) => {
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object;
     const { data: profile } = await supabase.from('profiles').select('id, email')
-      .eq('stripe_customer_id', sub.customer).single();
-    const { error } = await supabase.from('profiles').update({
-      plan: 'free',
-      updated_at: new Date().toISOString()
-    }).eq('stripe_customer_id', sub.customer);
-    if (error) return res.status(500).json({ error: 'Failed to downgrade' });
-    console.log('Downgraded customer ' + sub.customer);
-    // Send cancellation email
-    if (profile && profile.email) {
-      var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
-      fetch(siteUrl + '/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: profile.id, email: profile.email, type: 'subscription_cancelled', data: {} })
-      }).catch(function(e) { console.error('Cancel email failed:', e.message); });
+      .eq('stripe_customer_id', sub.customer).maybeSingle();
+    let stillSubscribed = false;
+    try { stillSubscribed = await hasOtherActiveSub(sub.customer, sub.id); } catch (e) { console.error('Sub list error:', e.message); }
+    if (!stillSubscribed) {
+      const { error } = await supabase.from('profiles').update({
+        plan: 'free',
+        updated_at: new Date().toISOString()
+      }).eq('stripe_customer_id', sub.customer);
+      if (error) return res.status(500).json({ error: 'Failed to downgrade' });
+      console.log('Downgraded customer ' + sub.customer);
+      if (profile && profile.email) {
+        await sendEmail({ userId: profile.id, email: profile.email, type: 'subscription_cancelled', data: {} });
+      }
     }
   }
 
@@ -164,39 +190,30 @@ module.exports = async (req, res) => {
     const trialSub = event.data.object;
     console.log('Trial ending for ' + trialSub.customer);
     const { data: trialProfile } = await supabase.from('profiles').select('id, email')
-      .eq('stripe_customer_id', trialSub.customer).single();
+      .eq('stripe_customer_id', trialSub.customer).maybeSingle();
     if (trialProfile && trialProfile.email) {
-      var trialEnd = trialSub.trial_end ? Math.ceil((trialSub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24)) : 3;
-      var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
-      fetch(siteUrl + '/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: trialProfile.id, email: trialProfile.email, type: 'trial_ending', data: { daysLeft: trialEnd } })
-      }).catch(function(e) { console.error('Trial email failed:', e.message); });
+      const daysLeft = trialSub.trial_end ? Math.ceil((trialSub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24)) : 3;
+      await sendEmail({ userId: trialProfile.id, email: trialProfile.email, type: 'trial_ending', data: { daysLeft } });
     }
   }
 
-    // ── PAYMENT FAILED ──
-      if (event.type === 'invoice.payment_failed') {
-          try {
-                const inv = event.data.object;
-                      var failedEmail = inv.customer_email || null;
-                            if (!failedEmail && inv.customer) {
-                                    try {
-                                              const cust = await stripe.customers.retrieve(inv.customer);
-                                                        failedEmail = cust.email;
-                                                                } catch (e) { console.error('Customer lookup error:', e.message); }
-                                                                      }
-                                                                            if (failedEmail) {
-                                                                                    var siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
-                                                                                            fetch(siteUrl + '/api/send-email', {
-                                                                                                      method: 'POST',
-                                                                                                                headers: { 'Content-Type': 'application/json' },
-                                                                                                                          body: JSON.stringify({ userId: inv.customer, email: failedEmail, type: 'payment_failed', data: { attempt: inv.attempt_count || 1 } })
-                                                                                                                                  }).catch(function(e) { console.error('Payment failed email error:', e.message); });
-                                                                                                                                        }
-                                                                                                                                            } catch (pfErr) { console.error('payment_failed handler error:', pfErr.message); }
-                                                                                                                                              }
+  if (event.type === 'invoice.payment_failed') {
+    try {
+      const inv = event.data.object;
+      let failedEmail = inv.customer_email || null;
+      if (!failedEmail && inv.customer) {
+        try {
+          const cust = await stripe.customers.retrieve(inv.customer);
+          failedEmail = cust.email;
+        } catch (e) { console.error('Customer lookup error:', e.message); }
+      }
+      if (failedEmail) {
+        const { data: failedProfile } = await supabase.from('profiles').select('id')
+          .eq('stripe_customer_id', inv.customer).maybeSingle();
+        await sendEmail({ userId: failedProfile ? failedProfile.id : null, email: failedEmail, type: 'payment_failed', data: { attempt: inv.attempt_count || 1 } });
+      }
+    } catch (pfErr) { console.error('payment_failed handler error:', pfErr.message); }
+  }
 
   res.status(200).json({ received: true });
 };

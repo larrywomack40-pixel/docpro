@@ -1,10 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
+const { adminClient, getUser } = require('../lib/auth');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabase = adminClient();
 
 const PRICE_TO_PLAN = {
   [process.env.STRIPE_PRO_PRICE_ID]: 'pro',
@@ -14,28 +11,33 @@ const PRICE_TO_PLAN = {
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { userId, sessionId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+    const user = await getUser(req);
+    if (!user) return res.status(401).json({ error: 'Please sign in first.' });
+    const userId = user.id;
+    const { sessionId } = req.body || {};
 
     // If sessionId provided, verify the specific checkout session
     if (sessionId) {
       const session = await stripe.checkout.sessions.retrieve(sessionId);
+      const owner = session.client_reference_id || session.metadata?.userId || session.metadata?.supabase_uid;
+      if (owner !== userId) return res.status(403).json({ error: 'This checkout belongs to a different account.' });
       if (session.payment_status === 'paid' || session.status === 'complete') {
         const subscriptionId = session.subscription;
-        let planName = session.metadata?.plan || 'pro';
+        let planName = null;
         let customerId = session.customer;
 
         if (subscriptionId) {
           const sub = await stripe.subscriptions.retrieve(subscriptionId);
           const priceId = sub.items.data[0]?.price?.id;
-          if (priceId && PRICE_TO_PLAN[priceId]) planName = PRICE_TO_PLAN[priceId];
+          if (['active', 'trialing'].includes(sub.status) && priceId && PRICE_TO_PLAN[priceId]) planName = PRICE_TO_PLAN[priceId];
         }
+        if (!planName) return res.status(200).json({ plan: 'free', status: 'pending' });
 
         // Update Supabase
         await supabase.from('profiles').update({

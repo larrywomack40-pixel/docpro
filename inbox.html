@@ -50,6 +50,7 @@ h1{font-family:"Playfair Display",serif;font-size:28px;margin-bottom:5px}
 .tab-btn{padding:10px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
 @media(max-width:600px){.msg-meta{display:none}.modal{margin:10px;padding:20px}}
+@media(max-width:640px){nav{flex-wrap:wrap;gap:8px;padding:12px 16px!important}.nav-links{flex-wrap:wrap;gap:8px 14px!important;font-size:14px}.nav-links a,.nav-links button{white-space:nowrap}}
 </style>
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -182,7 +183,9 @@ async function openMessage(id) {
   currentMsgId = id;
   document.getElementById("modalSubject").textContent = msg.subject;
   document.getElementById("modalFrom").textContent = "From: DraftMyForms Team \u2022 " + new Date(msg.created_at).toLocaleDateString();
-  document.getElementById("modalBody").innerHTML = msg.body.replace(/\n/g, "<br>");
+  var bodyEl = document.getElementById("modalBody");
+  bodyEl.textContent = msg.body || "";
+  bodyEl.style.whiteSpace = "pre-wrap";
   document.getElementById("replyText").value = "";
   document.getElementById("msgModal").classList.add("active");
   if (!msg.is_read && msg.recipient_id === currentUser.id) {

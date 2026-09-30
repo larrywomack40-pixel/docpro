@@ -1,10 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
+const { adminClient, getUser } = require('../lib/auth');
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabase = adminClient();
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,8 +17,12 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { plan, userId, email } = req.body;
-    if (!plan || !userId || !email) return res.status(400).json({ error: 'Missing required fields' });
+    const user = await getUser(req);
+    if (!user) return res.status(401).json({ error: 'Please sign in first.' });
+    const userId = user.id;
+    const email = user.email;
+    const { plan } = req.body || {};
+    if (plan !== 'pro' && plan !== 'business') return res.status(400).json({ error: 'Unknown plan' });
 
     const priceId = plan === 'pro' ? process.env.STRIPE_PRO_PRICE_ID : process.env.STRIPE_BUSINESS_PRICE_ID;
     if (!priceId) return res.status(500).json({ error: 'Price ID not configured for plan: ' + plan });
@@ -35,6 +36,16 @@ module.exports = async (req, res) => {
       await supabase.from('profiles').update({ stripe_customer_id: customerId }).eq('id', userId);
     }
 
+    // Don't pile up subscriptions: drop earlier ones that were never paid for.
+    const existing = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 20 });
+    if (existing.data.some(s => s.status === 'active' || s.status === 'trialing' || s.status === 'past_due')) {
+      return res.status(409).json({ error: 'You already have a subscription. Use Manage Billing to change plans.' });
+    }
+    for (const old of existing.data.filter(s => s.status === 'incomplete')) {
+      try { await stripe.subscriptions.cancel(old.id); } catch (e) { console.error('Cancel incomplete sub error:', e.message); }
+    }
+
+    // One trial per account, ever.
     const trialDays = (plan === 'pro' && !profile?.trial_used) ? 3 : 0;
 
     const subscriptionParams = {
@@ -50,9 +61,12 @@ module.exports = async (req, res) => {
       subscriptionParams.trial_period_days = trialDays;
       subscriptionParams.payment_settings.payment_method_types = ['card'];
       subscriptionParams.expand = ['pending_setup_intent'];
+      // No card by the end of the trial means no subscription.
+      subscriptionParams.trial_settings = { end_behavior: { missing_payment_method: 'cancel' } };
     }
 
     const subscription = await stripe.subscriptions.create(subscriptionParams);
+    if (trialDays > 0) await supabase.from('profiles').update({ trial_used: true }).eq('id', userId);
     let clientSecret, intentType;
 
     if (trialDays > 0 && subscription.pending_setup_intent) {

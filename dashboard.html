@@ -8,9 +8,16 @@
 <title>Dashboard | DraftMyForms</title>
 <meta name="description" content="Your DraftMyForms dashboard - manage documents, create new ones, and access your account.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23c99532'/%3E%3Cstop offset='100%25' stop-color='%23e8b94a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='24' fill='url(%23g)'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@40h0;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/auth-headers.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script>
+function dmfEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+// Sanitized HTML for previews; if DOMPurify didn't load, show text only.
+function dmfSafeHtml(h){return window.DOMPurify?DOMPurify.sanitize(h,{ADD_TAGS:['style']}):dmfEsc(String(h).replace(/<[^>]*>/g,' '));}
+</script>
 <script src="https://js.stripe.com/v3/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -417,15 +424,18 @@ var p=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
 if(p.data)currentProfile=p.data;
 renderDashboard();
 loadSavedDocuments();
+// Upgrade links from the homepage and editor land here as ?upgrade=pro|business.
+var upgradePlan = new URLSearchParams(window.location.search).get('upgrade');
+if (upgradePlan === 'pro' || upgradePlan === 'business') {
+  window.history.replaceState({}, '', '/dashboard.html');
+  openUpgradeModal();
+  startCheckout(upgradePlan);
+}
 // Fire auth-callback for session logging + welcome email
 fetch("/api/auth-callback", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    userId: currentUser.id,
-    email: currentUser.email,
-    name: (currentProfile && currentProfile.display_name) || currentUser.email
-  })
+  headers: await dmfAuthHeaders(),
+  body: JSON.stringify({ userAgent: navigator.userAgent, referralCode: localStorage.getItem('dmf_referral') || null })
 }).catch(function() {});
 }catch(e){console.error('Init error:',e);window.location.href='/'}
 }
@@ -484,13 +494,16 @@ function loadSavedDocuments(){
   }
   let html='<div class="doc-card new-doc" onclick="window.location.href=\'/editor.html\'"><div class="doc-preview" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-plus" style="font-size:2em;color:var(--primary);"></i></div><div class="doc-info"><h4>Create New Document</h4></div></div>';
   document.getElementById('statDocs').textContent=docs.length;
-  docs.sort((a,b)=>(b.data.updated_at||b.data.created_at||0)-(a.data.updated_at||a.data.created_at||0));
+  const docTime=d=>new Date(d.updated_at||d.savedAt||d.created_at||0).getTime()||0;
+  docs.sort((a,b)=>docTime(b.data)-docTime(a.data));
   docs.forEach(({key,data:d})=>{
     const title=d.title||'Untitled Document';
-    const date=d.updated_at?new Date(d.updated_at).toLocaleDateString():'';
-    const rawHtml = d.html || d.content || '';
+    const when=d.updated_at||d.savedAt;
+    const date=when?new Date(when).toLocaleDateString():'';
+    // Saved HTML can come from AI output or shared documents; never render it unsanitized.
+    const rawHtml = dmfSafeHtml(d.html || d.content || '');
     const previewText = rawHtml.replace(/<[^>]*>/g,'').substring(0,80);
-    html+='<div class="doc-card" onclick="openDoc(\'' + key.replace(/'/g,"\\'") + '\')"><div class="doc-preview"><div class="doc-preview-inner">' + rawHtml + '</div></div><div class="doc-info"><h4>'+title.substring(0,40)+'</h4><p class="doc-date">'+(date||'Draft')+'</p><p class="doc-excerpt">'+previewText+'</p></div></div>';
+    html+='<div class="doc-card" onclick="openDoc(\'' + key.replace(/'/g,"\\'") + '\')"><div class="doc-preview"><div class="doc-preview-inner">' + rawHtml + '</div></div><div class="doc-info"><h4>'+dmfEsc(title.substring(0,40))+'</h4><p class="doc-date">'+(date||'Draft')+'</p><p class="doc-excerpt">'+dmfEsc(previewText)+'</p></div></div>';
   });
   container.innerHTML=html;
 }
@@ -561,13 +574,13 @@ async function startCheckout(plan) {
   try {
     var resp = await fetch('/api/create-subscription', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await dmfAuthHeaders(),
       body: JSON.stringify({ plan: plan, userId: currentUser.id, email: currentUser.email })
     });
     var data = await resp.json();
 
     if (resp.status === 409) {
-      showToast(data.message || 'You already have an active subscription.');
+      showToast(data.message || data.error || 'You already have an active subscription.');
       closeUpgradeModal();
       btn.disabled = false;
       btn.innerHTML = origHTML;
@@ -649,9 +662,16 @@ async function confirmPayment() {
     } else {
       closePaymentModal();
       showToast('Payment successful! Activating your plan...');
-      var plan = window.__stripePlan || 'pro';
-      await sb.from('profiles').update({ plan: plan }).eq('id', currentUser.id);
-      setTimeout(function() { location.reload(); }, 2000);
+      // The server sets the plan from Stripe; poll until it shows up (the webhook may land first).
+      for (var tries = 0; tries < 6; tries++) {
+        try {
+          var vr = await fetch('/api/verify-session', { method: 'POST', headers: await dmfAuthHeaders(), body: '{}' });
+          var vd = await vr.json();
+          if (vd.plan && vd.plan !== 'free') break;
+        } catch (ve) {}
+        await new Promise(function(r) { setTimeout(r, 2000); });
+      }
+      location.reload();
     }
   } catch(e) {
     msgEl.textContent = 'An unexpected error occurred. Please try again.';
@@ -697,7 +717,7 @@ if (urlParams.get('payment') === 'success') {
         if (user) {
           var resp = await fetch('/api/verify-session', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: await dmfAuthHeaders(),
             body: JSON.stringify({ sessionId: sessionId, userId: user.id })
           });
           var data = await resp.json();
@@ -734,7 +754,7 @@ async function manageSubscription() {
   try {
     var resp = await fetch('/api/create-portal-session', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await dmfAuthHeaders(),
       body: JSON.stringify({ userId: user.id })
     });
     var data = await resp.json();

@@ -8,6 +8,8 @@
 const { createClient } = require('@supabase/supabase-js');
 
 function checkAuth(req) {
+  // Fail closed: without CRON_SECRET nobody may run the jobs.
+  if (!process.env.CRON_SECRET) return false;
   const authHeader = req.headers['authorization'] || '';
   return authHeader === 'Bearer ' + process.env.CRON_SECRET;
 }
@@ -168,7 +170,8 @@ async function handleWeeklyReport(req, res) {
 module.exports = async function handler(req, res) {
   if (!checkAuth(req)) return res.status(401).json({ error: 'Unauthorized' });
 
-  const urlPath = (req.url || '').split('?')[0].replace(/\/+$/, '');
+  // /api/cron/<job> is rewritten to /api/cron?job=<job> in vercel.json.
+  const urlPath = ((req.query && req.query.job) || (req.url || '').split('?')[0]).replace(/\/+$/, '');
 
   if (urlPath.endsWith('nightly-training')) return handleNightlyTraining(req, res);
   if (urlPath.endsWith('weekly-report')) return handleWeeklyReport(req, res);

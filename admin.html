@@ -775,7 +775,7 @@ if(!leads.length){tbody.innerHTML='<tr><td colspan="3" class="empty-state">No em
 var html='';
 leads.forEach(function(l){
 var d=l.created_at?new Date(l.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown';
-html+='<tr><td>'+escHtml(l.email)+'</td><td>'+(l.source||'N/A')+'</td><td>'+d+'</td></tr>';
+html+='<tr><td>'+escHtml(l.email)+'</td><td>'+(escHtml(l.source)||'N/A')+'</td><td>'+d+'</td></tr>';
 });
 tbody.innerHTML=html;
 }

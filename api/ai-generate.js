@@ -1,5 +1,7 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const { createClient } = require('@supabase/supabase-js');
+const { getUser } = require('../lib/auth');
+const { sendEmail, ADMIN_EMAIL } = require('../lib/email');
 
 // Credit limits per plan (generations per month)
 const PLAN_LIMITS = {
@@ -224,10 +226,36 @@ ALWAYS include print CSS:
   @page { size: letter; margin: 0; }
   @media print { * { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
 </style>`;
+// Take one credit with a compare-and-set, so parallel requests can't all pass the limit check.
+// Returns the new used count, or null when the limit is reached.
+async function reserveCredit(db, userId, limit, unlimited) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data: p } = await db.from('profiles').select('ai_credits_used').eq('id', userId).single();
+    const used = (p && p.ai_credits_used) || 0;
+    if (!unlimited && used >= limit) return null;
+    const { data: rows } = await db.from('profiles').update({ ai_credits_used: used + 1 })
+      .eq('id', userId).eq('ai_credits_used', used).select('id');
+    if (rows && rows.length) return used + 1;
+  }
+  throw new Error('Could not reserve an AI credit, please retry');
+}
+
+// Give a reserved credit back when generation fails.
+async function refundCredit(db, userId) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data: p } = await db.from('profiles').select('ai_credits_used').eq('id', userId).single();
+    const used = (p && p.ai_credits_used) || 0;
+    if (used <= 0) return;
+    const { data: rows } = await db.from('profiles').update({ ai_credits_used: used - 1 })
+      .eq('id', userId).eq('ai_credits_used', used).select('id');
+    if (rows && rows.length) return;
+  }
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -256,65 +284,95 @@ module.exports = async function handler(req, res) {
     } catch (rlErr) { /* rate limit check non-blocking */ }
   }
 
-  const { prompt, docType, plan, userId, currentContent, mode, templateStyle, fileData, fileName } = req.body;
+  const { prompt, docType, currentContent, mode, templateStyle, fileData, fileName } = req.body || {};
   // Sanitize user inputs
   var sanitizedPrompt = sanitizeInput(prompt, 10000);
   if (!sanitizedPrompt) return res.status(400).json({ error: 'Prompt is required' });
-
-  if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'AI service not configured' });
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return res.status(500).json({ error: 'AI service not configured' });
 
-  // --- CREDIT CHECK ---
+  // Every generation belongs to a signed-in user; the user id comes from their token only.
+  const authUser = await getUser(req);
+  if (!authUser) return res.status(401).json({ error: 'Please sign in to use AI features.' });
+  const userId = authUser.id;
+
+  // --- CREDIT CHECK (reserves one credit up front, refunded on failure) ---
+  const supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
   let creditsUsed = 0;
-  let creditLimit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+  let creditLimit = PLAN_LIMITS.free;
   let creditsRemaining = creditLimit;
-  let supabaseAdmin = null;
-  let userEmail = '';
+  let userEmail = authUser.email || '';
+  let plan = 'free';
+  let creditReserved = false;
 
-  if (userId && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  try {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('ai_credits_used, ai_credits_reset_at, ai_credits_limit, plan, plan_override, email')
+      .eq('id', userId)
+      .single();
+    if (!profile) return res.status(403).json({ error: 'Account profile not found.' });
+
+    userEmail = profile.email || userEmail;
+    plan = (profile.plan_override || profile.plan || 'free').toLowerCase();
+    creditLimit = profile.ai_credits_limit || PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+    const unlimited = plan === 'enterprise' || plan === 'business';
+
+    const resetAt = new Date(profile.ai_credits_reset_at || 0);
+    const now = new Date();
+    const monthsSinceReset = (now.getFullYear() - resetAt.getFullYear()) * 12 + (now.getMonth() - resetAt.getMonth());
+    if (monthsSinceReset >= 1) {
+      // Only one request wins the reset.
+      const resetQ = supabaseAdmin.from('profiles').update({ ai_credits_used: 0, ai_credits_reset_at: now.toISOString() }).eq('id', userId);
+      await (profile.ai_credits_reset_at ? resetQ.eq('ai_credits_reset_at', profile.ai_credits_reset_at) : resetQ.is('ai_credits_reset_at', null));
+    }
+
+    const newUsed = await reserveCredit(supabaseAdmin, userId, creditLimit, unlimited);
+    if (newUsed === null) {
+      return res.status(429).json({
+        error: 'AI credit limit reached',
+        creditsUsed: creditLimit, creditLimit,
+        creditsRemaining: 0,
+        plan,
+        resetDate: getNextResetDate(profile.ai_credits_reset_at)
+      });
+    }
+    creditReserved = true;
+    creditsUsed = newUsed - 1;
+    creditsRemaining = creditLimit - newUsed;
+  } catch (creditErr) {
+    console.error('Credit check error:', creditErr.message);
+    return res.status(503).json({ error: 'Could not check your AI credits. Please try again.' });
+  }
+
+  // --- WRITING ASSISTANT: plain text in, plain text out ---
+  if (mode === 'text') {
     try {
-      supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-      const { data: profile, error: profileErr } = await supabaseAdmin
-        .from('profiles')
-        .select('ai_credits_used, ai_credits_reset_at, ai_credits_limit, plan, plan_override, email')
-        .eq('id', userId)
-        .single();
-
-      if (profile) {
-        userEmail = profile.email || '';
-        const effectivePlan = (profile.plan_override || profile.plan || 'free').toLowerCase();
-        creditLimit = profile.ai_credits_limit || PLAN_LIMITS[effectivePlan] || PLAN_LIMITS.free;
-
-        const resetAt = new Date(profile.ai_credits_reset_at || 0);
-        const now = new Date();
-        const monthsSinceReset = (now.getFullYear() - resetAt.getFullYear()) * 12 + (now.getMonth() - resetAt.getMonth());
-
-        if (monthsSinceReset >= 1) {
-          await supabaseAdmin.from('profiles').update({
-            ai_credits_used: 0,
-            ai_credits_reset_at: now.toISOString()
-          }).eq('id', userId);
-          creditsUsed = 0;
-        } else {
-          creditsUsed = profile.ai_credits_used || 0;
-        }
-
-        creditsRemaining = creditLimit - creditsUsed;
-
-        if (effectivePlan !== 'enterprise' && effectivePlan !== 'business' && creditsUsed >= creditLimit) {
-          return res.status(429).json({
-            error: 'AI credit limit reached',
-            creditsUsed, creditLimit,
-            creditsRemaining: 0,
-            plan: effectivePlan,
-            resetDate: getNextResetDate(profile.ai_credits_reset_at)
-          });
-        }
+      const client = new Anthropic();
+      const message = await client.messages.create({
+        model: 'claude-opus-4-8', max_tokens: 4096,
+        system: 'You are a writing assistant for DraftMyForms. Follow the instruction and return only the resulting text, with no preamble.',
+        messages: [{ role: 'user', content: sanitizedPrompt }]
+      });
+      const text = message.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+      if (message.stop_reason !== 'end_turn' || !text) {
+        await refundCredit(supabaseAdmin, userId);
+        return res.status(502).json({ error: 'Could not finish that. Try a shorter selection.' });
       }
-    } catch (creditErr) {
-      console.error('Credit check error (non-blocking):', creditErr.message);
+      try {
+        await supabaseAdmin.from('ai_usage').insert({
+          user_id: userId, prompt_text: sanitizedPrompt.substring(0, 500), doc_type: 'text', mode: 'text',
+          input_tokens: message.usage.input_tokens, output_tokens: message.usage.output_tokens
+        });
+      } catch (e) { /* usage log optional */ }
+      return res.status(200).json({ content: text, credits: { used: creditsUsed + 1, limit: creditLimit, remaining: Math.max(0, creditsRemaining) } });
+    } catch (err) {
+      await refundCredit(supabaseAdmin, userId);
+      console.error('Writing assistant error:', err.message);
+      return res.status(500).json({ error: 'AI request failed. Please try again.' });
     }
   }
+
     // ——————————— AI GENERATION ———————————
     const documentType = (docType || 'general').toLowerCase().replace(/[^a-z0-9\s-]/g, '');
 
@@ -442,22 +500,29 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
     }
   try {
       const client = new Anthropic();
-    const message = await client.messages.create({
-            model: 'claude-opus-4-8', max_tokens: 8192,
+    // Stream so long documents don't hit an idle timeout; finalMessage() collects the whole reply.
+    const message = await client.messages.stream({
+      model: 'claude-opus-4-8', max_tokens: 16000,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
-    });
+    }).finalMessage();
+
+    // A reply cut off at max_tokens is broken HTML; don't save it or charge a credit.
+    const textBlock = message.content.find(b => b.type === 'text');
+    if (message.stop_reason === 'max_tokens' || !textBlock) {
+      console.error('[AI] Incomplete reply, stop_reason:', message.stop_reason);
+      await refundCredit(supabaseAdmin, userId);
+      creditReserved = false;
+      return res.status(502).json({ error: 'The document was too long to finish. Try a shorter request or split it into parts.' });
+    }
 
     // Clean AI response
-    const html = cleanAIResponse(message.content[0].text);
+    const html = cleanAIResponse(textBlock.text);
 
     // --- LOG USAGE & INCREMENT CREDITS ---
+    creditReserved = false; // the credit is spent now
     if (supabaseAdmin && userId) {
       try {
-        await supabaseAdmin.from('profiles').update({
-          ai_credits_used: creditsUsed + 1
-        }).eq('id', userId);
-
         await supabaseAdmin.from('ai_usage').insert({
           user_id: userId,
           prompt_text: prompt.substring(0, 500),
@@ -467,7 +532,6 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
           output_tokens: message.usage.output_tokens
         });
 
-        creditsRemaining = creditLimit - (creditsUsed + 1);
 
         // Log document to history
         try {
@@ -518,43 +582,9 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
           }
         } catch (actErr) { /* non-blocking */ }
 
-        // Fire-and-forget style extraction for edits
-        if (mode === 'edit' && process.env.VERCEL_URL) {
-          const siteUrl = 'https://' + process.env.VERCEL_URL;
-          fetch(siteUrl + '/api/extract-style', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, html, documentType })
-          }).catch(() => {});
-
-          // Fire-and-forget email notifications
-          if (userEmail && process.env.VERCEL_URL) {
-            const emailUrl = 'https://' + process.env.VERCEL_URL + '/api/send-email';
-            // Document ready notification
-            fetch(emailUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: userId,
-                email: userEmail,
-                type: 'document_ready',
-                data: { docType: docType || 'Document' }
-              })
-            }).catch(() => {});
-            // Credits low warning (2 or fewer remaining)
-            if (creditsRemaining <= 2 && creditsRemaining >= 0) {
-              fetch(emailUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: userId,
-                  email: userEmail,
-                  type: 'credits_low',
-                  data: { creditsRemaining: creditsRemaining, planName: plan || 'Free' }
-                })
-              }).catch(() => {});
-            }
-          }
+        // Credits low warning (2 or fewer remaining)
+        if (userEmail && creditsRemaining <= 2 && creditsRemaining >= 0) {
+          await sendEmail({ userId, email: userEmail, type: 'credits_low', data: { creditsRemaining, planName: plan } });
         }
 
       } catch (logErr) {
@@ -563,20 +593,8 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
     }
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    // Notify admin of AI usage
-    try {
-      fetch('/api/send-email', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          type: 'ai_usage_admin',
-          email: 'larrywomack40@gmail.com',
-          userEmail: userEmail || 'unknown',
-          creditsUsed: creditsUsed + 1,
-          creditsRemaining: Math.max(0, creditsRemaining)
-        })
-      }).catch(function() {});
-    } catch(e) {}
+    // Notify admin of AI usage (throttled to one email per user per hour)
+    await sendEmail({ userId, email: ADMIN_EMAIL, type: 'ai_usage_admin', data: { userEmail: userEmail || 'unknown', docType: documentType, plan } });
     return res.status(200).json({
       html: html,
       usage: {
@@ -592,6 +610,7 @@ ${docPrompt ? 'DOCUMENT-SPECIFIC INSTRUCTIONS:\n' + docPrompt : ''}`;
 
   } catch (error) {
     console.error('AI generation error:', error);
+    if (creditReserved) { try { await refundCredit(supabaseAdmin, userId); } catch (e) { /* best effort */ } }
     return res.status(500).json({ error: 'AI generation failed: ' + (error.message || 'Unknown error') });
   }
 };

@@ -24,10 +24,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/auth-headers.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script>
+// Sanitize untrusted/AI/shared/saved HTML before it is assigned to innerHTML.
+// Uses DOMPurify when loaded; otherwise falls back to an inert DOMParser walk.
+function dmfSanitizeHTML(html) {
+  if (html === null || html === undefined) return '';
+  html = String(html);
+  if (window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
+    try {
+      return window.DOMPurify.sanitize(html, {WHOLE_DOCUMENT: false, ADD_TAGS: ['style'], ADD_ATTR: ['target']});
+    } catch (e) {}
+  }
+  try {
+    var doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+    var bad = doc.body.querySelectorAll('script,iframe,object,embed,base,meta,link,frame,frameset');
+    for (var i = 0; i < bad.length; i++) { bad[i].parentNode && bad[i].parentNode.removeChild(bad[i]); }
+    var all = doc.body.querySelectorAll('*');
+    for (var j = 0; j < all.length; j++) {
+      var el = all[j];
+      for (var k = el.attributes.length - 1; k >= 0; k--) {
+        var name = el.attributes[k].name.toLowerCase();
+        var val = (el.attributes[k].value || '').replace(/[\u0000-\u0020]/g, '').toLowerCase();
+        if (name.indexOf('on') === 0) { el.removeAttribute(el.attributes[k].name); continue; }
+        if ((name === 'href' || name === 'src' || name === 'action' || name === 'formaction' || name === 'xlink:href' || name === 'srcdoc') &&
+            (val.indexOf('javascript:') === 0 || val.indexOf('vbscript:') === 0 || name === 'srcdoc')) {
+          el.removeAttribute(el.attributes[k].name);
+        }
+      }
+    }
+    return doc.body.innerHTML;
+  } catch (e2) {
+    return String(html).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+}
+</script>
     <script>
       (function(){
         var SURL='https://mupeqeuuwdmkndvtbhzb.supabase.co';
-          var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNzkwNDMsImV4cCI6MjA2OTU1MDQzfQ.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
+          var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
             if(!window.supabase){return;}
               var sb=window.supabase.createClient(SURL,SKEY);
                 window.sbClient=sb;
@@ -36,13 +72,13 @@
                       var params=new URLSearchParams(window.location.search);
                         var tok=params.get('access_token');
                           if(tok){
-                              sb.from('temp_access_tokens').select('*').eq('token',tok).eq('is_active',true).gt('expires_at',new Date().toISOString()).single().then(function(r){
+                              dmfRedeemToken(sb, tok).then(function(r){
                                     var td=r.data;
                                           if(td&&!r.error&&td.used_count<td.max_uses){
                                                   window.dmfUserPlan=td.plan_level||'business';
                                                           window.dmfUserEmail='guest-'+tok.substring(0,8);
                                                                   window.dmfGuestMode=true;
-                                                                          sb.from('temp_access_tokens').update({used_count:td.used_count+1}).eq('id',td.id);
+                                                                          /* counted by dmfRedeemToken */
                                                                                   showPage();
                                                                                         }else{kickOut();}
                                                                                             }).catch(function(){kickOut();});
@@ -603,6 +639,7 @@ window._isSharedView = new URLSearchParams(window.location.search).has('share');
 
 <!-- AI SIDEBAR -->
 <aside class="ai-sidebar" id="aiSidebar">
+<script>(function(){try{if(window.matchMedia&&window.matchMedia('(max-width:768px)').matches){document.getElementById('aiSidebar').classList.add('collapsed');}}catch(e){}})();</script>
 <div class="ai-header">
 <h3><span class="star">✦</span> AI Assistant</h3>
 <button class="btn btn-ghost btn-sm" onclick="toggleAI()"><i class="fas fa-times"></i></button>
@@ -888,7 +925,11 @@ function updateToolbarState() {
 document.addEventListener("selectionchange", function() {
   var el = document.getElementById("docCanvas");
 
-    docCanvas.addEventListener('paste', function(e) {
+  if (el && (el === document.activeElement || el.contains(document.getSelection().anchorNode))) { updateToolbarState(); }
+});
+
+// Paste handler (registered once)
+document.getElementById('docCanvas').addEventListener('paste', function(e) {
         e.preventDefault();
         let text = '';
         if (e.clipboardData && e.clipboardData.getData) {
@@ -903,8 +944,6 @@ document.addEventListener("selectionchange", function() {
         document.execCommand('insertHTML', false, text);
         updateWordCount();
         updatePreview();
-    });
-  if (el && (el === document.activeElement || el.contains(document.getSelection().anchorNode))) { updateToolbarState(); }
 });
 
 function insertHeading(tag) {
@@ -1017,7 +1056,7 @@ function toggleAI() {
 
 // ═══ AUTH SECURITY GUARD ═══
 (function() {
-  var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNzkwNDMsImV4cCI6MjA2OTU1MDQzfQ.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';var sb=window.sbClient||(window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null);if(!sb){console.warn('DMF: Supabase not available, showing page');showPage&&showPage();return;}window.sbClient=sb;
+  var SUPABASE_URL='https://mupeqeuuwdmkndvtbhzb.supabase.co';var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';var sb=window.sbClient||(window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null);if(!sb){console.warn('DMF: Supabase not available, showing page');showPage&&showPage();return;}window.sbClient=sb;
       function showPage() {
         var s = document.getElementById('auth-guard-style');
         if (s) s.remove();
@@ -1034,7 +1073,7 @@ function toggleAI() {
       var _params = new URLSearchParams(window.location.search);
       var _accessToken = _params.get('access_token');
       if (_accessToken && sb) {
-        sb.from('temp_access_tokens').select('*').eq('token', _accessToken).eq('is_active', true).gt('expires_at', new Date().toISOString()).single().then(function(r) {
+        dmfRedeemToken(sb, _accessToken).then(function(r) {
           var td = r.data;
           if (td && !r.error) {
             var cp = window.location.pathname;
@@ -1044,7 +1083,7 @@ function toggleAI() {
               window.dmfUserEmail = 'guest-' + _accessToken.substring(0, 8);
               window.dmfUserName = td.label || 'Guest';
               window.dmfGuestMode = true;
-              sb.from('temp_access_tokens').update({used_count: td.used_count + 1}).eq('id', td.id);
+              /* counted by dmfRedeemToken */
               showPage();
               document.dispatchEvent(new CustomEvent('dmf-auth-ready'));
               return;
@@ -1176,7 +1215,7 @@ function toggleAI() {
       if (docTitle) docTitle.textContent = template.name || 'Untitled Document';
       var canvas = document.getElementById('docCanvas') || document.getElementById('editor-canvas') || document.querySelector('.editor-canvas');
       if (canvas) {
-        canvas.innerHTML = html;
+        canvas.innerHTML = dmfSanitizeHTML(html);
         makePlaceholdersEditable(canvas);
       }
     }
@@ -1192,8 +1231,12 @@ function toggleAI() {
         showUpgradeModal('business', templateSlug.replace(/-/g,' '));
         return;
       }
-      if (sb) {
-        sb.from('seo_templates').select('*').eq('slug', templateSlug).single().then(function(r) {
+      var sbc = window.sbClient || (window.supabase ? window.supabase.createClient('https://mupeqeuuwdmkndvtbhzb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk') : null);
+      if (sbc) { window.sbClient = sbc; }
+      if (!sbc) {
+        loadTemplateIntoEditor({slug: templateSlug, name: templateSlug.replace(/-/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();}), description:''});
+      } else {
+        sbc.from('seo_templates').select('*').eq('slug', templateSlug).single().then(function(r) {
           if (r.data && !r.error) {
             if (r.data.tier === 'pro' && !isAdmin && plan === 'free') {
               showUpgradeModal('pro', r.data.name);
@@ -1260,7 +1303,7 @@ function toggleAI() {
 function addAIMessage(text, role) {
   const div = document.createElement('div');
   div.className = 'ai-msg ' + role;
-  div.innerHTML = fixEncoding(text);
+  div.innerHTML = dmfSanitizeHTML(fixEncoding(text));
   document.getElementById('aiMessages').appendChild(div);
   div.scrollIntoView({ behavior: 'smooth' });
 }
@@ -1318,7 +1361,7 @@ async function sendAI() {
   try {
     const res = await fetch('/api/ai-generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await dmfAuthHeaders(),
       body: JSON.stringify({
         prompt: prompt,
         docType: 'custom',
@@ -1342,10 +1385,10 @@ async function sendAI() {
     }
     
     const data = await res.json();
-    lastAIResponse = data.html;
+    lastAIResponse = sanitizeAIContent(fixEncoding(data.html));
     
     // Auto-apply to canvas
-    docCanvas.innerHTML = sanitizeAIContent(fixEncoding(data.html));
+    docCanvas.innerHTML = lastAIResponse;
     updatePreview();
     updateWordCount();
     
@@ -1370,7 +1413,7 @@ async function sendAI() {
 
 function applyAIToDoc() {
   if (lastAIResponse) {
-    docCanvas.innerHTML = lastAIResponse;
+    docCanvas.innerHTML = dmfSanitizeHTML(lastAIResponse);
     updatePreview();
     updateWordCount();
     showToast('AI content applied to document');
@@ -1395,7 +1438,7 @@ function closeUpload() {
 
     function sanitizeAIContent(html) {
         const temp = document.createElement('div');
-        temp.innerHTML = html;
+        temp.innerHTML = dmfSanitizeHTML(html);
 
         temp.querySelectorAll('*').forEach(el => {
             const style = el.getAttribute('style') || '';
@@ -1516,7 +1559,7 @@ function closeUpload() {
   } else if (file.type === 'text/html' || file.name.endsWith('.html')) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      document.getElementById('docCanvas').innerHTML = e.target.result;
+      document.getElementById('docCanvas').innerHTML = dmfSanitizeHTML(e.target.result);
       document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
       updatePreview();
       updateWordCount();
@@ -1648,7 +1691,7 @@ function closeUpload() {
        removeAILoading();
        if (html.trim()) {
          const docCanvas = document.getElementById('docCanvas');
-         docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
+         docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + dmfSanitizeHTML(html) + '</div>';
          document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
          updatePreview();
          updateWordCount();
@@ -1682,7 +1725,7 @@ function closeUpload() {
          removeAILoading();
          if (result.value && result.value.trim()) {
            const docCanvas = document.getElementById('docCanvas');
-           docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + result.value + '</div>';
+           docCanvas.innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + dmfSanitizeHTML(result.value) + '</div>';
            document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
            updateWordCount();
            updatePreview();
@@ -1716,7 +1759,7 @@ function closeUpload() {
              if (pText.trim()) html += '<p>' + escapeHTML(pText) + '</p>';
            }
            if (html) {
-             document.getElementById('docCanvas').innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + html + '</div>';
+             document.getElementById('docCanvas').innerHTML = '<div class="uploaded-doc" style="padding:20px;font-family:var(--font-body);line-height:1.6">' + dmfSanitizeHTML(html) + '</div>';
              document.getElementById('docTitle').textContent = file.name.replace(/\.[^.]+$/, '');
              updatePreview();
              updateWordCount();
@@ -1785,7 +1828,7 @@ async function generateLogo() {
   try {
     const res = await fetch('/api/ai-generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await dmfAuthHeaders(),
       body: JSON.stringify({
         prompt: 'Create an elegant, professional SVG logo for a company called "' + name + '". The logo should be modern, clean, and suitable for business documents. Use gold (#c99532) as the primary accent color with dark text. Output ONLY the SVG code, nothing else.',
         docType: 'logo',
@@ -1802,7 +1845,7 @@ async function generateLogo() {
         insertLogoInDoc(url);
         addAIMessage('Logo created and inserted into your document!', 'assistant');
       } else {
-        docCanvas.innerHTML = data.html + docCanvas.innerHTML;
+        docCanvas.innerHTML = dmfSanitizeHTML(data.html) + docCanvas.innerHTML;
         updatePreview();
         addAIMessage('Logo concept generated!', 'assistant');
       }
@@ -2020,7 +2063,7 @@ async function loadTemplate(category, index) {
   try {
     const res = await fetch('/api/ai-generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await dmfAuthHeaders(),
       body: JSON.stringify({
         prompt: 'Create a professional ' + category.slice(0,-1).toLowerCase() + ' document. Style: "' + template.name + '" - ' + template.style + '. Fill in with realistic sample data. Make it look premium and polished with proper spacing, colors, and typography. Include all standard sections for this document type.',
         docType: category.slice(0,-1).toLowerCase(),
@@ -2031,7 +2074,7 @@ async function loadTemplate(category, index) {
     removeAILoading();
     if (res.ok) {
       const data = await res.json();
-      docCanvas.innerHTML = data.html;
+      docCanvas.innerHTML = dmfSanitizeHTML(data.html);
       updatePreview();
       updateWordCount();
       document.getElementById('docTitle').value = template.name + ' ' + category.slice(0,-1);
@@ -2059,31 +2102,53 @@ async function downloadPDF() {
 
     showToast('Generating PDF...');
 
+    // Render the clone on-screen (behind the page) so html2canvas captures its real size.
+    // (An off-screen left:-9999px clone produced blank PDFs.)
+    var holder = document.createElement('div');
+    holder.style.cssText = 'position:fixed;left:0;top:0;z-index:-1;pointer-events:none;width:816px;background:#fff;';
     var clone = canvas.cloneNode(true);
-    clone.style.position = 'absolute';
-    clone.style.left = '-9999px';
+    clone.removeAttribute('id');
+    clone.removeAttribute('contenteditable');
+    clone.style.position = 'static';
+    clone.style.left = '0';
+    clone.style.top = '0';
     clone.style.width = '7.5in';
     clone.style.maxWidth = '816px';
+    clone.style.height = 'auto';
+    clone.style.maxHeight = 'none';
+    clone.style.overflow = 'visible';
     clone.style.overflowX = 'hidden';
+    clone.style.transform = 'none';
     clone.style.background = '#fff';
     clone.style.padding = '0.5in';
-    document.body.appendChild(clone);
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+    function cleanupPdfClone() { if (holder.parentNode) holder.parentNode.removeChild(holder); }
 
     var opt = {
       margin: [0.5, 0.6, 0.5, 0.6],
       filename: 'dmyf.' + safeName + '.pdf',
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0 },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
-    html2pdf().set(opt).from(clone).save().then(function() {
-      document.body.removeChild(clone);
+    if (!clone.offsetHeight) {
+      cleanupPdfClone();
+      showToast('PDF failed: the document appears to be empty.');
+      return;
+    }
+
+    html2pdf().set(opt).from(clone).toCanvas().get('canvas').then(function(c) {
+      if (!c || !c.width || !c.height) { var e = new Error('EMPTY_CANVAS'); e.emptyCanvas = true; throw e; }
+    }).save().then(function() {
+      cleanupPdfClone();
       showToast('PDF downloaded!');
     }).catch(function(err) {
       console.error('PDF generation error:', err);
-      document.body.removeChild(clone);
+      cleanupPdfClone();
+      if (err && err.emptyCanvas) { showToast('PDF failed: nothing was captured. Please try again or use Print.'); return; }
       showToast('PDF failed, falling back to print...');
       printDoc();
     });
@@ -2152,9 +2217,14 @@ function saveDocument() {
     title: document.getElementById('docTitle').value,
     user_id: _uid,
     content: docCanvas.innerHTML,
-    savedAt: new Date().toISOString()
+    savedAt: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   };
-  localStorage.setItem('dmf_doc_' + Date.now(), JSON.stringify(data));
+  // Reuse the key of the currently opened document so re-saving doesn't create duplicates
+  if (!window.dmfCurrentDocKey) window.dmfCurrentDocKey = 'dmf_doc_' + Date.now();
+  try { var _prev = JSON.parse(localStorage.getItem(window.dmfCurrentDocKey) || 'null'); if (_prev && _prev.created_at) data.created_at = _prev.created_at; } catch(e) {}
+  if (!data.created_at) data.created_at = data.updated_at;
+  localStorage.setItem(window.dmfCurrentDocKey, JSON.stringify(data));
   document.getElementById('saveStatus').textContent = 'Saved ' + new Date().toLocaleTimeString();
   showToast('Document saved locally!');
 }
@@ -2324,11 +2394,12 @@ function loadSavedContent() {
     var loadKey = sessionStorage.getItem('dmf_load_doc');
     if (loadKey) {
       sessionStorage.removeItem('dmf_load_doc');
-      try { var doc = JSON.parse(localStorage.getItem(loadKey)); if (doc && doc.content) { docCanvas.innerHTML = doc.content; document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); return; } } catch(e) {}
+      if (loadKey.indexOf('dmf_doc_') === 0) window.dmfCurrentDocKey = loadKey;
+      try { var doc = JSON.parse(localStorage.getItem(loadKey)); if (doc && doc.content) { window.dmfContentRestored = true; docCanvas.innerHTML = dmfSanitizeHTML(doc.content); document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); return; } } catch(e) {}
     }
     var auto = localStorage.getItem('dmf_autosave');
     if (auto) {
-      try { var doc = JSON.parse(auto); if (doc.content && doc.content.trim() !== '' && doc.content.trim() !== '<br>') { docCanvas.innerHTML = doc.content; document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); } } catch(e) {}
+      try { var doc = JSON.parse(auto); if (doc.content && doc.content.trim() !== '' && doc.content.trim() !== '<br>') { window.dmfContentRestored = true; docCanvas.innerHTML = dmfSanitizeHTML(doc.content); document.getElementById('docTitle').value = doc.title || 'Untitled'; updatePreview(); updateWordCount(); } } catch(e) {}
     }
   
   // Default content if no saved document
@@ -2367,6 +2438,9 @@ document.addEventListener('keydown', (e) => {
   // Auto-show AI sidebar on desktop
   if (window.innerWidth > 768) {
     document.getElementById('aiSidebar').classList.remove('collapsed');
+  } else {
+    // Narrow screens: start with the AI panel hidden so it doesn't cover the document
+    document.getElementById('aiSidebar').classList.add('collapsed');
   }
   
   updatePreview();
@@ -2375,6 +2449,7 @@ document.addEventListener('keydown', (e) => {
 function openEditorUpgrade() {
   var overlay = document.getElementById('editorUpgradeOverlay');
   if (overlay) { overlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+  else { window.location.href = '/dashboard.html?upgrade=pro'; }
 }
 function closeEditorUpgrade() {
   var overlay = document.getElementById('editorUpgradeOverlay');
@@ -2389,14 +2464,8 @@ async function editorCheckout(plan) {
     var session = JSON.parse(localStorage.getItem('sb-mupeqeuuwdmkndvtbhzb-auth-token') || '{}');
     var user = session && session.user ? session.user : null;
     if (!user) { alert('Please sign in first.'); btn.disabled = false; btn.innerHTML = orig; return; }
-    var resp = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan, userId: user.id, userEmail: user.email })
-    });
-    var data = await resp.json();
-    if (data.url) { window.location.href = data.url; }
-    else { alert('Error: ' + (data.error || 'Could not start checkout')); btn.disabled = false; btn.innerHTML = orig; }
+    // Card entry lives on the dashboard.
+    window.location.href = '/dashboard.html?upgrade=' + encodeURIComponent(plan);
   } catch (e) { alert('Connection error. Please try again.'); btn.disabled = false; btn.innerHTML = orig; }
 }
 (function checkEditorPlan() {
@@ -2442,10 +2511,11 @@ async function editorCheckout(plan) {
     var userId = session.user ? session.user.id : null;
     var email = session.user ? session.user.email : null;
     if (!userId || !email) return;
+    if (!session.access_token) return;
     fetch("/api/auth-callback", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: userId, email: email, name: email })
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
+      body: JSON.stringify({ userAgent: navigator.userAgent, referralCode: localStorage.getItem("dmf_referral") || null })
     }).catch(function() {});
   } catch(e) {}
 })();
@@ -2791,6 +2861,7 @@ async function editorCheckout(plan) {
   // Only set default if no document was loaded from storage
   var loadKey = sessionStorage.getItem("dmf_load_doc");
   if (loadKey) return; // User is loading a saved doc
+  if (window.dmfContentRestored) return; // A saved doc or autosave was already restored
   
   var canvas = document.getElementById("docCanvas");
   if (!canvas) return;
@@ -2816,6 +2887,7 @@ async function editorCheckout(plan) {
   } catch(e) { setBlank("free"); }
   
   function setBlank(p) {
+    if (window.dmfContentRestored) return;
     var c = document.getElementById("docCanvas");
     if (!c) return;
     var badge = "";
@@ -3034,14 +3106,15 @@ initTheme();
           }
           const canvas = document.getElementById('docCanvas');
           if (canvas) {
-            canvas.innerHTML = data.html_content;
+            canvas.innerHTML = dmfSanitizeHTML(data.html_content);
             const titleEl = document.querySelector('.file-name');
             if (titleEl) titleEl.textContent = data.title + ' (Shared)';
           }
           // Increment view count
           window.sbClient.from('shared_documents')
             .update({ views_count: (data.views_count || 0) + 1 })
-            .eq('share_token', shareToken);
+            .eq('share_token', shareToken)
+            .then(function(){}, function(){});
         });
     })();
 </script>
@@ -3169,7 +3242,7 @@ async function runWATool(tool){
     var resp=await fetch('/api/ai-generate',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({type:'custom',customPrompt:prompts[tool]+text,userId:window._dmfUserId||null,plan:window._dmfUserPlan||'Free'})
+      body:JSON.stringify({mode:'text',prompt:prompts[tool]+text})
     });
     var data=await resp.json();
     if(data.content){

@@ -1,34 +1,33 @@
-const { createClient } = require('@supabase/supabase-js');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { adminClient, getUser } = require('../lib/auth');
+const { sendEmail, ADMIN_EMAIL } = require('../lib/email');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
-const ADMIN_EMAIL = 'larrywomack40@gmail.com';
-
-// Helper: fire-and-forget email via internal API
-function sendEmail(siteUrl, payload) {
-  return fetch(siteUrl + '/api/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(function(e) { console.error('sendEmail fire error:', e.message); });
-}
+const supabase = adminClient();
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { userId, email, userAgent, isNewUser, referralCode } = req.body;
-    if (!userId || !email) return res.status(400).json({ error: 'Missing userId or email' });
+    // Who signed in comes from their Supabase token, not from the request body.
+    const user = await getUser(req);
+    if (!user) return res.status(401).json({ error: 'Not signed in' });
+    const userId = user.id;
+    const email = user.email;
+    const { userAgent, referralCode, action } = req.body || {};
+
+    // Settings -> Delete account. Lives here because the Hobby plan allows only 12 functions.
+    if (action === 'delete_account') return deleteAccount(user, res);
 
     const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
-    const siteUrl = process.env.SITE_URL || ('https://' + (process.env.VERCEL_URL || 'www.draftmyforms.com'));
+
+    // New = account made in the last day that has never logged a session before.
+    const { count: priorSessions } = await supabase.from('user_sessions')
+      .select('id', { count: 'exact', head: true }).eq('user_id', userId);
+    const isNewUser = !priorSessions && (Date.now() - new Date(user.created_at).getTime()) < 24 * 60 * 60 * 1000;
 
     // 1. Log session
     try {
@@ -49,7 +48,7 @@ module.exports = async (req, res) => {
     if (isNewUser) {
 
       // 2. Welcome email
-      sendEmail(siteUrl, {
+      await sendEmail({
         userId: userId,
         email: email,
         type: 'welcome',
@@ -57,8 +56,8 @@ module.exports = async (req, res) => {
       });
 
       // 3. Admin: new signup notification
-      sendEmail(siteUrl, {
-        userId: 'admin',
+      await sendEmail({
+        userId: null,
         email: ADMIN_EMAIL,
         type: 'new_signup_admin',
         data: { newUserEmail: email, referralCode: referralCode || 'none' }
@@ -72,21 +71,21 @@ module.exports = async (req, res) => {
             .from('profiles')
             .select('id, email, display_name')
             .eq('referral_code', referralCode.toUpperCase().trim())
-            .single();
+            .maybeSingle();
 
           if (referrer && referrer.id !== userId) {
-            // Insert referral record
-            await supabase.from('referrals').insert({
+            // 'signed_up' until the new user's first paid renewal; webhook.js then rewards the referrer.
+            const { error: refInsertErr } = await supabase.from('referrals').insert({
               referrer_id: referrer.id,
               referee_id: userId,
               referee_email: email,
               referral_code: referralCode.toUpperCase().trim(),
-              status: 'completed',
-              converted_at: new Date().toISOString()
-            }).onConflict ? null : null; // ignore if table uses upsert
+              status: 'signed_up'
+            });
+            if (refInsertErr) throw refInsertErr;
 
             // Notify referrer
-            sendEmail(siteUrl, {
+            await sendEmail({
               userId: referrer.id,
               email: referrer.email,
               type: 'referral_converted',
@@ -135,3 +134,29 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+// Stop billing first, then remove the user's data and login.
+async function deleteAccount(user, res) {
+  try {
+    const { data: profile } = await supabase.from('profiles').select('stripe_customer_id').eq('id', user.id).maybeSingle();
+    if (profile && profile.stripe_customer_id) {
+      const subs = await stripe.subscriptions.list({ customer: profile.stripe_customer_id, status: 'all', limit: 20 });
+      for (const sub of subs.data) {
+        if (!['canceled', 'incomplete_expired'].includes(sub.status)) await stripe.subscriptions.cancel(sub.id);
+      }
+    }
+    for (const [table, col] of [['user_preferences', 'user_id'], ['saved_documents', 'user_id'], ['user_sessions', 'user_id'], ['profiles', 'id']]) {
+      const { error } = await supabase.from(table).delete().eq(col, user.id);
+      if (error) console.error('delete_account ' + table + ':', error.message);
+    }
+    const { error: delErr } = await supabase.auth.admin.deleteUser(user.id);
+    if (delErr) {
+      console.error('delete_account auth user:', delErr.message);
+      return res.status(500).json({ error: 'Subscription cancelled, but the login could not be removed' });
+    }
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('delete_account error:', err.message);
+    return res.status(500).json({ error: 'Account deletion failed' });
+  }
+}

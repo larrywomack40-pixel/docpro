@@ -32,7 +32,7 @@ p{color:#666;font-size:15px;line-height:1.6;margin-bottom:24px}
 
 <script>
 const SUPABASE_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.RqnIoFp18fDHzGgABpoLLkLCn1oVJioqk4yKiWnOAbA';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function handleVerification() {
@@ -52,8 +52,9 @@ async function handleVerification() {
       card.innerHTML = `
         <div class="icon">❌</div>
         <h1 class="error">Verification Failed</h1>
-        <p>${error}</p>
+        <p id="verifyErr"></p>
         <a href="/index.html" class="btn">Back to Home</a>`;
+      document.getElementById('verifyErr').textContent = error;
       return;
     }
 

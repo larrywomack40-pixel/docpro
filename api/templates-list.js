@@ -99,13 +99,16 @@ ${urls}
       query = query.eq('tier', tier);
     }
     if (search) {
-      query = query.or(`name.ilike.%${search}%,industry.ilike.%${search}%,style_name.ilike.%${search}%,document_type.ilike.%${search}%`);
+      // Characters that are PostgREST filter syntax would let a caller inject extra filters.
+      const s = String(search).trim().replace(/[,()%*\\:"]/g, ' ').slice(0, 100);
+      if (s) query = query.or(`name.ilike.%${s}%,industry.ilike.%${s}%,style_name.ilike.%${s}%,document_type.ilike.%${s}%`);
     }
 
     const { data, error, count } = await query;
 
     if (error) {
-      return res.status(500).json({ error: 'Failed to fetch templates', detail: error.message });
+      console.error('templates-list query error:', error.message);
+      return res.status(500).json({ error: 'Failed to fetch templates' });
     }
 
     return res.status(200).json({
@@ -119,6 +122,7 @@ ${urls}
       }
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal error', detail: err.message });
+    console.error('templates-list error:', err.message);
+    return res.status(500).json({ error: 'Internal error' });
   }
 };

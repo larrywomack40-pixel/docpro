@@ -150,7 +150,7 @@ async function loadCategories(){
 async function loadTemplates(catSlug,search,indFilter){
   var q=sb.from("seo_templates").select("*,seo_categories(slug,name)").order("downloads",{ascending:false}).limit(50);
   if(catSlug){
-    var cr=await sb.from("seo_categories").select("id").eq("slug",catSlug).single();
+    var cr=await sb.from("seo_categories").select("id").eq("slug",catSlug).maybeSingle();
     if(cr.data)q=q.eq("category_id",cr.data.id);
   }
   if(search)q=q.ilike("name","%"+search+"%");
@@ -166,15 +166,15 @@ var p=new URLSearchParams(window.location.search);
 // Support both ?cat= (internal) and ?category= (sitemap/external links)
 var CATEGORY_MAP={
   'invoices':'invoices','pay-stubs':'pay-stubs','receipts':'receipts',
-  'contracts':'contracts','business-forms':'business','employment-documents':'employment',
+  'contracts':'contracts','business-forms':'business-forms','employment-documents':'employment',
   'legal-documents':'legal','real-estate':'real-estate','healthcare-forms':'healthcare',
   'construction':'construction','education':'education','personal-documents':'personal',
   'government-forms':'government','automotive':'automotive',
   // also accept short forms directly
-  'business':'business','employment':'employment','legal':'legal','healthcare':'healthcare',
+  'business':'business-forms','employment':'employment','legal':'legal','healthcare':'healthcare',
   'personal':'personal','government':'government'
 };
-var cf=p.get("cat") || CATEGORY_MAP[p.get("category")] || null;
+var cf=CATEGORY_MAP[p.get("cat")] || p.get("cat") || CATEGORY_MAP[p.get("category")] || null;
 var indFilter=p.get("industry")||p.get("subtype")||null;
 
 // Long-tail SEO metadata for category+industry pages
@@ -183,7 +183,7 @@ var SEO_META={
   'pay-stubs':{ title:'Free Pay Stub Templates',desc:'Create accurate pay stubs instantly. Free downloadable pay stub templates for employers and contractors.' },
   'receipts':{ title:'Free Receipt Templates',desc:'Professional receipt templates for any transaction. Download free editable receipt forms for businesses.' },
   'contracts':{ title:'Free Contract Templates',desc:'Professionally structured contract templates for services, employment, NDA, freelance, and more. Free download.' },
-  'business':{ title:'Free Business Form Templates',desc:'Essential business document templates for operations, HR, and administration. Free professional forms.' },
+  'business-forms':{ title:'Free Business Form Templates',desc:'Essential business document templates for operations, HR, and administration. Free professional forms.' },
   'employment':{ title:'Free Employment Document Templates',desc:'Offer letters, job descriptions, employee forms and more. Free employment document templates.' },
   'legal':{ title:'Free Formal Document Templates',desc:'Agreements, affidavits, power of attorney, and formal agreements. Free downloadable formal templates.' },
   'real-estate':{ title:'Free Real Estate Templates',desc:'Lease agreements, rental forms, property checklists and more. Free real estate document templates.' },

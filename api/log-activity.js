@@ -3,6 +3,11 @@ const { createClient } = require('@supabase/supabase-js');
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGVxZXV1d2Rta25kdnRiaHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzkwNDMsImV4cCI6MjA4Njk1NTA0M30.aEixeQPtdXIxWUmCVXYba0G6x5Zs-2XRwt0gaA30ORk';
 const SB_URL = 'https://mupeqeuuwdmkndvtbhzb.supabase.co';
 
+// Server-side writes use the service key so these tables can be closed to the public anon key.
+function writeClient() {
+  return createClient(SB_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || ANON_KEY, { auth: { persistSession: false } });
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -28,7 +33,7 @@ module.exports = async function handler(req, res) {
       const __admin = createClient(SB_URL, __SVC, { auth: { persistSession: false } });
       const { data: __ud, error: __ue } = await __admin.auth.getUser(__token);
       if (__ue || !__ud || !__ud.user || !__ud.user.email) { return res.status(401).json({ error: 'Invalid session' }); }
-      const { error: __upe } = await __admin.from('visitor_sessions').update({ user_email: __ud.user.email }).eq('session_id', __sid);
+      const { error: __upe } = await __admin.from('visitor_sessions').update({ user_email: __ud.user.email }).eq('session_id', __sid).is('user_email', null);
       if (__upe) { return res.status(500).json({ error: 'Update failed' }); }
       return res.status(200).json({ ok: true });
     }
@@ -65,7 +70,7 @@ module.exports = async function handler(req, res) {
           if (ud && ud.user) { evUserId = ud.user.id; evEmail = ud.user.email || evEmail; }
         }
       } catch (te) {}
-      const ec = createClient(SB_URL, ANON_KEY);
+      const ec = writeClient();
       const { error: evErr } = await ec.from('user_events').insert({
         user_id: evUserId,
         email: evEmail,
@@ -106,7 +111,7 @@ module.exports = async function handler(req, res) {
           if (gResp.ok) geo = await gResp.json();
         }
       } catch(ge) {}
-      const client = createClient(SB_URL, ANON_KEY);
+      const client = writeClient();
       const { error: upsertErr } = await client.from('visitor_sessions').upsert({
         session_id: sid, landing_page: page, ip_address: ip,
         country: geo.country_name || '', region: geo.region || '', city: geo.city || '',
@@ -126,10 +131,10 @@ module.exports = async function handler(req, res) {
     try {
       var le = (body.email || '').toLowerCase().trim();
       if (!le || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(le)) return res.status(400).json({error:'Valid email required'});
-      var lc = createClient(SB_URL, ANON_KEY);
+      var lc = writeClient();
       var dup = await lc.from('email_leads').select('id').eq('email',le).limit(1);
       if (dup.data && dup.data.length > 0) return res.status(200).json({success:true,message:'Already subscribed'});
-      var ins = await lc.from('email_leads').insert({email:le,source:body.source||'homepage',created_at:new Date().toISOString()});
+      var ins = await lc.from('email_leads').insert({email:le,source:(/^[a-z0-9_-]{1,40}$/i.test(body.source||'')?body.source:'homepage'),created_at:new Date().toISOString()});
       if (ins.error) return res.status(500).json({success:false,error:ins.error.message});
       return res.status(200).json({success:true,message:'Subscribed successfully'});
     } catch(ex) { return res.status(500).json({success:false,error:ex.message}); }
@@ -137,10 +142,14 @@ module.exports = async function handler(req, res) {
 
   // Original log-activity (userId-based activity logging)
   try {
-    const { userId, action, metadata } = body;
-    if (!userId) return res.status(400).json({ error: 'userId required' });
-    const client = createClient(SB_URL, ANON_KEY);
-    const { error } = await client.from('activity_log').insert({ user_id: userId, action, metadata });
+    const { action, metadata } = body;
+    // The user comes from their token, never from the body.
+    const tok = (req.headers.authorization || '').replace('Bearer ', '');
+    if (!tok || !process.env.SUPABASE_SERVICE_ROLE_KEY) return res.status(401).json({ error: 'Unauthorized' });
+    const client = createClient(SB_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+    const { data: ud, error: ue } = await client.auth.getUser(tok);
+    if (ue || !ud || !ud.user) return res.status(401).json({ error: 'Invalid session' });
+    const { error } = await client.from('activity_log').insert({ user_id: ud.user.id, action, metadata });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true });
   } catch(e) {

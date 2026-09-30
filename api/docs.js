@@ -49,7 +49,7 @@ async function handleGenerate(req, res) {
   // Plan check
   const PLAN_RANK = { free: 0, pro: 1, business: 2 };
   const catalog = loadCatalog();
-  const docDef = catalog ? catalog[slug] : null;
+  const docDef = catalog && catalog.CATALOG ? catalog.CATALOG[slug] : null;
   if (!docDef) return res.status(404).json({ error: 'Unknown document slug: ' + slug });
 
   const { data: profile } = await supabase
@@ -65,15 +65,14 @@ async function handleGenerate(req, res) {
 
   // Render
   const renderer = loadRenderer(docDef.renderer);
-  const utils = loadUtils();
-  if (!renderer || !utils) {
+  if (!renderer) {
     return res.status(500).json({ error: 'Renderer not available' });
   }
 
   let pdfBuffer;
   try {
-    const htmlContent = renderer.render(slug, fields || {}, docDef);
-    pdfBuffer = await utils.htmlToPdf(htmlContent);
+    // Renderers build the PDF with pdfkit and resolve to a Buffer.
+    pdfBuffer = await renderer.render(slug, fields || {}, docDef);
   } catch (renderErr) {
     console.error('Render error:', renderErr);
     return res.status(500).json({ error: 'Document render failed: ' + renderErr.message });
@@ -154,7 +153,8 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const urlPath = (req.url || '').split('?')[0].replace(/\/+$/, '');
+  // /api/docs/<route> is rewritten to /api/docs?route=<route> in vercel.json.
+  const urlPath = ((req.query && req.query.route) || (req.url || '').split('?')[0]).replace(/\/+$/, '');
   const isGenerate = urlPath.endsWith('generate-for-user') || req.method === 'POST';
   const isHistory = urlPath.endsWith('user-history') || (req.method === 'GET' && !isGenerate);
 
