@@ -67,7 +67,7 @@ function dmfSanitizeHTML(html) {
             if(!window.supabase){return;}
               var sb=window.supabase.createClient(SURL,SKEY);
                 window.sbClient=sb;
-                  function showPage(){var s=document.getElementById('auth-guard-style');if(s)s.remove();document.body.style.visibility='';document.body.style.pointerEvents='';document.body.classList.add('authenticated');document.dispatchEvent(new CustomEvent('dmf-auth-ready'));}
+                  function showPage(){if(!document.body){document.addEventListener('DOMContentLoaded',showPage);return;}var s=document.getElementById('auth-guard-style');if(s)s.remove();document.body.style.visibility='';document.body.style.pointerEvents='';document.body.classList.add('authenticated');document.dispatchEvent(new CustomEvent('dmf-auth-ready'));}
                     function kickOut(){sessionStorage.setItem('dmf_redirect',window.location.href);history.replaceState(null,'','/index.html');window.location.replace('/index.html');}
                       var params=new URLSearchParams(window.location.search);
                         var tok=params.get('access_token');
@@ -3095,7 +3095,7 @@ initTheme();
       if (!shareToken) return;
 
       window.sbClient.from('shared_documents')
-        .select('title, html_content, document_type')
+        .select('title, html_content, document_type, views_count')
         .eq('share_token', shareToken)
         .eq('is_active', true)
         .single()

@@ -692,10 +692,10 @@ function renderUsers(users){
       '<td><span class="role-badge role-'+u.role+'">'+(u.role||'customer')+'</span></td>'+
       '<td>'+
         '<span style="font-weight:600;text-transform:capitalize">'+planDisplay+'</span>'+badge+
-        (!isAdmin?' <button onclick="openPlanModal(\''+u.id+'\',\''+escHtml(u.email||'')+'\',\''+planDisplay+'\',\''+(u.plan_override_expires_at||'')+'\',\''+(u.plan_override_reason||'')+'\')" style="margin-left:8px;padding:2px 10px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.8em;">Change</button>':'')+
+        (!isAdmin?' <button onclick="openPlanModal(\''+jsArg(u.id)+'\',\''+jsArg(u.email)+'\',\''+jsArg(planDisplay)+'\',\''+jsArg(u.plan_override_expires_at)+'\',\''+jsArg(u.plan_override_reason)+'\')" style="margin-left:8px;padding:2px 10px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.8em;">Change</button>':'')+
       '</td>'+
       '<td>'+(u.referral_code?'<code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;font-size:0.8em;">'+u.referral_code+'</code>':'<span style="color:#999">None</span>')+'</td>'+
-      '<td>'+(!isAdmin?'<button class="action-btn" onclick="toggleRole(\''+u.id+'\',\''+u.role+'\')" style="margin-right:6px">Toggle Admin</button>':'')+' <button class="btn-sm" onclick="openEmailModal(\''+escHtml(u.email||'')+'\')" title="Send email notification"><i class="fas fa-envelope"></i></button></td>'+
+      '<td>'+(!isAdmin?'<button class="action-btn" onclick="toggleRole(\''+jsArg(u.id)+'\',\''+jsArg(u.role)+'\')" style="margin-right:6px">Toggle Admin</button>':'')+' <button class="btn-sm" onclick="openEmailModal(\''+jsArg(u.email)+'\')" title="Send email notification"><i class="fas fa-envelope"></i></button></td>'+
     '</tr>';
   }).join('');
 }
@@ -780,6 +780,8 @@ html+='<tr><td>'+escHtml(l.email)+'</td><td>'+(escHtml(l.source)||'N/A')+'</td><
 tbody.innerHTML=html;
 }
 
+// For values placed inside onclick="fn('...')": escape for the JS string and the HTML attribute.
+function jsArg(v){return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/[\r\n]+/g,' ');}
 function escHtml(str){
 if(!str)return '';
 var d=document.createElement('div');
