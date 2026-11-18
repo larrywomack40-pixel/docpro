@@ -1319,6 +1319,291 @@ setTimeout(function(){
         { key: 'termination_date', label: 'Termination Date (if any)', type: 'date' },
         { key: 'governing_state', label: 'Governing State', type: 'text', required: true }
       ]
+    },
+    'receipt': {
+      slug: 'receipt', title: 'Receipt', category: 'financial', category_label: 'Financial',
+      icon: '🧾', plan: 'free', renderer: 'financial',
+      fields: [
+        { key: 'business_name', label: 'Business Name', type: 'text', required: true },
+        { key: 'business_address', label: 'Business Address', type: 'textarea' },
+        { key: 'business_phone', label: 'Business Phone', type: 'text' },
+        { key: 'customer_name', label: 'Customer Name', type: 'text' },
+        { key: 'receipt_number', label: 'Receipt Number', type: 'text', required: true },
+        { key: 'receipt_date', label: 'Receipt Date', type: 'date', required: true },
+        { key: 'line_items', label: 'Items (one per line: description | qty | unit price)', type: 'textarea', required: true },
+        { key: 'tax_rate', label: 'Tax Rate %', type: 'number' },
+        { key: 'amount_paid', label: 'Amount Paid (USD)', type: 'number' },
+        { key: 'payment_method', label: 'Payment Method', type: 'select', options: ['Cash', 'Credit Card', 'Debit Card', 'Check', 'Bank Transfer', 'Other'] },
+        { key: 'notes', label: 'Notes', type: 'textarea' }
+      ]
+    },
+    'purchase-order': {
+      slug: 'purchase-order', title: 'Purchase Order', category: 'financial', category_label: 'Financial',
+      icon: '📦', plan: 'free', renderer: 'financial',
+      fields: [
+        { key: 'buyer_name', label: 'Buyer / Company Name', type: 'text', required: true },
+        { key: 'buyer_address', label: 'Buyer Address', type: 'textarea' },
+        { key: 'vendor_name', label: 'Vendor Name', type: 'text', required: true },
+        { key: 'vendor_address', label: 'Vendor Address', type: 'textarea' },
+        { key: 'po_number', label: 'PO Number', type: 'text', required: true },
+        { key: 'po_date', label: 'Order Date', type: 'date', required: true },
+        { key: 'ship_to', label: 'Ship To Address', type: 'textarea' },
+        { key: 'delivery_date', label: 'Requested Delivery Date', type: 'date' },
+        { key: 'line_items', label: 'Line Items (one per line: description | qty | unit price)', type: 'textarea', required: true },
+        { key: 'tax_rate', label: 'Tax Rate %', type: 'number' },
+        { key: 'shipping_terms', label: 'Shipping Terms', type: 'text' },
+        { key: 'payment_terms', label: 'Payment Terms (e.g., Net 30)', type: 'text' },
+        { key: 'notes', label: 'Notes', type: 'textarea' }
+      ]
+    },
+    'credit-memo': {
+      slug: 'credit-memo', title: 'Credit Memo', category: 'financial', category_label: 'Financial',
+      icon: '💳', plan: 'free', renderer: 'financial',
+      fields: [
+        { key: 'business_name', label: 'Your Business Name', type: 'text', required: true },
+        { key: 'business_address', label: 'Your Business Address', type: 'textarea' },
+        { key: 'client_name', label: 'Client Name', type: 'text', required: true },
+        { key: 'client_address', label: 'Client Address', type: 'textarea' },
+        { key: 'memo_number', label: 'Credit Memo Number', type: 'text', required: true },
+        { key: 'memo_date', label: 'Date', type: 'date', required: true },
+        { key: 'original_invoice', label: 'Original Invoice Number', type: 'text' },
+        { key: 'line_items', label: 'Credited Items (one per line: description | qty | unit price)', type: 'textarea', required: true },
+        { key: 'tax_rate', label: 'Tax Rate %', type: 'number' },
+        { key: 'reason', label: 'Reason for Credit', type: 'textarea' }
+      ]
+    },
+    'residential-lease': {
+      slug: 'residential-lease', title: 'Residential Lease Agreement', category: 'real-estate', category_label: 'Real Estate',
+      icon: '🏡', plan: 'pro', renderer: 'realestate',
+      fields: [
+        { key: 'landlord_name', label: 'Landlord Name', type: 'text', required: true },
+        { key: 'landlord_address', label: 'Landlord Address', type: 'textarea' },
+        { key: 'tenant_name', label: 'Tenant Name(s)', type: 'text', required: true },
+        { key: 'property_address', label: 'Rental Property Address', type: 'textarea', required: true },
+        { key: 'lease_start', label: 'Lease Start Date', type: 'date', required: true },
+        { key: 'lease_end', label: 'Lease End Date', type: 'date', required: true },
+        { key: 'monthly_rent', label: 'Monthly Rent (USD)', type: 'number', required: true },
+        { key: 'rent_due_day', label: 'Rent Due (e.g., 1st of each month)', type: 'text' },
+        { key: 'grace_period_days', label: 'Late Fee Grace Period (days)', type: 'number' },
+        { key: 'late_fee', label: 'Late Fee (USD)', type: 'number' },
+        { key: 'security_deposit', label: 'Security Deposit (USD)', type: 'number' },
+        { key: 'occupants', label: 'Authorized Occupants', type: 'textarea' },
+        { key: 'utilities_tenant', label: 'Utilities Paid by Tenant', type: 'textarea' },
+        { key: 'pets_policy', label: 'Pet Policy', type: 'select', options: ['No pets allowed', 'Pets allowed with deposit', 'Pets allowed'] },
+        { key: 'lead_paint_disclosure', label: 'Property built before 1978 (lead paint disclosure)', type: 'select', options: ['No', 'Yes'] },
+        { key: 'governing_state', label: 'State', type: 'text' }
+      ]
+    },
+    'month-to-month-rental': {
+      slug: 'month-to-month-rental', title: 'Month-to-Month Rental Agreement', category: 'real-estate', category_label: 'Real Estate',
+      icon: '🔄', plan: 'pro', renderer: 'realestate',
+      fields: [
+        { key: 'landlord_name', label: 'Landlord Name', type: 'text', required: true },
+        { key: 'landlord_address', label: 'Landlord Address', type: 'textarea' },
+        { key: 'tenant_name', label: 'Tenant Name(s)', type: 'text', required: true },
+        { key: 'property_address', label: 'Rental Property Address', type: 'textarea', required: true },
+        { key: 'start_date', label: 'Agreement Start Date', type: 'date', required: true },
+        { key: 'monthly_rent', label: 'Monthly Rent (USD)', type: 'number', required: true },
+        { key: 'rent_due_day', label: 'Rent Due (e.g., 1st of each month)', type: 'text' },
+        { key: 'security_deposit', label: 'Security Deposit (USD)', type: 'number' },
+        { key: 'notice_days', label: 'Notice to Terminate (days, e.g., 30)', type: 'number' },
+        { key: 'utilities_tenant', label: 'Utilities Paid by Tenant', type: 'textarea' },
+        { key: 'pets_policy', label: 'Pet Policy', type: 'select', options: ['No pets allowed', 'Pets allowed with deposit', 'Pets allowed'] },
+        { key: 'governing_state', label: 'State', type: 'text' }
+      ]
+    },
+    'rental-application': {
+      slug: 'rental-application', title: 'Rental Application', category: 'real-estate', category_label: 'Real Estate',
+      icon: '📋', plan: 'pro', renderer: 'realestate',
+      fields: [
+        { key: 'property_address', label: 'Property Applying For', type: 'textarea', required: true },
+        { key: 'applicant_name', label: 'Applicant Full Name', type: 'text', required: true },
+        { key: 'applicant_dob', label: 'Date of Birth', type: 'date' },
+        { key: 'applicant_phone', label: 'Phone', type: 'text' },
+        { key: 'applicant_email', label: 'Email', type: 'text' },
+        { key: 'ssn_last4', label: 'SSN (last 4 digits only)', type: 'text' },
+        { key: 'current_address', label: 'Current Address', type: 'textarea' },
+        { key: 'current_landlord', label: 'Current Landlord Name & Phone', type: 'text' },
+        { key: 'monthly_income', label: 'Gross Monthly Income (USD)', type: 'number' },
+        { key: 'employer_name', label: 'Employer', type: 'text' },
+        { key: 'employer_phone', label: 'Employer Phone', type: 'text' },
+        { key: 'job_title', label: 'Job Title', type: 'text' },
+        { key: 'employment_length', label: 'Length of Employment', type: 'text' },
+        { key: 'additional_income', label: 'Additional Income Sources', type: 'textarea' },
+        { key: 'references', label: 'References (one per line: name, relationship, phone)', type: 'textarea' },
+        { key: 'vehicle', label: 'Vehicle (make, model, plate)', type: 'text' },
+        { key: 'pets', label: 'Pets', type: 'text' },
+        { key: 'ever_evicted', label: 'Ever been evicted?', type: 'select', options: ['No', 'Yes'] },
+        { key: 'desired_move_in', label: 'Desired Move-In Date', type: 'date' }
+      ]
+    },
+    'lease-termination': {
+      slug: 'lease-termination', title: 'Lease Termination Notice', category: 'real-estate', category_label: 'Real Estate',
+      icon: '📭', plan: 'pro', renderer: 'realestate',
+      fields: [
+        { key: 'sent_by', label: 'This notice is given by', type: 'select', options: ['Landlord', 'Tenant'] },
+        { key: 'landlord_name', label: 'Landlord Name', type: 'text', required: true },
+        { key: 'tenant_name', label: 'Tenant Name', type: 'text', required: true },
+        { key: 'property_address', label: 'Rental Property Address', type: 'textarea', required: true },
+        { key: 'lease_date', label: 'Original Lease Date', type: 'date' },
+        { key: 'notice_date', label: 'Notice Date', type: 'date', required: true },
+        { key: 'move_out_date', label: 'Move-Out / Termination Date', type: 'date', required: true },
+        { key: 'reason', label: 'Reason for Termination', type: 'textarea' },
+        { key: 'forwarding_address', label: 'Tenant Forwarding Address (for deposit return)', type: 'textarea' },
+        { key: 'governing_state', label: 'State', type: 'text' }
+      ]
+    },
+    'promissory-note': {
+      slug: 'promissory-note', title: 'Promissory Note', category: 'legal', category_label: 'Legal',
+      icon: '💰', plan: 'pro', renderer: 'legal',
+      fields: [
+        { key: 'lender_name', label: 'Lender Name', type: 'text', required: true },
+        { key: 'lender_address', label: 'Lender Address', type: 'textarea' },
+        { key: 'borrower_name', label: 'Borrower Name', type: 'text', required: true },
+        { key: 'borrower_address', label: 'Borrower Address', type: 'textarea' },
+        { key: 'principal_amount', label: 'Principal Amount (USD)', type: 'number', required: true },
+        { key: 'interest_rate', label: 'Annual Interest Rate %', type: 'number' },
+        { key: 'note_date', label: 'Date of Note', type: 'date', required: true },
+        { key: 'repayment_type', label: 'Repayment Type', type: 'select', options: ['Lump sum on maturity date', 'Monthly installments', 'On demand'] },
+        { key: 'payment_amount', label: 'Installment Payment Amount (if applicable)', type: 'number' },
+        { key: 'payment_frequency', label: 'Payment Frequency (if installments)', type: 'select', options: ['Monthly', 'Biweekly', 'Weekly', 'Quarterly'] },
+        { key: 'maturity_date', label: 'Maturity / Due Date', type: 'date' },
+        { key: 'late_fee', label: 'Late Fee Terms', type: 'text' },
+        { key: 'secured', label: 'Security', type: 'select', options: ['Unsecured', 'Secured by collateral'] },
+        { key: 'collateral', label: 'Collateral Description (if secured)', type: 'textarea' },
+        { key: 'governing_state', label: 'Governing State', type: 'text' }
+      ]
+    },
+    'loan-agreement': {
+      slug: 'loan-agreement', title: 'Loan Agreement', category: 'legal', category_label: 'Legal',
+      icon: '🏦', plan: 'pro', renderer: 'legal',
+      fields: [
+        { key: 'lender_name', label: 'Lender Name', type: 'text', required: true },
+        { key: 'lender_address', label: 'Lender Address', type: 'textarea' },
+        { key: 'borrower_name', label: 'Borrower Name', type: 'text', required: true },
+        { key: 'borrower_address', label: 'Borrower Address', type: 'textarea' },
+        { key: 'loan_amount', label: 'Loan Amount (USD)', type: 'number', required: true },
+        { key: 'interest_rate', label: 'Annual Interest Rate %', type: 'number' },
+        { key: 'agreement_date', label: 'Agreement Date', type: 'date', required: true },
+        { key: 'repayment_terms', label: 'Repayment Terms', type: 'textarea', required: true },
+        { key: 'first_payment_date', label: 'First Payment Date', type: 'date' },
+        { key: 'final_payment_date', label: 'Final Payment / Maturity Date', type: 'date' },
+        { key: 'late_fee', label: 'Late Fee Terms', type: 'text' },
+        { key: 'collateral', label: 'Collateral / Security (if any)', type: 'textarea' },
+        { key: 'default_terms', label: 'Events of Default', type: 'textarea' },
+        { key: 'governing_state', label: 'Governing State', type: 'text' }
+      ]
+    },
+    'demand-letter': {
+      slug: 'demand-letter', title: 'Demand Letter', category: 'legal', category_label: 'Legal',
+      icon: '✉️', plan: 'pro', renderer: 'legal',
+      fields: [
+        { key: 'sender_name', label: 'Your Name', type: 'text', required: true },
+        { key: 'sender_address', label: 'Your Address', type: 'textarea' },
+        { key: 'recipient_name', label: 'Recipient Name', type: 'text', required: true },
+        { key: 'recipient_address', label: 'Recipient Address', type: 'textarea' },
+        { key: 'letter_date', label: 'Date', type: 'date', required: true },
+        { key: 'amount_owed', label: 'Amount Owed (USD)', type: 'number' },
+        { key: 'reason', label: 'Description of Debt / Dispute', type: 'textarea', required: true },
+        { key: 'original_date', label: 'Date Debt / Obligation Arose', type: 'date' },
+        { key: 'deadline_date', label: 'Deadline to Respond or Pay', type: 'date' },
+        { key: 'consequences', label: 'Consequences if Not Resolved', type: 'textarea' },
+        { key: 'governing_state', label: 'Governing State', type: 'text' }
+      ]
+    },
+    'service-agreement': {
+      slug: 'service-agreement', title: 'Service Agreement', category: 'legal', category_label: 'Legal',
+      icon: '🤝', plan: 'pro', renderer: 'legal',
+      fields: [
+        { key: 'provider_name', label: 'Service Provider (full legal name)', type: 'text', required: true },
+        { key: 'provider_address', label: 'Provider Address', type: 'textarea' },
+        { key: 'client_name', label: 'Client (full legal name)', type: 'text', required: true },
+        { key: 'client_address', label: 'Client Address', type: 'textarea' },
+        { key: 'effective_date', label: 'Effective Date', type: 'date', required: true },
+        { key: 'services', label: 'Description of Services', type: 'textarea', required: true },
+        { key: 'fees', label: 'Fees and Payment Terms', type: 'textarea', required: true },
+        { key: 'term', label: 'Term of Agreement', type: 'text' },
+        { key: 'termination', label: 'Termination Terms', type: 'textarea' },
+        { key: 'governing_state', label: 'Governing State', type: 'text' }
+      ]
+    },
+    'vehicle-bill-of-sale': {
+      slug: 'vehicle-bill-of-sale', title: 'Vehicle Bill of Sale', category: 'automotive', category_label: 'Automotive',
+      icon: '🚗', plan: 'pro', renderer: 'legal',
+      fields: [
+        { key: 'seller_name', label: 'Seller (full legal name)', type: 'text', required: true },
+        { key: 'seller_address', label: 'Seller Address', type: 'textarea' },
+        { key: 'buyer_name', label: 'Buyer (full legal name)', type: 'text', required: true },
+        { key: 'buyer_address', label: 'Buyer Address', type: 'textarea' },
+        { key: 'sale_date', label: 'Date of Sale', type: 'date', required: true },
+        { key: 'vehicle_year', label: 'Vehicle Year', type: 'text', required: true },
+        { key: 'vehicle_make', label: 'Make', type: 'text', required: true },
+        { key: 'vehicle_model', label: 'Model', type: 'text', required: true },
+        { key: 'vehicle_vin', label: 'VIN', type: 'text', required: true },
+        { key: 'vehicle_color', label: 'Color', type: 'text' },
+        { key: 'odometer', label: 'Odometer Reading (miles)', type: 'number' },
+        { key: 'sale_price', label: 'Sale Price (USD)', type: 'number', required: true },
+        { key: 'payment_method', label: 'Payment Method', type: 'text' },
+        { key: 'as_is', label: 'Sold As-Is', type: 'select', options: ['Yes', 'No'] },
+        { key: 'governing_state', label: 'State', type: 'text' }
+      ]
+    },
+    'offer-letter': {
+      slug: 'offer-letter', title: 'Employment Offer Letter', category: 'employment', category_label: 'Employment',
+      icon: '💼', plan: 'pro', renderer: 'employment',
+      fields: [
+        { key: 'company_name', label: 'Company Name', type: 'text', required: true },
+        { key: 'company_address', label: 'Company Address', type: 'textarea' },
+        { key: 'candidate_name', label: 'Candidate Name', type: 'text', required: true },
+        { key: 'candidate_address', label: 'Candidate Address', type: 'textarea' },
+        { key: 'letter_date', label: 'Date', type: 'date', required: true },
+        { key: 'position_title', label: 'Position Title', type: 'text', required: true },
+        { key: 'employment_type', label: 'Employment Type', type: 'select', options: ['Full-time', 'Part-time', 'Contract', 'Temporary'] },
+        { key: 'start_date', label: 'Start Date', type: 'date', required: true },
+        { key: 'salary', label: 'Compensation (e.g., $65,000/year or $25/hour)', type: 'text', required: true },
+        { key: 'pay_frequency', label: 'Pay Basis', type: 'select', options: ['Annual', 'Hourly', 'Monthly', 'Biweekly'] },
+        { key: 'reporting_to', label: 'Reports To', type: 'text' },
+        { key: 'benefits', label: 'Benefits Summary', type: 'textarea' },
+        { key: 'contingencies', label: 'Contingencies (background check, I-9, etc.)', type: 'textarea' },
+        { key: 'response_deadline', label: 'Please Respond By', type: 'date' },
+        { key: 'at_will_state', label: 'State', type: 'text' }
+      ]
+    },
+    'employment-verification': {
+      slug: 'employment-verification', title: 'Employment Verification Letter', category: 'employment', category_label: 'Employment',
+      icon: '📄', plan: 'pro', renderer: 'employment',
+      fields: [
+        { key: 'company_name', label: 'Company Name', type: 'text', required: true },
+        { key: 'company_address', label: 'Company Address', type: 'textarea' },
+        { key: 'letter_date', label: 'Date', type: 'date', required: true },
+        { key: 'employee_name', label: 'Employee Name', type: 'text', required: true },
+        { key: 'job_title', label: 'Job Title', type: 'text' },
+        { key: 'employment_status', label: 'Employment Status', type: 'select', options: ['Current employee', 'Former employee'] },
+        { key: 'start_date', label: 'Employment Start Date', type: 'date' },
+        { key: 'end_date', label: 'Employment End Date (if former)', type: 'date' },
+        { key: 'include_salary', label: 'Include Salary in Letter', type: 'select', options: ['No', 'Yes'] },
+        { key: 'annual_salary', label: 'Annual Salary (if included)', type: 'text' },
+        { key: 'addressed_to', label: 'Letter Addressed To (requesting party)', type: 'text' },
+        { key: 'hr_contact', label: 'HR Contact Name & Title', type: 'text' },
+        { key: 'hr_phone', label: 'HR Phone', type: 'text' }
+      ]
+    },
+    'last-will': {
+      slug: 'last-will', title: 'Last Will and Testament', category: 'estate', category_label: 'Estate',
+      icon: '📜', plan: 'business', renderer: 'estate',
+      fields: [
+        { key: 'testator_name', label: 'Your Full Legal Name (Testator)', type: 'text', required: true },
+        { key: 'testator_address', label: 'Your Address', type: 'textarea' },
+        { key: 'domicile_state', label: 'State of Residence', type: 'text', required: true },
+        { key: 'executor_name', label: 'Executor (Personal Representative)', type: 'text', required: true },
+        { key: 'executor_address', label: 'Executor Address', type: 'textarea' },
+        { key: 'alternate_executor', label: 'Alternate Executor', type: 'text' },
+        { key: 'has_minor_children', label: 'Do you have minor children?', type: 'select', options: ['No', 'Yes'] },
+        { key: 'guardian_name', label: 'Guardian for Minor Children', type: 'text' },
+        { key: 'specific_bequests', label: 'Specific Gifts (one per line: item or amount — to — beneficiary)', type: 'textarea' },
+        { key: 'residuary_beneficiary', label: 'Residuary Beneficiary(ies) — who inherits everything else', type: 'textarea', required: true },
+        { key: 'self_proving', label: 'Include Self-Proving Affidavit (notarized)', type: 'select', options: ['Yes', 'No'] }
+      ]
     }
   };
 
@@ -1349,6 +1634,9 @@ setTimeout(function(){
       + '<option value="all">All Categories</option>'
       + '<option value="financial">Financial</option>'
       + '<option value="legal">Legal</option>'
+      + '<option value="real-estate">Real Estate</option>'
+      + '<option value="employment">Employment</option>'
+      + '<option value="automotive">Automotive</option>'
       + '<option value="assessment">Assessment</option>'
       + '<option value="estate">Estate</option>'
       + '</select></div>'
