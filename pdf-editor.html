@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PDF Editor | DraftMyForms</title>
+<meta name="description" content="Free online PDF editor: add text, signatures, images, highlights, shapes and white-out to any PDF, right in your browser. Your file never leaves your device.">
+<link rel="canonical" href="https://www.draftmyforms.com/pdf-editor.html">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='24' fill='%23D97706'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="/vendor/pdf-lib.min.js"></script>
+<script src="/vendor/pdf.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;color:#1a1a1a;background:#e9e7e2}
+nav{background:#1B2A3C;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{color:#fff;font-size:18px;font-weight:700;text-decoration:none}
+.nav-brand span{color:#D97706}
+.nav-links a{color:#cbd5e1;text-decoration:none;margin-left:24px;font-size:14px;font-weight:500}
+.nav-links a:hover,.nav-links a.active{color:#D97706}
+/* open screen */
+#open{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:30px;background:#FAF9F6}
+.openbox{max-width:560px;text-align:center}
+.openbox h1{font-size:34px;color:#1B2A3C;margin-bottom:10px}
+.openbox p{color:#6b7280;font-size:16px;margin-bottom:26px}
+.dropzone{border:2px dashed #cbb98c;border-radius:16px;padding:54px 30px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.drag{border-color:#D97706;background:#fff7ec}
+.dropzone i{font-size:46px;color:#D97706;margin-bottom:14px}
+.dropzone .t{font-weight:600;color:#1B2A3C;font-size:18px}
+.dropzone .s{font-size:14px;color:#6b7280;margin-top:6px}
+.openbox .priv{margin-top:18px;font-size:13px;color:#9a8c6a}
+.openbox .priv i{color:#D97706}
+/* toolbar */
+#tb{display:none;position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #e3ded4;padding:8px 14px;align-items:center;gap:6px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.tool{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;cursor:pointer;padding:6px 9px;border-radius:9px;color:#374151;font-size:10px;font-family:inherit;min-width:48px}
+.tool i{font-size:16px}
+.tool:hover{background:#f3f0e9}
+.tool.active{background:#1B2A3C;color:#fff}
+.sep{width:1px;height:34px;background:#e3ded4;margin:0 4px}
+.props{display:flex;align-items:center;gap:8px;margin-left:4px}
+.props label{font-size:12px;color:#6b7280}
+.props input[type=number]{width:52px;padding:5px 6px;border:1px solid #d7d2c7;border-radius:6px;font-family:inherit}
+.props input[type=color]{width:34px;height:30px;border:1px solid #d7d2c7;border-radius:6px;background:#fff;cursor:pointer;padding:2px}
+#tb .spacer{flex:1}
+.btn-dl{background:#D97706;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px}
+.btn-dl:hover{background:#b45309}
+.btn-dl:disabled{opacity:.5}
+.btn-ghost{background:#f3f0e9;color:#374151;border:0;border-radius:9px;padding:10px 14px;font-size:14px;cursor:pointer;font-family:inherit}
+/* pages */
+#pages{display:none;padding:24px 12px 80px;align-items:center;flex-direction:column;gap:18px}
+.pagewrap{position:relative;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.14);line-height:0}
+.pagewrap canvas.base{display:block}
+.inklayer{position:absolute;inset:0;z-index:2;pointer-events:none}
+.capture{position:absolute;inset:0;z-index:5}
+.el{position:absolute;z-index:4;box-sizing:border-box}
+.el.sel{outline:1.5px solid #2563eb}
+.el .h{position:absolute;width:12px;height:12px;background:#2563eb;border:2px solid #fff;border-radius:50%;right:-7px;bottom:-7px;cursor:nwse-resize;z-index:6}
+.el .del{position:absolute;top:-11px;right:-11px;width:22px;height:22px;border-radius:50%;background:#ef4444;color:#fff;border:2px solid #fff;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:7;line-height:1}
+.el.sel .del{display:flex}
+.el.text{min-width:40px;min-height:22px;padding:2px 4px;line-height:1.25;overflow:hidden;white-space:pre-wrap;word-break:break-word;cursor:move}
+.el.text[contenteditable=true]{cursor:text;outline:1.5px solid #2563eb;background:rgba(37,99,235,.03)}
+.el.img,.el.sign{cursor:move}
+.el.img img,.el.sign img{width:100%;height:100%;display:block;pointer-events:none}
+.el.box{cursor:move}
+.hintbar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1B2A3C;color:#fff;font-size:13px;padding:8px 16px;border-radius:999px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+.hintbar.show{opacity:.95}
+/* signature modal */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:200;display:none;align-items:center;justify-content:center;padding:18px}
+.modal.open{display:flex}
+.modal .card{background:#fff;border-radius:14px;width:100%;max-width:520px;padding:22px}
+.modal h3{color:#1B2A3C;margin-bottom:12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:8px;border:1px solid #e3ded4;background:#faf8f4;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px}
+.tabs button.active{background:#1B2A3C;color:#fff;border-color:#1B2A3C}
+#sigpad{border:1px dashed #cbb98c;border-radius:10px;background:#fffdf8;touch-action:none;width:100%;display:block}
+#sigtype{display:none}
+#sigtype input{width:100%;padding:12px;border:1px solid #d7d2c7;border-radius:8px;font-family:'Caveat',cursive;font-size:30px;text-align:center}
+.modal .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+.modal .row .left{display:flex;gap:8px}
+@media(max-width:640px){.nav-links{display:none}.tool{min-width:42px;font-size:9px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand"><span>&#10022;</span> DraftMyForms</a>
+  <div class="nav-links">
+    <a href="/pdf-tools.html">PDF Tools</a>
+    <a href="/pdf-editor.html" class="active">Edit PDF</a>
+    <a href="/editor.html">AI Editor</a>
+  </div>
+</nav>
+
+<div id="open">
+  <div class="openbox">
+    <h1>PDF Editor</h1>
+    <p>Add text, signatures, images, highlights, shapes and white-out to any PDF — then download. Nothing is uploaded.</p>
+    <div class="dropzone" id="dz">
+      <i class="fa-solid fa-file-circle-plus"></i>
+      <div class="t">Choose a PDF or drop it here</div>
+      <div class="s">Your file is opened and edited entirely in your browser.</div>
+    </div>
+    <div class="priv"><i class="fa-solid fa-lock"></i> Private by design — your document never leaves your device.</div>
+    <input type="file" id="file" accept="application/pdf" style="display:none">
+  </div>
+</div>
+
+<div id="tb">
+  <button class="tool active" data-tool="select"><i class="fa-solid fa-arrow-pointer"></i>Select</button>
+  <button class="tool" data-tool="text"><i class="fa-solid fa-font"></i>Text</button>
+  <button class="tool" data-tool="sign"><i class="fa-solid fa-signature"></i>Sign</button>
+  <button class="tool" data-tool="image"><i class="fa-solid fa-image"></i>Image</button>
+  <button class="tool" data-tool="draw"><i class="fa-solid fa-pen"></i>Draw</button>
+  <button class="tool" data-tool="highlight"><i class="fa-solid fa-highlighter"></i>Highlight</button>
+  <button class="tool" data-tool="rect"><i class="fa-regular fa-square"></i>Box</button>
+  <button class="tool" data-tool="white"><i class="fa-solid fa-eraser"></i>White-out</button>
+  <div class="sep"></div>
+  <div class="props">
+    <label>Color</label><input type="color" id="pColor" value="#1a1a1a">
+    <label>Size</label><input type="number" id="pSize" value="16" min="6" max="96">
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-ghost" id="btnClose">Close</button>
+  <button class="btn-dl" id="btnDownload"><i class="fa-solid fa-download"></i> Download PDF</button>
+  <input type="file" id="imgfile" accept="image/jpeg,image/png" style="display:none">
+</div>
+
+<div id="pages"></div>
+<div class="hintbar" id="hint"></div>
+
+<!-- signature modal -->
+<div class="modal" id="sigModal">
+  <div class="card">
+    <h3>Add your signature</h3>
+    <div class="tabs"><button id="tabDraw" class="active">Draw</button><button id="tabType">Type</button></div>
+    <canvas id="sigpad" width="470" height="180"></canvas>
+    <div id="sigtype"><input type="text" id="sigtypeinput" placeholder="Type your name"></div>
+    <div class="row">
+      <div class="left"><button class="btn-ghost" id="sigClear">Clear</button></div>
+      <div class="left"><button class="btn-ghost" id="sigCancel">Cancel</button><button class="btn-dl" id="sigInsert"><i class="fa-solid fa-check"></i> Insert</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdf.worker.min.js';
+const { PDFDocument, StandardFonts, rgb, degrees } = PDFLib;
+
+let srcBytes=null, pdfjsDoc=null, docName='document';
+let currentTool='select';
+const pageInfo=[]; // {wrap, base, ink, inkctx, capture, wPts, hPts, scale, draws:[ [points] ]}
+let selected=null;
+
+const hint=document.getElementById('hint');let hintT;
+function showHint(t){hint.textContent=t;hint.classList.add('show');clearTimeout(hintT);hintT=setTimeout(()=>hint.classList.remove('show'),2200);}
+
+/* ---------- open file ---------- */
+const dz=document.getElementById('dz'),fileInput=document.getElementById('file');
+dz.addEventListener('click',()=>fileInput.click());
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])loadFile(fileInput.files[0]);});
+
+async function loadFile(file){
+  if(file.type!=='application/pdf'){alert('Please choose a PDF file.');return;}
+  docName=(file.name||'document').replace(/\.pdf$/i,'');
+  srcBytes=new Uint8Array(await file.arrayBuffer());
+  pdfjsDoc=await pdfjsLib.getDocument({data:srcBytes.slice(0)}).promise;
+  document.getElementById('open').style.display='none';
+  document.getElementById('tb').style.display='flex';
+  const host=document.getElementById('pages');host.style.display='flex';host.innerHTML='';pageInfo.length=0;
+  const maxW=Math.min(820,window.innerWidth-28);
+  for(let i=1;i<=pdfjsDoc.numPages;i++){
+    const page=await pdfjsDoc.getPage(i);
+    const v1=page.getViewport({scale:1});
+    const scale=Math.min(maxW/v1.width,2);
+    const viewport=page.getViewport({scale});
+    const wrap=document.createElement('div');wrap.className='pagewrap';wrap.style.width=viewport.width+'px';wrap.style.height=viewport.height+'px';
+    const base=document.createElement('canvas');base.className='base';base.width=viewport.width;base.height=viewport.height;
+    wrap.appendChild(base);
+    await page.render({canvasContext:base.getContext('2d'),viewport}).promise;
+    const ink=document.createElement('canvas');ink.className='inklayer';ink.width=viewport.width;ink.height=viewport.height;wrap.appendChild(ink);
+    const cap=document.createElement('div');cap.className='capture';wrap.appendChild(cap);
+    host.appendChild(wrap);
+    const info={wrap,base,ink,inkctx:ink.getContext('2d'),capture:cap,wPts:v1.width,hPts:v1.height,scale,index:i-1};
+    pageInfo.push(info);
+    wireCapture(info);
+  }
+  showHint('Pick a tool, then click or drag on the page.');
+}
+
+/* ---------- toolbar ---------- */
+document.querySelectorAll('.tool').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');currentTool=b.getAttribute('data-tool');
+  deselect();
+  if(currentTool==='sign')openSig();
+  if(currentTool==='image')document.getElementById('imgfile').click();
+}));
+document.getElementById('btnClose').addEventListener('click',()=>location.reload());
+document.getElementById('btnDownload').addEventListener('click',exportPdf);
+document.getElementById('pColor').addEventListener('input',e=>{if(selected&&selected.dataset.kind==='text')selected.style.color=e.target.value;if(selected&&selected.dataset.kind==='rect')selected.style.borderColor=e.target.value;});
+document.getElementById('pSize').addEventListener('input',e=>{if(selected&&selected.dataset.kind==='text')selected.style.fontSize=e.target.value+'px';});
+document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&selected&&selected.getAttribute('contenteditable')!=='true'){e.preventDefault();selected.remove();selected=null;}});
+
+/* ---------- capture layer: create elements by click/drag ---------- */
+function wireCapture(info){
+  const cap=info.capture;
+  let start=null,drawing=false,box=null,penStroke=null;
+  cap.addEventListener('pointerdown',e=>{
+    if(currentTool==='select'){return;}
+    cap.setPointerCapture(e.pointerId);
+    const r=cap.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+    if(currentTool==='text'){addText(info,x,y);setTool('select');return;}
+    if(currentTool==='draw'){drawing=true;penStroke=[[x,y]];info.inkctx.strokeStyle=document.getElementById('pColor').value;info.inkctx.lineWidth=Math.max(1.5,(+document.getElementById('pSize').value)/6);info.inkctx.lineCap='round';info.inkctx.lineJoin='round';info.inkctx.beginPath();info.inkctx.moveTo(x,y);return;}
+    if(currentTool==='highlight'||currentTool==='rect'||currentTool==='white'){start=[x,y];box=document.createElement('div');box.className='el box';styleBox(box,currentTool);box.style.left=x+'px';box.style.top=y+'px';info.wrap.appendChild(box);return;}
+  });
+  cap.addEventListener('pointermove',e=>{
+    const r=cap.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+    if(drawing&&penStroke){penStroke.push([x,y]);info.inkctx.lineTo(x,y);info.inkctx.stroke();return;}
+    if(start&&box){const L=Math.min(x,start[0]),T=Math.min(y,start[1]),W=Math.abs(x-start[0]),H=Math.abs(y-start[1]);box.style.left=L+'px';box.style.top=T+'px';box.style.width=W+'px';box.style.height=H+'px';}
+  });
+  cap.addEventListener('pointerup',e=>{
+    if(drawing){drawing=false;if(penStroke&&penStroke.length>1){info.draws=info.draws||[];info.draws.push({pts:penStroke,color:document.getElementById('pColor').value,w:Math.max(1.5,(+document.getElementById('pSize').value)/6)});}penStroke=null;return;}
+    if(start&&box){const w=parseFloat(box.style.width)||0,h=parseFloat(box.style.height)||0;if(w<6||h<6){box.remove();}else{finalizeEl(box);select(box);setTool('select');}start=null;box=null;}
+  });
+}
+function setTool(t){currentTool=t;document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('active',x.getAttribute('data-tool')===t));}
+function styleBox(box,tool){
+  box.dataset.kind=tool;
+  if(tool==='highlight'){box.style.background='rgba(255,221,0,.38)';}
+  else if(tool==='white'){box.style.background='#ffffff';}
+  else if(tool==='rect'){box.style.background='transparent';box.style.border='2px solid '+document.getElementById('pColor').value;}
+}
+
+/* ---------- element factories ---------- */
+function addText(info,x,y){
+  const el=document.createElement('div');el.className='el text';el.dataset.kind='text';
+  el.style.left=x+'px';el.style.top=y+'px';el.style.width='180px';
+  el.style.color=document.getElementById('pColor').value;el.style.fontSize=document.getElementById('pSize').value+'px';
+  el.setAttribute('contenteditable','true');el.textContent='Text';
+  info.wrap.appendChild(el);finalizeEl(el);
+  select(el);el.focus();document.execCommand&&document.getSelection&&selectAllText(el);
+  el.addEventListener('blur',()=>{el.setAttribute('contenteditable','false');if(!el.textContent.trim())el.remove();});
+  el.addEventListener('dblclick',()=>{el.setAttribute('contenteditable','true');el.focus();});
+}
+function selectAllText(el){try{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);}catch(e){}}
+function addImageEl(info,dataUrl,kind,natW,natH){
+  const el=document.createElement('div');el.className='el '+(kind==='sign'?'sign':'img');el.dataset.kind=kind;el.dataset.src=dataUrl;
+  const maxW=info.wrap.clientWidth*0.4;const ratio=natH/natW;let w=Math.min(maxW,natW);let h=w*ratio;
+  el.style.left=(info.wrap.clientWidth/2-w/2)+'px';el.style.top='40px';el.style.width=w+'px';el.style.height=h+'px';
+  const img=document.createElement('img');img.src=dataUrl;el.appendChild(img);
+  info.wrap.appendChild(el);finalizeEl(el);select(el);
+}
+
+/* ---------- selection / move / resize ---------- */
+function finalizeEl(el){
+  const handle=document.createElement('div');handle.className='h';el.appendChild(handle);
+  const del=document.createElement('button');del.className='del';del.innerHTML='&times;';el.appendChild(del);
+  del.addEventListener('pointerdown',e=>e.stopPropagation());
+  del.addEventListener('click',e=>{e.stopPropagation();el.remove();if(selected===el)selected=null;});
+  el.addEventListener('pointerdown',e=>{
+    if(currentTool!=='select')return;
+    if(e.target===handle)return startResize(el,e);
+    if(el.getAttribute('contenteditable')==='true'&&el.dataset.kind==='text')return;
+    e.stopPropagation();select(el);startMove(el,e);
+  });
+  handle.addEventListener('pointerdown',e=>{e.stopPropagation();select(el);startResize(el,e);});
+}
+function startMove(el,e){
+  const wrap=el.parentElement;const r=wrap.getBoundingClientRect();
+  const ox=e.clientX-(parseFloat(el.style.left)||0)-r.left;const oy=e.clientY-(parseFloat(el.style.top)||0)-r.top;
+  function mv(ev){let L=ev.clientX-r.left-ox,T=ev.clientY-r.top-oy;L=Math.max(0,Math.min(L,wrap.clientWidth-10));T=Math.max(0,Math.min(T,wrap.clientHeight-10));el.style.left=L+'px';el.style.top=T+'px';}
+  function up(){document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);}
+  document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);
+}
+function startResize(el,e){
+  e.stopPropagation();const wrap=el.parentElement;const r=wrap.getBoundingClientRect();
+  const startX=e.clientX,startY=e.clientY;const w0=el.offsetWidth,h0=el.offsetHeight;const keep=el.dataset.kind==='img'||el.dataset.kind==='sign';const ratio=h0/w0;
+  function mv(ev){let w=Math.max(20,w0+(ev.clientX-startX));let h=keep?w*ratio:Math.max(14,h0+(ev.clientY-startY));el.style.width=w+'px';if(el.dataset.kind!=='text')el.style.height=h+'px';}
+  function up(){document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);}
+  document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);
+}
+function select(el){deselect();selected=el;el.classList.add('sel');
+  if(el.dataset.kind==='text'){document.getElementById('pColor').value=rgbToHex(el.style.color);document.getElementById('pSize').value=parseInt(el.style.fontSize)||16;}
+}
+function deselect(){if(selected){selected.classList.remove('sel');if(selected.getAttribute('contenteditable')==='true')selected.setAttribute('contenteditable','false');}selected=null;}
+document.getElementById('pages').addEventListener('pointerdown',e=>{if(e.target.id==='pages'||e.target.classList.contains('pagewrap')||e.target.classList.contains('capture'))deselect();});
+function rgbToHex(c){if(!c)return '#1a1a1a';if(c[0]==='#')return c;const m=c.match(/\d+/g);if(!m)return '#1a1a1a';return '#'+m.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');}
+
+/* ---------- image upload ---------- */
+document.getElementById('imgfile').addEventListener('change',e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const rd=new FileReader();rd.onload=()=>{const img=new Image();img.onload=()=>{addImageEl(pageInfo[0],rd.result,'img',img.width,img.height);setTool('select');};img.src=rd.result;};rd.readAsDataURL(f);
+});
+
+/* ---------- signature modal ---------- */
+const sigModal=document.getElementById('sigModal'),sigpad=document.getElementById('sigpad'),sctx=sigpad.getContext('2d');
+let sdraw=false,sigHas=false,sigMode='draw';
+function openSig(){sigModal.classList.add('open');clearSig();}
+function clearSig(){sctx.clearRect(0,0,sigpad.width,sigpad.height);sctx.strokeStyle='#14233a';sctx.lineWidth=2.4;sctx.lineCap='round';sctx.lineJoin='round';sigHas=false;document.getElementById('sigtypeinput').value='';}
+sigpad.addEventListener('pointerdown',e=>{sdraw=true;sigHas=true;const r=sigpad.getBoundingClientRect();sctx.beginPath();sctx.moveTo((e.clientX-r.left)*sigpad.width/r.width,(e.clientY-r.top)*sigpad.height/r.height);});
+sigpad.addEventListener('pointermove',e=>{if(!sdraw)return;const r=sigpad.getBoundingClientRect();sctx.lineTo((e.clientX-r.left)*sigpad.width/r.width,(e.clientY-r.top)*sigpad.height/r.height);sctx.stroke();});
+window.addEventListener('pointerup',()=>sdraw=false);
+document.getElementById('sigClear').addEventListener('click',clearSig);
+document.getElementById('sigCancel').addEventListener('click',()=>{sigModal.classList.remove('open');setTool('select');});
+document.getElementById('tabDraw').addEventListener('click',()=>{sigMode='draw';document.getElementById('tabDraw').classList.add('active');document.getElementById('tabType').classList.remove('active');sigpad.style.display='block';document.getElementById('sigtype').style.display='none';});
+document.getElementById('tabType').addEventListener('click',()=>{sigMode='type';document.getElementById('tabType').classList.add('active');document.getElementById('tabDraw').classList.remove('active');sigpad.style.display='none';document.getElementById('sigtype').style.display='block';});
+document.getElementById('sigInsert').addEventListener('click',()=>{
+  let dataUrl,w,h;
+  if(sigMode==='type'){
+    const txt=document.getElementById('sigtypeinput').value.trim()||'Signature';
+    const c=document.createElement('canvas');c.width=600;c.height=200;const cx=c.getContext('2d');
+    cx.fillStyle='#14233a';cx.font='600 90px Caveat, cursive';cx.textBaseline='middle';cx.textAlign='center';cx.fillText(txt,300,110);
+    dataUrl=c.toDataURL('image/png');w=600;h=200;
+  }else{
+    if(!sigHas){showHint('Draw your signature first.');return;}
+    dataUrl=sigpad.toDataURL('image/png');w=sigpad.width;h=sigpad.height;
+  }
+  sigModal.classList.remove('open');addImageEl(pageInfo[0],dataUrl,'sign',w,h);setTool('select');
+});
+
+/* ---------- export ---------- */
+async function exportPdf(){
+  const btn=document.getElementById('btnDownload');btn.disabled=true;const old=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Building…';
+  try{
+    deselect();
+    const doc=await PDFDocument.load(srcBytes,{ignoreEncryption:true});
+    const helv=await doc.embedFont(StandardFonts.Helvetica);
+    const pages=doc.getPages();
+    const imgCache=new Map();
+    async function embed(dataUrl){
+      if(imgCache.has(dataUrl))return imgCache.get(dataUrl);
+      const bytes=Uint8Array.from(atob(dataUrl.split(',')[1]),c=>c.charCodeAt(0));
+      const img=dataUrl.indexOf('image/png')>=0?await doc.embedPng(bytes):await doc.embedJpg(bytes);
+      imgCache.set(dataUrl,img);return img;
+    }
+    for(const info of pageInfo){
+      const page=pages[info.index];if(!page)continue;
+      const S=info.scale;const Hpx=info.hPts*S;
+      const toPtsX=px=>px/S, toPtsY=px=>(Hpx-px)/S;
+      // ink strokes
+      if(info.draws&&info.draws.length){
+        for(const st of info.draws){const col=hexRgb(st.color);for(let i=1;i<st.pts.length;i++){const[a,b]=st.pts[i-1],[c,d]=st.pts[i];page.drawLine({start:{x:toPtsX(a),y:toPtsY(b)},end:{x:toPtsX(c),y:toPtsY(d)},thickness:st.w/S,color:col,opacity:1});}}
+      }
+      // DOM elements
+      const els=info.wrap.querySelectorAll('.el');
+      for(const el of els){
+        const left=parseFloat(el.style.left)||0,top=parseFloat(el.style.top)||0;
+        const w=el.offsetWidth,h=el.offsetHeight;const kind=el.dataset.kind;
+        if(kind==='text'){
+          const size=(parseInt(el.style.fontSize)||16)/S;const col=hexRgb(rgbToHex(el.style.color));
+          const lines=san(el.innerText||el.textContent||'').replace(/\r/g,'').split('\n');
+          let ly=top+ (parseInt(el.style.fontSize)||16)*0.98;
+          for(const line of lines){if(line.length)page.drawText(line,{x:toPtsX(left+3),y:toPtsY(ly),size,font:helv,color:col,maxWidth:(w-6)/S,lineHeight:size*1.18});ly+=(parseInt(el.style.fontSize)||16)*1.25;}
+        }else if(kind==='img'||kind==='sign'){
+          const img=await embed(el.dataset.src);page.drawImage(img,{x:toPtsX(left),y:toPtsY(top+h),width:w/S,height:h/S});
+        }else if(kind==='highlight'){
+          page.drawRectangle({x:toPtsX(left),y:toPtsY(top+h),width:w/S,height:h/S,color:rgb(1,0.86,0),opacity:0.38});
+        }else if(kind==='white'){
+          page.drawRectangle({x:toPtsX(left),y:toPtsY(top+h),width:w/S,height:h/S,color:rgb(1,1,1)});
+        }else if(kind==='rect'){
+          const col=hexRgb(rgbToHex(el.style.borderColor));page.drawRectangle({x:toPtsX(left),y:toPtsY(top+h),width:w/S,height:h/S,borderColor:col,borderWidth:2/S,opacity:0});
+        }
+      }
+    }
+    const out=await doc.save();
+    const blob=new Blob([out],{type:'application/pdf'});const u=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=u;a.download=docName+'_edited.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
+    showHint('Downloaded '+docName+'_edited.pdf');
+  }catch(err){console.error(err);alert('Could not build the PDF: '+(err&&err.message||err));}
+  finally{btn.disabled=false;btn.innerHTML=old;}
+}
+function hexRgb(hex){hex=rgbToHex(hex);const n=parseInt(hex.slice(1),16);return rgb(((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255);}
+// Map common typographic characters to ASCII and drop anything the standard
+// Helvetica (WinAnsi) font cannot encode, so export never throws on fancy input.
+function san(s){
+  return String(s)
+    .replace(/[‘’‚′]/g,"'").replace(/[“”„″]/g,'"')
+    .replace(/[–—]/g,'-').replace(/…/g,'...').replace(/ /g,' ')
+    .replace(/[^\x09\x0A\x0D\x20-\xFF]/g,'');
+}
+</script>
+</body>
+</html>
